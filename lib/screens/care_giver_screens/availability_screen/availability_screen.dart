@@ -205,13 +205,14 @@ class AvailabilityScreen extends StatelessWidget {
     );
   }
 }
-/// 12:53:35[GETX] GOING TO ROUTE /app-navigation-screen
-/// [GETX] REMOVING ROUTE /
-/// [GETX] Instance "AppNavigationScreenController" has been created
-/// [GETX] Instance "AppNavigationScreenController" has been initialized
-/// [GETX] Instance "ClientHomeController" has been created
-/// [GETX] Instance "ClientHomeController" has been initialized
-/// [GETX] Instance "FindCaregiverController" has been created
-/// [GETX] Instance "FindCaregiverController" has been initialized
-/// [GETX] Instance "SelectedServiceTypeController" has been created
-/// [GETX] Instance "SelectedServiceTypeController" has been initialized
+
+///   12:53:35[GETX] GOING TO ROUTE /app-navigation-screen
+///   [GETX] REMOVING ROUTE /
+///   [GETX] Instance "AppNavigationScreenController" has been created
+///   [GETX] Instance "AppNavigationScreenController" has been initialized
+///   [GETX] Instance "ClientHomeController" has been created
+///   [GETX] Instance "ClientHomeController" has been initialized
+///   [GETX] Instance "FindCaregiverController" has been created
+///   [GETX] Instance "FindCaregiverController" has been initialized
+///   [GETX] Instance "SelectedServiceTypeController" has been created
+///   GETX] Instance "SelectedServiceTypeController" has been initialized
