@@ -10,6 +10,7 @@ import 'package:carely_caregiver/screens/notification_screen/notification_screen
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/basic_info_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/care_recipients_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
+import 'package:carely_caregiver/screens/profile_screens/notification_settings_screen/notification_settings_screen.dart';
 import 'package:carely_caregiver/screens/profile_screens/personal_information_screen/personal_info_screen.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_setup_screen/profile_setup_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/booking_status_screen/booking_status_screen.dart';
@@ -108,6 +109,12 @@ List<GetPage> appRootRoutesFile = <GetPage>[
     name: AppRoutes.instance.personalInfoScreen,
     binding: NavigationScreenBinding(),
     page: () => const PersonalInfoScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+  GetPage(
+    name: AppRoutes.instance.notificationSettingsScreen,
+    binding: NavigationScreenBinding(),
+    page: () => const NotificationSettingsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(

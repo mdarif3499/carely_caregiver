@@ -31,6 +31,7 @@ class AppRoutes {
   final String notificationScreen = "/notificationScreen";
   final String availabilityScreen = "/availabilityScreen";
   final String bookingStatusScreen = "/bookingStatusScreen";
+  final String notificationSettingsScreen = "/notificationSettingsScreen";
   ////////////////////// base
   final String termsAndConditions = "/terms-and-conditions";
   final String privacyPolicy = "/privacy-policy";

@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/screens/chat_list_screen/controller/chat_list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,7 @@ class MessageScreenController extends GetxController{
   final RxList<String> filePaths = <String>[].obs;
   final RxInt currentPage = 1.obs;
   final RxBool hasMore = true.obs;
+  final Rxn<ChatConversation> selectedConversation = Rxn<ChatConversation>();
   String chatId ='';
   String userId='';
   final RxString message = ''.obs;
@@ -21,7 +23,15 @@ class MessageScreenController extends GetxController{
       ..addListener(() {
         message.value = messageTextController?.text ?? '';
       });
-    // userId = Get.arguments['userId'] ?? '';
+    
+    if (Get.arguments is ChatConversation) {
+      selectedConversation.value = Get.arguments as ChatConversation;
+      chatId = selectedConversation.value?.id ?? '';
+      // For now, let's keep userId as empty or set a dummy one if needed
+      // but ideally it should come from an auth service.
+      // In the mock, it was commented out: userId = Get.arguments['userId'] ?? '';
+    }
+    
     init();
   }
 
