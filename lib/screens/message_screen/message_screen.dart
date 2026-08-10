@@ -18,7 +18,6 @@ class MessageScreen extends StatelessWidget {
     MessageScreenController controller = Get.find<MessageScreenController>();
     return DefaultBackgroundTemplate(
       onBackPress: Get.back,
-      // appBarTitle: 'test',
 
       titleWidget: Obx(() {
         final conversation = controller.selectedConversation.value;
@@ -71,9 +70,6 @@ class MessageScreen extends StatelessWidget {
       ),
     );
   }
-
-
-
   Widget _chatItem(
     ChatMessage chat,
     BuildContext context,
