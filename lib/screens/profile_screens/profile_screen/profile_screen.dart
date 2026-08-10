@@ -72,7 +72,9 @@ class ProfileScreen extends StatelessWidget {
       ProfileMenuItem(
         icon: Icons.notifications_none_rounded,
         title: 'Notifications',
-        onTap: () {},
+        onTap: () {
+          Get.toNamed(AppRoutes.instance.notificationSettingsScreen);
+        },
       ),
       ProfileMenuItem(
         icon: Icons.lock_outline_rounded,

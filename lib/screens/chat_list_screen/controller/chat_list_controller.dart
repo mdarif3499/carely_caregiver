@@ -113,6 +113,6 @@ class ChatListController extends GetxController {
   void onSearchChanged(value) => searchQuery.value = value;
 
   void onConversationTap(ChatConversation conversation) {
-   Get.toNamed(AppRoutes.instance.messageScreen);
+   Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
   }
 }
