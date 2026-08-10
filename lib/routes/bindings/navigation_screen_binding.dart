@@ -13,6 +13,7 @@ import 'package:carely_caregiver/screens/notification_screen/controller/notifica
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/controller/basic_info_controller.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/controller/care_recipients_controller.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/controller/health_profile_controller.dart';
+import 'package:carely_caregiver/screens/profile_screens/notification_settings_screen/controller/notification_settings_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/personal_information_screen/controller/personal_info_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_setup_screen/controller/profle_setup_screen_controller.dart';
@@ -47,6 +48,7 @@ class NavigationScreenBinding extends Bindings {
     Get.lazyPut(() => NotificationScreenController());
     Get.lazyPut(() => AvailabilityScreenController());
     Get.lazyPut(() => PersonalInfoController());
+    Get.lazyPut(() => NotificationSettingsController());
     Get.lazyPut(() => CareRecipientsController());
     Get.lazyPut(() => HealthProfileController());
   }

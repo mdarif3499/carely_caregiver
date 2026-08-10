@@ -20,16 +20,29 @@ class MessageScreen extends StatelessWidget {
       onBackPress: Get.back,
       // appBarTitle: 'test',
 
-      titleWidget: Row(
-        mainAxisSize:MainAxisSize .min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          ProfileAvatar(size: 48.h, imageUrl: 'https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg?semt=ais_user_personalization&w=740&q=80', borderColor: AppColors.instance.transparent,),
-          2.width,
-          CommonText(text: 'Sarah Jenkins, RN',fontSize: 20,fontWeight: FontWeight.w500,)
-
-        ],
-      ),
+      titleWidget: Obx(() {
+        final conversation = controller.selectedConversation.value;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ProfileAvatar(
+              size: 48.h,
+              imageUrl: conversation?.avatarUrl ??
+                  'https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg?semt=ais_user_personalization&w=740&q=80',
+              borderColor: AppColors.instance.transparent,
+            ),
+            2.width,
+            CommonText(
+              text: conversation != null
+                  ? '${conversation.name}, ${conversation.role}'
+                  : 'Chat',
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            )
+          ],
+        );
+      }),
       child: Column(
         children: [
           Expanded(
@@ -58,6 +71,8 @@ class MessageScreen extends StatelessWidget {
       ),
     );
   }
+
+
 
   Widget _chatItem(
     ChatMessage chat,
