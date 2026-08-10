@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/availability_screen/widget/availability_widgets.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/availability_screen/controller/availability_screen_controller.dart';
@@ -33,6 +31,17 @@ class AvailabilityScreen extends StatelessWidget {
                     return AppCalendar(controller: c);
                   }),
                   24.height,
+///    image_picker_android 0.8.13+13 (0.8.13+19 available)
+///   intl 0.20.2 (0.20.3 available)
+///   json_annotation 4.10.0 (4.12.0 available)
+///   lints 3.0.0 (6.1.0 available)
+///   matcher 0.12.19 (0.12.20 available)
+///   meta 1.18.0 (1.19.0 available)
+///   native_toolchain_c 0.17.4 (0.19.3 available)
+
+
+
+
 
                   Obx(
                     () => Row(
