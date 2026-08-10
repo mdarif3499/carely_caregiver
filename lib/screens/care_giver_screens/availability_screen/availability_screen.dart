@@ -22,21 +22,18 @@ class AvailabilityScreen extends StatelessWidget {
       appBarTitle: 'Availability',
       child: Column(
         children: [
-          // ── Scrollable body ─────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Calendar
                   Obx(() {
                     errorLog('availabily ui update${c.rebuild.value}', 'AvailabilityScreen');
                     return AppCalendar(controller: c);
                   }),
                   24.height,
 
-                  // Schedule header row
                   Obx(
                     () => Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,7 +62,6 @@ class AvailabilityScreen extends StatelessWidget {
                   ),
                   16.height,
 
-                  // Shift list
                   Obx(() {
                     final shifts = c.shiftsForSelected;
                     if (shifts.isEmpty) {
@@ -103,7 +99,7 @@ class AvailabilityScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Bottom bar ───────────────────────────────
+
           Obx(
             () => Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -148,7 +144,6 @@ class AvailabilityScreen extends StatelessWidget {
     );
   }
 
-  // ── Add / Edit Shift Bottom Sheet ─────────────────────
   void _showAddShiftSheet(
     BuildContext context,
     AvailabilityScreenController c, {
