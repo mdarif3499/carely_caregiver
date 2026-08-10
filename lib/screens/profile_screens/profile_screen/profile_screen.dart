@@ -84,7 +84,9 @@ class ProfileScreen extends StatelessWidget {
       ProfileMenuItem(
         icon: Icons.description_outlined,
         title: 'Terms of Service',
-        onTap: () {},
+        onTap: () {
+          Get.toNamed(AppRoutes.instance.termsAndConditions);
+        },
       ),
     ];
 
