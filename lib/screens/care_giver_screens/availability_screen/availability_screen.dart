@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/availability_screen/widget/availability_widgets.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/availability_screen/controller/availability_screen_controller.dart';
@@ -22,21 +20,17 @@ class AvailabilityScreen extends StatelessWidget {
       appBarTitle: 'Availability',
       child: Column(
         children: [
-          // ── Scrollable body ─────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Calendar
                   Obx(() {
                     errorLog('availabily ui update${c.rebuild.value}', 'AvailabilityScreen');
                     return AppCalendar(controller: c);
                   }),
                   24.height,
-
-                  // Schedule header row
                   Obx(
                     () => Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,7 +59,6 @@ class AvailabilityScreen extends StatelessWidget {
                   ),
                   16.height,
 
-                  // Shift list
                   Obx(() {
                     final shifts = c.shiftsForSelected;
                     if (shifts.isEmpty) {
@@ -103,7 +96,7 @@ class AvailabilityScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Bottom bar ───────────────────────────────
+
           Obx(
             () => Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -148,12 +141,12 @@ class AvailabilityScreen extends StatelessWidget {
     );
   }
 
-  // ── Add / Edit Shift Bottom Sheet ─────────────────────
   void _showAddShiftSheet(
     BuildContext context,
     AvailabilityScreenController c, {
     Shift? existing,
-  }) {
+  })
+  {
     final labels = ['Morning Shift', 'Evening Shift', 'Night Shift'];
     final starts = ['08:00 AM', '05:00 PM', '10:00 PM'];
     final ends = ['12:00 PM', '09:00 PM', '06:00 AM'];
@@ -210,3 +203,14 @@ class AvailabilityScreen extends StatelessWidget {
     );
   }
 }
+
+///   12:53:35[GETX] GOING TO ROUTE /app-navigation-screen
+///   [GETX] REMOVING ROUTE /
+///   [GETX] Instance "AppNavigationScreenController" has been created
+///   [GETX] Instance "AppNavigationScreenController" has been initialized
+///   [GETX] Instance "ClientHomeController" has been created
+///   [GETX] Instance "ClientHomeController" has been initialized
+///   [GETX] Instance "FindCaregiverController" has been created
+///   [GETX] Instance "FindCaregiverController" has been initialized
+///   [GETX] Instance "SelectedServiceTypeController" has been created
+///   GETX] Instance "SelectedServiceTypeController" has been initialized
