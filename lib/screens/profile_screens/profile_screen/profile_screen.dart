@@ -77,7 +77,9 @@ class ProfileScreen extends StatelessWidget {
       ProfileMenuItem(
         icon: Icons.lock_outline_rounded,
         title: 'Privacy Policy',
-        onTap: () {},
+        onTap: () {
+          Get.toNamed(AppRoutes.instance.privacyPolicy);
+        },
       ),
       ProfileMenuItem(
         icon: Icons.description_outlined,
