@@ -31,18 +31,6 @@ class AvailabilityScreen extends StatelessWidget {
                     return AppCalendar(controller: c);
                   }),
                   24.height,
-///    image_picker_android 0.8.13+13 (0.8.13+19 available)
-///   intl 0.20.2 (0.20.3 available)
-///   json_annotation 4.10.0 (4.12.0 available)
-///   lints 3.0.0 (6.1.0 available)
-///   matcher 0.12.19 (0.12.20 available)
-///   meta 1.18.0 (1.19.0 available)
-///   native_toolchain_c 0.17.4 (0.19.3 available)
-
-
-
-
-
                   Obx(
                     () => Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -157,7 +145,8 @@ class AvailabilityScreen extends StatelessWidget {
     BuildContext context,
     AvailabilityScreenController c, {
     Shift? existing,
-  }) {
+  })
+  {
     final labels = ['Morning Shift', 'Evening Shift', 'Night Shift'];
     final starts = ['08:00 AM', '05:00 PM', '10:00 PM'];
     final ends = ['12:00 PM', '09:00 PM', '06:00 AM'];
