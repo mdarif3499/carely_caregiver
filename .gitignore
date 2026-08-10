@@ -1,0 +1,59 @@
+# https://dart.dev/guides/libraries/private-files
+# Created by https://www.toptal.com/developers/gitignore/api/flutter,android,ios,visualstudiocode,intellij
+
+### Android ###
+# Built-in ignore
+*.iml
+*.xml
+.gradle
+local.properties
+.idea
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+
+### Flutter ###
+# https://flutter.dev/docs/development/tools/vs-code#settings
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+### iOS ###
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+ios/Podfile.lock
+
+### IntelliJ ###
+.idea/
+*.iml
+*.iws
+*.ipr
+cmake-build-*/
+
+### VS Code ###
+.vscode/
+
+# FVM ###
+.fvm/flutter_sdk
