@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 
-// ─────────────────────────────────────────────
-//  Model
-// ─────────────────────────────────────────────
+
 class BookingDetails {
   final String id;
   final String clientName;
