@@ -1,36 +1,28 @@
-# Implementation Plan - Privacy Policy Screen UI Update
+# Implementation Plan - Terms and Conditions UI Update
 
-Update the `PrivacyPolicyScreen` to match the professional design provided in the screenshot and link it to the Profile screen.
+The goal is to fix the visibility issue in the `TermsAndConditionsScreen` and update it to match the professional design of the rest of the app.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The current `TermsAndConditionsScreen` contains placeholder text ("car a rental") and uses a basic `Scaffold` that seems to be causing rendering issues. I will replace it with the `DefaultBackgroundTemplate` used in other screens.
 
 ## Proposed Changes
 
-### Privacy Policy Feature
+### Terms and Conditions Feature
 
-#### [NEW] [privacy_policy_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/privacy_policy_screen/widgets/privacy_policy_widgets.dart)
-- `LastUpdatedBanner`: Light blue card with a calendar icon showing the revision date.
-- `PolicySectionHeader`: Reusable header with a blue vertical indicator bar.
-- `BulletPointItem`: List item with a small circle bullet and descriptive text.
-- `CheckmarkItem`: List item with a purple circular checkmark.
-- `SecurityBox`: Dark-themed container for high-priority security information.
-
-#### [MODIFY] [privacy_policy_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/privacy_policy_screen/privacy_policy_screen.dart)
-- Re-implement the screen to match the screenshot layout:
-    - Header with back button.
-    - Intro text ("At CareConnect...").
-    - "Information We Collect" section.
-    - "How We Use Your Data" section.
-    - "Data Security" section.
-
-### Profile Integration
-
-#### [MODIFY] [profile_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/profile_screen.dart)
-- Link the "Privacy Policy" menu item to `AppRoutes.instance.privacyPolicy`.
+#### [MODIFY] [terms_and_conditions_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/terms_and_conditions_screen/terms_and_conditions_screen.dart)
+- Replace `Scaffold` with `DefaultBackgroundTemplate`.
+- Set `appBarTitle` to "Terms and Conditions".
+- Update the text content to be specific to **Carely Caregiver**.
+- Use structured sections with headers, similar to the `PrivacyPolicyScreen`.
+- Explicitly set `fontSize` and `textColor` for the `CommonText` components to ensure visibility.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `fvm flutter analyze` to ensure code integrity and correct routing.
+- Run `fvm flutter analyze` to check for syntax errors.
 
 ### Manual Verification
-- Log in as a user and navigate to **Profile -> Privacy Policy**.
-- Verify the layout, icons, and sections match the professional design precisely.
+- Navigate to **Profile -> Terms of Service**.
+- Verify that the text is clearly visible and the layout follows the professional brand guidelines.

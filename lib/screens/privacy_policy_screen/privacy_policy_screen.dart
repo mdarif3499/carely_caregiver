@@ -78,7 +78,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // ── Section: Data Security ──
-
+            const PolicySectionHeader(title: 'Data Security'),
+            const SizedBox(height: 20),
+            const SecurityBox(
+              text: 'All health-related information is stored with AES-256 bit encryption. Our servers are HIPAA-compliant and undergo quarterly security audits by third-party experts. We never sell your personal data to advertisers.',
+            ),
             const SizedBox(height: 24),
           ],
         ),

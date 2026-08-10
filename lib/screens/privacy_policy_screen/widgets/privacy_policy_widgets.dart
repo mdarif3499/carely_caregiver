@@ -175,6 +175,7 @@ class SecurityBox extends StatelessWidget {
         textColor: Colors.white.withAlpha(230),
         textAlign: TextAlign.start,
         height: 1.5,
+        maxLines: 50,
       ),
     );
   }
