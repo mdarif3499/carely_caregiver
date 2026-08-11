@@ -1,4 +1,5 @@
-- [x] Update `ChatListController` to pass conversation arguments
-- [x] Update `MessageScreenController` to handle arguments and dynamic data
-- [x] Update `MessageScreen` UI to display dynamic header data
-- [x] Verify navigation logic
+- [ ] Add `pretty_dio_logger` to `pubspec.yaml`
+- [ ] Run `flutter pub get`
+- [ ] Create `lib/utils/log/app_log.dart`
+- [ ] Add `PrettyDioLogger` to `DioApiClient`
+- [ ] Verify logging output

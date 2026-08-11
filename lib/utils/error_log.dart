@@ -1,22 +1,5 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
+import 'log/app_log.dart';
 
 void errorLog(String message, dynamic e, {String title = "Error form"}) {
-  try {
-    if (kDebugMode) {
-      log(""""
-
-      >>>>>>>>>>>>>>>>>>>>>>>>>>>😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-     ➡️➡️➡️➡️➡️➡️➡️ $title ➡️➡️➡️➡️➡️➡️ $message >>> ${e.toString()} 🔚🔚🔚🔚🔚🔚🔚🔚
-      
-
-      <<<<<<<<<<<<<<<<<<<<<<<<<<<😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡😡<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      """);
-    }
-  } catch (e) {
-    ///////
-  }
+  appLog("$message >>> ${e.toString()}", source: title);
 }

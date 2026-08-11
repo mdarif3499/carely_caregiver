@@ -10,11 +10,14 @@ class AppApiEndPoint {
   final String baseUrl = "${_getDomain()}/api/v1";
   final String liveServer = "https://test.com";
   final String refreshToken = "https://test.com";
+
+  // Auth
+  static const String signUp = "/auth/register";
 }
 
 String _getDomain() {
-  String liveServer = "https://test.com";
-  String localServer = "https://test.com";
+  String liveServer = "http://10.10.26.188:5050";
+  String localServer = "http://10.10.26.188:5050";
 
   try {
     if (kDebugMode) {
