@@ -5,7 +5,9 @@ import '../../../../utils/error_log.dart';
 
 class LoginScreenController extends GetxController {
   ////////// object
+  TextEditingController fullNameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController phoneTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
   RxBool isSignInPage = true.obs;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -22,7 +24,9 @@ class LoginScreenController extends GetxController {
   ///////////. app. close
   void appOnClose() {
     try {
+      fullNameTextEditingController.dispose();
       emailTextEditingController.dispose();
+      phoneTextEditingController.dispose();
       passwordTextEditingController.dispose();
     } catch (e) {
       errorLog("appOnClose", e);

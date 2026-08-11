@@ -74,10 +74,15 @@ class LoginScreen extends StatelessWidget {
                                       children: [
                                         const AppContentHeader(text: 'Full Name'),
                                         12.height,
-                                        const CommonTextField(
+                                        CommonTextField(
+                                          controller: controller.fullNameTextEditingController,
                                           validationType:
-                                              ValidationType.validateEmail,
+                                              ValidationType.validateRequired,
                                           hintText: 'Enter your Full Name',
+                                          validation: (value) {
+                                            if (value == null || value.trim().isEmpty) return "Full Name is required";
+                                            return null;
+                                          },
                                         ),
                                         16.height,
                                       ],
@@ -86,9 +91,15 @@ class LoginScreen extends StatelessWidget {
 
                             const AppContentHeader(text: 'Email'),
                             12.height,
-                            const CommonTextField(
+                            CommonTextField(
+                              controller: controller.emailTextEditingController,
                               validationType: ValidationType.validateEmail,
                               hintText: 'Enter your email',
+                              validation: (value) {
+                                if (value == null || value.trim().isEmpty) return "Email is required";
+                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) return "Enter a valid email";
+                                return null;
+                              },
                             ),
                             16.height,
                             Obx(
@@ -99,16 +110,28 @@ class LoginScreen extends StatelessWidget {
                                       children: [
                                         const AppContentHeader(text: 'Phone Number'),
                                         12.height,
-                                        const PhoneTextField(),
+                                        PhoneTextField(
+                                          controller: controller.phoneTextEditingController,
+                                          validator: (value) {
+                                            if (value == null || value.trim().isEmpty) return "Phone number is required";
+                                            return null;
+                                          },
+                                        ),
                                         16.height,
                                       ],
                                     ),
                             ),
                             const AppContentHeader(text: 'Password'),
                             12.height,
-                            const CommonTextField(
+                            CommonTextField(
+                              controller: controller.passwordTextEditingController,
                               validationType: ValidationType.validatePassword,
                               hintText: 'Enter your Password',
+                              validation: (value) {
+                                if (value == null || value.trim().isEmpty) return "Password is required";
+                                if (value.length < 8) return "Password must be at least 8 characters";
+                                return null;
+                              },
                             ),
                             8.height,
                             Obx(
@@ -128,12 +151,22 @@ class LoginScreen extends StatelessWidget {
                             Obx(
                               () => CommonButton(
                                 onTap: () {
-                                  if (controller.isSignInPage.value) {
-                                    Get.toNamed(AppRoutes.instance.appNavigationScreen,arguments: {"isClient":true});
-                                  } else {
-                                    Get.toNamed(
-                                      AppRoutes.instance.welcomeScreen,
-                                    );
+                                  if (formKey.currentState!.validate()) {
+                                    if (controller.isSignInPage.value) {
+                                      Get.toNamed(
+                                          AppRoutes.instance.appNavigationScreen,
+                                          arguments: {"isClient": true});
+                                    } else {
+                                      Get.toNamed(
+                                        AppRoutes.instance.welcomeScreen,
+                                        arguments: {
+                                          "name": controller.fullNameTextEditingController.text.trim(),
+                                          "email": controller.emailTextEditingController.text.trim(),
+                                          "phone": controller.phoneTextEditingController.text.trim(),
+                                          "password": controller.passwordTextEditingController.text,
+                                        },
+                                      );
+                                    }
                                   }
                                 },
                                 titleText: controller.isSignInPage.value
@@ -146,11 +179,14 @@ class LoginScreen extends StatelessWidget {
                             Obx(
                               () => controller.isSignInPage.value?CommonButton(
                                 onTap: () {
-
-                                  Get.toNamed(AppRoutes.instance.appNavigationScreen,arguments: {"isClient":false});
+                                  if (formKey.currentState!.validate()) {
+                                    Get.toNamed(
+                                        AppRoutes.instance.appNavigationScreen,
+                                        arguments: {"isClient": false});
+                                  }
                                 },
                                 titleText: controller.isSignInPage.value
-                                    ? 'Login'
+                                    ? 'Login (Caregiver)'
                                     : 'Continue',
                                 buttonWidth: double.infinity,
                               ):SizedBox(),
