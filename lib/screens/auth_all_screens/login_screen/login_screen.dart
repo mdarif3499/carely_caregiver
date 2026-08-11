@@ -148,12 +148,11 @@ class LoginScreen extends StatelessWidget {
                             32.height,
                             Obx(
                               () => CommonButton(
+                                isLoading: controller.isLoading.value,
                                 onTap: () {
                                   if (formKey.currentState!.validate()) {
                                     if (controller.isSignInPage.value) {
-                                      Get.toNamed(
-                                          AppRoutes.instance.appNavigationScreen,
-                                          arguments: {"isClient": true});
+                                      controller.loginUser();
                                     } else {
                                       Get.toNamed(
                                         AppRoutes.instance.welcomeScreen,

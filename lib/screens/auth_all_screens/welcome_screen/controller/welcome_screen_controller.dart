@@ -4,6 +4,7 @@ import 'package:carely_caregiver/services/api/api_service.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../utils/log/app_log.dart';
 
 class WelcomeScreenController extends GetxController {
   RxInt selectedIndex = RxInt(-1);
@@ -36,7 +37,9 @@ class WelcomeScreenController extends GetxController {
         "phone": signupData['phone'],
       };
 
+      appLog("Request Body: $body", source: "REGISTER_ROLE_API");
       final response = await _apiClient.post(AppApiEndPoint.signUp, body: body);
+      appLog("Response Body: ${response.data}", source: "REGISTER_ROLE_API");
 
       if (response.isSuccess) {
         showCustomSnackbar(message: response.message, isError: false);

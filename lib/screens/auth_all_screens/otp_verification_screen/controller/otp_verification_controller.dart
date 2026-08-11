@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
@@ -10,6 +11,8 @@ import '../../../../services/api/api_service.dart';
 import '../../../../constant/app_api_end_point.dart';
 
 import 'package:pin_code_fields/pin_code_fields.dart';
+
+import '../../../../utils/log/app_log.dart';
 
 class OtpVerificationController extends GetxController {
   final otpController = TextEditingController();
@@ -59,7 +62,7 @@ class OtpVerificationController extends GetxController {
   void startTimer() {
     _timer?.cancel();
     canResend.value = false;
-    timerSeconds.value = 240;
+    timerSeconds.value = 180;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (timerSeconds.value > 0) {
         timerSeconds.value--;
@@ -81,7 +84,9 @@ class OtpVerificationController extends GetxController {
         type.value == 'email' ? 'email' : 'phone': identity.value,
       };
       
+      appLog("Request Body: $body", source: "SEND_OTP_API");
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
+      appLog("Response Body: ${response.data}", source: "SEND_OTP_API");
 
       if (response.isSuccess) {
         startTimer();
@@ -116,9 +121,11 @@ class OtpVerificationController extends GetxController {
         "otp": int.tryParse(otp) ?? otp,
       };
 
+      appLog("Request Body: $body", source: "VERIFY_EMAIL_API");
       final response = await _apiClient.post(AppApiEndPoint.verifyEmail, body: body);
-
+      appLog("Response Body: ${response.data}", source: "VERIFY_EMAIL_API");
       if (response.isSuccess) {
+        showCustomSnackbar(message: response.message, isError: false);
         onSuccess();
       } else {
         showCustomSnackbar(message: response.message, isError: true);

@@ -11,17 +11,13 @@ class ForgotScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ForgotScreenController>();
     return Scaffold(
       appBar: AppBar(),
-      body: GetBuilder(
-        init: ForgotScreenController(),
-        builder: (controller) {
-          return PageView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: controller.pageController,
-            children: [ForgotEmailInputScreen(), ForgotOtpInputScreen(), ForgotScreenCreatePasswordScreen()],
-          );
-        },
+      body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: controller.pageController,
+        children: [ForgotEmailInputScreen(), ForgotOtpInputScreen(), ForgotScreenCreatePasswordScreen()],
       ),
     );
   }
