@@ -15,20 +15,23 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
+    final controller = Get.find<SignUpController>();
 
     return Scaffold(
-      body: GetBuilder(
-        init: SignUpController(),
-        builder: (controller) {
-          return Scaffold(
-            appBar: AppBar(title: CommonText(text: "Create New Account", fontSize: 18), centerTitle: true, surfaceTintColor: AppColors.instance.white50,),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: AppSize.width(value: 20.0)),
-                child: Form(
-                  key: controller.formKey,
-                  child: Column(
-                    children: [
+      body: Scaffold(
+        appBar: AppBar(
+          title: const CommonText(text: "Create New Account", fontSize: 18),
+          centerTitle: true,
+          surfaceTintColor: AppColors.instance.white50,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding:
+                EdgeInsets.symmetric(horizontal: AppSize.width(value: 20.0)),
+            child: Form(
+              key: controller.formKey,
+              child: Column(
+                children: [
                       CommonImage(src: AppAssertImage.instance.logo, width: AppSize.size.width * 0.6),
                       10.height,
                       Obx(
@@ -242,9 +245,7 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
     );
   }
 }

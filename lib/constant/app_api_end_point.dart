@@ -13,6 +13,8 @@ class AppApiEndPoint {
 
   // Auth
   static const String signUp = "/auth/register";
+  static const String sendOtp = "/auth/send-otp";
+  static const String verifyEmail = "/auth/verify-email";
 }
 
 String _getDomain() {

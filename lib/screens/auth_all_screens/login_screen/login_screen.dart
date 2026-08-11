@@ -19,15 +19,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
+    final controller = Get.find<LoginScreenController>();
 
-    return GetBuilder<LoginScreenController>(
-      init: LoginScreenController(),
-      builder: (controller) {
-        return Scaffold(
-          backgroundColor: AppColors.instance.screenBg,
-          body: FormBuilder(
-            entity: AuthEntity(),
-            builder: (context, formKey, entity) {
+    return Scaffold(
+      backgroundColor: AppColors.instance.screenBg,
+      body: FormBuilder(
+        entity: AuthEntity(),
+        builder: (context, formKey, entity) {
               return SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -240,8 +238,6 @@ class LoginScreen extends StatelessWidget {
             },
           ),
         );
-      },
-    );
   }
 
   Widget _googleSignIn() {

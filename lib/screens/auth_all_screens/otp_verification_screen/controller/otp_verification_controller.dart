@@ -4,82 +4,150 @@ import 'package:get/get.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
+import '../../../../utils/app_utils.dart';
+import '../../../../services/api/api_client.dart';
+import '../../../../services/api/api_service.dart';
+import '../../../../constant/app_api_end_point.dart';
+
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 class OtpVerificationController extends GetxController {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  RxString email = "".obs;
+  final otpController = TextEditingController();
+  late final PinInputController pinController;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  
+  final ApiClient _apiClient = DioApiClient();
+  RxBool isLoading = false.obs;
+  RxBool isResending = false.obs;
+  
+  RxString identity = "".obs; // email or phone
+  RxString type = "email".obs; // 'email' or 'phone'
 
-  void checkOtpFunction() {
-    try {
-      if (formKey.currentState!.validate()) {
-        Get.offAndToNamed(AppRoutes.instance.loginScreen);
-        showCustomSnackbar(message: "Login with your credentials");
-      }
-    } catch (e) {
-      errorLog("checkOtpFunction", e);
-    }
+  RxInt timerSeconds = 180.obs; // 4 minutes
+  Timer? _timer;
+  RxBool canResend = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    pinController = PinInputController(textController: otpController);
+    _loadInitialData();
   }
 
-  void onAppInitialDataLoadFunction() {
+  void _loadInitialData() {
     try {
       final argData = Get.arguments;
       if (argData is String) {
-        email.value = argData;
-        startTimer();
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        identity.value = argData;
+      } else if (argData is Map) {
+        identity.value = (argData['identity'] ?? argData['email'] ?? '').toString();
+        type.value = (argData['type'] ?? 'email').toString();
+      }
+
+      if (identity.value.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           Get.offAllNamed(AppRoutes.instance.errorScreen);
         });
+      } else {
+        startTimer();
       }
     } catch (e) {
-      errorLog("message", e);
-    }
-  }
-
-  //////////////////////// Otp timer //////////////////////////
-  RxInt secondsRemaining = 60.obs;
-  Timer? _timer;
-
-  void reSendOtp() {
-    try {
-      secondsRemaining.value = 60;
-      startTimer();
-    } catch (e) {
-      errorLog("reSendOtp", e);
+      errorLog("loadInitialData", e);
     }
   }
 
   void startTimer() {
+    _timer?.cancel();
+    canResend.value = false;
+    timerSeconds.value = 240;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (timerSeconds.value > 0) {
+        timerSeconds.value--;
+      } else {
+        canResend.value = true;
+        timer.cancel();
+      }
+    });
+  }
+
+  Future<void> reSendOtp() async {
+    if (isResending.value || !canResend.value) return;
+
     try {
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        if (secondsRemaining.value > 0) {
-          secondsRemaining.value = secondsRemaining.value - 1;
-        } else {
-          _timer?.cancel();
-        }
-      });
+      isResending.value = true;
+      update();
+
+      Map<String, dynamic> body = {
+        type.value == 'email' ? 'email' : 'phone': identity.value,
+      };
+      
+      final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
+
+      if (response.isSuccess) {
+        startTimer();
+        showCustomSnackbar(message: response.message, isError: false);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
     } catch (e) {
-      errorLog("startTimer", e);
+      errorLog("reSendOtp", e);
+      showCustomSnackbar(message: "Failed to resend OTP", isError: true);
+    } finally {
+      isResending.value = false;
+      update();
     }
   }
 
-  void onAppClose() {
+  Future<void> checkOtpFunction({required Function onSuccess}) async {
+    final otp = otpController.text.trim();
+    if (otp.isEmpty || otp.length < 6) {
+      showCustomSnackbar(message: "Please enter a valid 6-digit OTP", isError: true);
+      return;
+    }
+
+    if (isLoading.value) return;
+
     try {
-      _timer?.cancel();
+      isLoading.value = true;
+      update();
+
+      Map<String, dynamic> body = {
+        "email": identity.value,
+        "otp": int.tryParse(otp) ?? otp,
+      };
+
+      final response = await _apiClient.post(AppApiEndPoint.verifyEmail, body: body);
+
+      if (response.isSuccess) {
+        onSuccess();
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
     } catch (e) {
-      errorLog("onAppClose", e);
+      errorLog("checkOtpFunction", e);
+      showCustomSnackbar(message: "Verification failed. Please try again.", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
 
-  @override
-  void onInit() {
-    onAppInitialDataLoadFunction();
-    super.onInit();
+  String get minutes => (timerSeconds.value ~/ 60).toString().padLeft(2, '0');
+  String get seconds => (timerSeconds.value % 60).toString().padLeft(2, '0');
+
+  String get maskedIdentity {
+    final value = identity.value;
+    if (type.value == 'email' && value.contains('@')) {
+      return AppUtils.maskEmail(value);
+    }
+    return value;
   }
 
   @override
   void onClose() {
-    onAppClose();
+    _timer?.cancel();
+    otpController.dispose();
+    pinController.dispose();
     super.onClose();
   }
 }

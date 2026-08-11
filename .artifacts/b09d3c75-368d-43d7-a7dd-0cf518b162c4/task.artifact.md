@@ -1,5 +1,4 @@
-- [ ] Add `pretty_dio_logger` to `pubspec.yaml`
-- [ ] Run `flutter pub get`
-- [ ] Create `lib/utils/log/app_log.dart`
-- [ ] Add `PrettyDioLogger` to `DioApiClient`
-- [ ] Verify logging output
+- [ ] Add `verifyEmail` endpoint to `AppApiEndPoint`
+- [ ] Update `OtpVerificationController` for 6-digit API call
+- [ ] Update `OtpVerificationScreen` UI for 6-digit input
+- [ ] Verify API integration and UI layout

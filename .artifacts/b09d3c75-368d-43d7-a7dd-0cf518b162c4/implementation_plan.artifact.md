@@ -1,36 +1,34 @@
-# Implementation Plan - Beautiful API & App Logging
+# Implementation Plan - OTP Verification Update
 
-Improve the logging system to match the "umodzi" project style, making API requests and responses more readable and professional.
+Update the OTP verification flow to support 6-digit codes and integrate the `/auth/verify-email` API.
 
 ## Proposed Changes
 
-### [Component] Dependencies
-Add the logger package.
+### [Component] API Constants
 
-#### [MODIFY] [pubspec.yaml](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/pubspec.yaml)
-- Add `pretty_dio_logger: ^1.3.1` to `dependencies`.
+#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
+- Add `verifyEmail` endpoint: `/auth/verify-email`.
 
-### [Component] Utilities - Logging
-Create and refine loggers.
+### [Component] OTP Verification Controller
 
-#### [NEW] [app_log.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/utils/log/app_log.dart)
-- Implement `appLog` with decorative borders and source tags, similar to `umodzi`.
+#### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
+- Update `checkOtpFunction` validation to require 6 digits.
+- Implement the POST request to `/auth/verify-email` with the required body: `{"email": "...", "otp": ...}`.
+- Parse OTP as an integer for the API call as per the provided documentation.
 
-#### [MODIFY] [error_log.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/utils/error_log.dart)
-- Update or wrap with the new logging style.
+### [Component] OTP Verification Screen
 
-### [Component] API Service Integration
-Inject the pretty logger into the network layer.
-
-#### [MODIFY] [api_service.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_service.dart)
-- Import `pretty_dio_logger`.
-- Add `PrettyDioLogger` to the `Dio` instance interceptors.
+#### [MODIFY] [otp_verification_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/otp_verification_screen.dart)
+- Update instruction text to "6-digit code".
+- Change `MaterialPinField` `length` to 6.
+- Adjust `cellSize` and `spacing` of `MaterialPinField` to ensure 6 boxes fit on the screen without overflow.
 
 ## Verification Plan
 
 ### Manual Verification
-- Run the app and trigger an API call (e.g., Registration).
-- Check the debug console.
-- **Expected:** API requests (URL, Headers, Body) and responses (Status, Data) should be formatted nicely with box borders.
-- Check general app logs.
-- **Expected:** Non-API logs should appear with the decorative "umodzi" style borders.
+- Navigate to the OTP screen.
+- Verify that 6 input boxes are displayed.
+- Enter a 6-digit code and click "Verify".
+- Check the console logs (Pretty Logger) to ensure the request is sent to `/auth/verify-email` with the correct body.
+- Verify that the success dialog appears and navigates to Login on a successful API response.
+- Verify error snackbars appear for invalid OTPs.
