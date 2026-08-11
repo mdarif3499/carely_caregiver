@@ -8,6 +8,7 @@ import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
+import '../../../../utils/log/app_log.dart';
 
 class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
@@ -41,13 +42,39 @@ class ForgotScreenController extends GetxController {
     }
   }
 
-  void checkOtpFunction() {
+  Future<void> checkOtpFunction() async {
+    final otp = otpController.text.trim();
+    if (otp.isEmpty || otp.length < 6) {
+      showCustomSnackbar(message: "Please enter a valid 6-digit OTP", isError: true);
+      return;
+    }
+
+    if (isLoading.value) return;
+
     try {
-      if (formKey2.currentState!.validate()) {
+      isLoading.value = true;
+      update();
+
+      Map<String, dynamic> body = {
+        "email": emailController.text.trim(),
+        "otp": int.tryParse(otp) ?? otp,
+      };
+
+      appLog("Request Body: $body", source: "VERIFY_EMAIL_API");
+      final response = await _apiClient.post(AppApiEndPoint.verifyEmail, body: body);
+      appLog("Response Body: ${response.data}", source: "VERIFY_EMAIL_API");
+
+      if (response.isSuccess) {
         pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
       }
     } catch (e) {
       errorLog("checkOtpFunction", e);
+      showCustomSnackbar(message: "Verification failed. Please try again.", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
 
@@ -62,7 +89,6 @@ class ForgotScreenController extends GetxController {
     }
   }
 
-  //////////////////////// Otp timer //////////////////////////
   RxInt secondsRemaining = 60.obs;
   Timer? _timer;
 
@@ -77,7 +103,9 @@ class ForgotScreenController extends GetxController {
         'email': emailController.text.trim(),
       };
       
+      appLog("Request Body: $body", source: "SEND_OTP_API");
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
+      appLog("Response Body: ${response.data}", source: "SEND_OTP_API");
 
       if (response.isSuccess) {
         secondsRemaining.value = 60;

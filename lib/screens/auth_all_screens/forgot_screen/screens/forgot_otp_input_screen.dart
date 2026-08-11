@@ -38,14 +38,17 @@ class ForgotOtpInputScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.center,
                         child: MaterialPinField(
-                          length: 4,
+                          length: 6,
                           pinController: controller.pinController,
                           onChanged: (value) {},
+                          onCompleted: (value) {
+                            controller.checkOtpFunction();
+                          },
                           theme: MaterialPinTheme(
                             shape: MaterialPinShape.outlined,
                             borderRadius: BorderRadius.circular(8.r),
-                            cellSize: Size(53.w, 50.h),
-                            spacing: 8.w,
+                            cellSize: Size(45.w, 50.h),
+                            spacing: 6.w,
                             borderColor: const Color(0xFFF2F2F2),
                             focusedBorderColor: const Color(0xFFA53200),
                             filledBorderColor: const Color(0xFFF2F2F2),
@@ -53,7 +56,7 @@ class ForgotOtpInputScreen extends StatelessWidget {
                             focusedFillColor: const Color(0xFFF2F2F2),
                             filledFillColor: Colors.white,
                             textStyle: TextStyle(
-                              fontSize: 20.sp,
+                              fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),

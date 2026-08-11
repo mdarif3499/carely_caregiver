@@ -1,9 +1,7 @@
 import 'package:core_kit/core_kit.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import '../../../constant/app_colors.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../routes/app_routes.dart';
 import '../../../utils/app_size.dart';
@@ -87,6 +85,12 @@ class OtpVerificationScreen extends StatelessWidget {
                         length: 6,
                         pinController: controller.pinController,
                         onChanged: (value) {},
+                        onCompleted: (value) {
+                          controller.checkOtpFunction(
+                            onSuccess: () => _showSuccessDialog(context),
+                          );
+                        },
+
                         theme: MaterialPinTheme(
                           shape: MaterialPinShape.outlined,
                           borderRadius: BorderRadius.circular(8.r),
@@ -104,6 +108,7 @@ class OtpVerificationScreen extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
+
                       ),
                     ),
                   ],
@@ -114,9 +119,13 @@ class OtpVerificationScreen extends StatelessWidget {
                   isLoading: controller.isLoading.value,
                   buttonColor: Colors.black,
                   titleText: 'Verify',
-                  onTap: () => controller.checkOtpFunction(
-                    onSuccess: () => _showSuccessDialog(context),
-                  ),
+                  onTap: () {
+                    if (!controller.isLoading.value) {
+                      controller.checkOtpFunction(
+                        onSuccess: () => _showSuccessDialog(context),
+                      );
+                    }
+                  },
                   buttonWidth: double.infinity,
                 )),
                 SizedBox(height: 12.h),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
+import '../../../../utils/log/app_log.dart';
 
 class SignUpController extends GetxController {
   ///////////object
@@ -53,7 +54,9 @@ class SignUpController extends GetxController {
         "phone": phoneTextEditingController.text.trim(),
       };
 
+      appLog("Request Body: $body", source: "SIGN_UP_API");
       final response = await _apiClient.post(AppApiEndPoint.signUp, body: body);
+      appLog("Response Body: ${response.data}", source: "SIGN_UP_API");
 
       if (response.isSuccess) {
         showCustomSnackbar(message: response.message, isError: false);

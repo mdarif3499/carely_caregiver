@@ -1,34 +1,37 @@
-# Implementation Plan - OTP Verification Update
+# Implementation Plan - Final Audit and Fixes for Auth Flow
 
-Update the OTP verification flow to support 6-digit codes and integrate the `/auth/verify-email` API.
+Ensure all authentication screens (Login, Signup, OTP, Forgot Password) are bug-free, professional, and consistent with the requested `MaterialPinField` and API integrations.
+
+## User Review Required
+
+> [!IMPORTANT]
+> I will standardize the OTP length to 6 digits across all OTP screens (Registration and Forgot Password) as per the latest API requirements.
 
 ## Proposed Changes
 
-### [Component] API Constants
-
-#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
-- Add `verifyEmail` endpoint: `/auth/verify-email`.
-
-### [Component] OTP Verification Controller
+### [Component] Authentication Screens
 
 #### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
-- Update `checkOtpFunction` validation to require 6 digits.
-- Implement the POST request to `/auth/verify-email` with the required body: `{"email": "...", "otp": ...}`.
-- Parse OTP as an integer for the API call as per the provided documentation.
-
-### [Component] OTP Verification Screen
+- Set timer to exactly 4 minutes (240 seconds).
+- Ensure `isLoading` is used correctly in the UI.
+- Add descriptive logs for API calls.
 
 #### [MODIFY] [otp_verification_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/otp_verification_screen.dart)
-- Update instruction text to "6-digit code".
-- Change `MaterialPinField` `length` to 6.
-- Adjust `cellSize` and `spacing` of `MaterialPinField` to ensure 6 boxes fit on the screen without overflow.
+- Ensure no duplicate `Positioned` or layout issues.
+- Clean up unused imports.
+
+#### [MODIFY] [forgot_otp_input_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/screens/forgot_otp_input_screen.dart)
+- Update `MaterialPinField` to have `length: 6`.
+- Add `onCompleted` callback to trigger the API call automatically.
+- Adjust `cellSize` and `spacing` for 6 digits.
+
+#### [MODIFY] [forgot_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/controller/forgot_screen_controller.dart)
+- Update `checkOtpFunction` to require 6 digits.
+- Ensure API call to `verifyEmail` is correctly implemented.
 
 ## Verification Plan
 
 ### Manual Verification
-- Navigate to the OTP screen.
-- Verify that 6 input boxes are displayed.
-- Enter a 6-digit code and click "Verify".
-- Check the console logs (Pretty Logger) to ensure the request is sent to `/auth/verify-email` with the correct body.
-- Verify that the success dialog appears and navigates to Login on a successful API response.
-- Verify error snackbars appear for invalid OTPs.
+- Test Registration OTP: Enter 6 digits and verify it calls the API and shows the success dialog.
+- Test Forgot Password OTP: Enter 6 digits and verify it navigates to the Create Password step.
+- Verify no "disposed controller" errors occur when navigating between these screens.

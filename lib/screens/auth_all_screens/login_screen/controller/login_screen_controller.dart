@@ -1,3 +1,8 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/services/api/api_client.dart';
+import 'package:carely_caregiver/services/api/api_service.dart';
+import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
@@ -5,12 +10,48 @@ import '../../../../utils/error_log.dart';
 
 class LoginScreenController extends GetxController {
   ////////// object
-  TextEditingController fullNameTextEditingController = TextEditingController();
-  TextEditingController emailTextEditingController = TextEditingController();
-  TextEditingController phoneTextEditingController = TextEditingController();
-  TextEditingController passwordTextEditingController = TextEditingController();
+  final emailTextEditingController = TextEditingController();
+  final fullNameTextEditingController = TextEditingController();
+  final phoneTextEditingController = TextEditingController();
+  final passwordTextEditingController = TextEditingController();
+  
   RxBool isSignInPage = true.obs;
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
+
+  final ApiClient _apiClient = DioApiClient();
+  RxBool isLoading = false.obs;
+
+  Future<void> loginUser() async {
+    if (isLoading.value) return;
+
+    try {
+      isLoading.value = true;
+      update();
+
+      Map<String, dynamic> body = {
+        "email": emailTextEditingController.text.trim(),
+        "password": passwordTextEditingController.text,
+      };
+
+      appLog("Request Body: $body", source: "LOGIN_API");
+      final response = await _apiClient.post(AppApiEndPoint.login, body: body);
+      appLog("Response Body: ${response.data}", source: "LOGIN_API");
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: response.message, isError: false);
+        // Navigate based on role or logic
+        Get.offAndToNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": true});
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      errorLog("loginUser", e);
+      showCustomSnackbar(message: "Login failed. Please try again.", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
   void checkValidation() {
     try {
       if (formKey.currentState!.validate()) {
