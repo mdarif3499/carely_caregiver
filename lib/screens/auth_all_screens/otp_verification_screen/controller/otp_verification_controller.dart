@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../services/share_pref_helper/share_pref_helper.dart';
 import '../../../../utils/error_log.dart';
 import '../../../../utils/app_utils.dart';
 import '../../../../services/api/api_client.dart';
@@ -125,6 +126,17 @@ class OtpVerificationController extends GetxController {
       final response = await _apiClient.post(AppApiEndPoint.verifyEmail, body: body);
       appLog("Response Body: ${response.data}", source: "VERIFY_EMAIL_API");
       if (response.isSuccess) {
+        final data = response.data;
+        final accessToken = data['accessToken'] ?? "";
+        final user = data['user'] ?? {};
+
+        if (accessToken.toString().isNotEmpty) {
+          await SharePrefsHelper.setString(SharedPreferenceValue.token, accessToken);
+          await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
+        }
+
         showCustomSnackbar(message: response.message, isError: false);
         onSuccess();
       } else {

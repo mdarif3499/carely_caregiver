@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
+import '../../../../utils/log/app_log.dart';
 
 class LoginScreenController extends GetxController {
   ////////// object
@@ -38,9 +39,20 @@ class LoginScreenController extends GetxController {
       appLog("Response Body: ${response.data}", source: "LOGIN_API");
 
       if (response.isSuccess) {
+        final data = response.data;
+        final accessToken = data['accessToken'] ?? "";
+        final user = data['user'] ?? {};
+
+        if (accessToken.toString().isNotEmpty) {
+          await SharePrefsHelper.setString(SharedPreferenceValue.token, accessToken);
+          await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
+        }
+
         showCustomSnackbar(message: response.message, isError: false);
         // Navigate based on role or logic
-        Get.offAndToNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": true});
+        Get.offAndToNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": user['role'] == "CLIENT"});
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }

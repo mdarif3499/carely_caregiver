@@ -1,17 +1,20 @@
-# Walkthrough - Resolved OTP Utility and Screen Conflicts
+# Walkthrough - Token Persistence and Automatic Auth Headers
 
-I have resolved the compilation error in the Forgot Password flow and standardized the OTP utilities across the project.
+I have implemented the logic to persist the authentication token and user information, and automatically include them in all subsequent API calls.
 
 ## Changes Made
 
-### Centralized Utilities
-- Created [app_utils.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/utils/app_utils.dart) to host shared helper methods like `maskEmail` and `formatSecondFunction`.
-- Updated [OtpVerificationController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart) to use these centralized utilities, removing duplicate code.
+### Automatic Authentication Headers
+- **Auth Interceptor:** Created [auth_interceptor.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/auth_interceptor.dart). This interceptor automatically reads the stored token from `SharedPreferences` and adds it to the `Authorization` header as a Bearer token for every request.
+- **Service Integration:** Updated [DioApiClient](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_service.dart) to include the `AuthInterceptor` in its Dio instance.
 
-### Forgot Password Flow Fix
-- Fixed [ForgotOtpInputScreen](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/screens/forgot_otp_input_screen.dart) which was failing because the old utility class was removed. It now uses the new `AppUtils`.
-- **UI Update:** Replaced the standard text field in the Forgot Password OTP screen with the modern `PinCodeTextField`, matching the Registration OTP design for a consistent user experience.
+### Data Persistence
+- **OTP Verification:** Updated [OtpVerificationController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart) to extract and save the `accessToken`, `userId`, `email`, and `role` to `SharedPreferences` upon successful verification.
+- **Login:** Updated [LoginScreenController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/controller/login_screen_controller.dart) to also persist the same information after a successful login. It also now dynamically determines the `isClient` argument for navigation based on the user's actual role.
 
 ## Verification
-- Both the Registration OTP and Forgot Password OTP screens now compile and use the same professional logic and styling.
-- Masked email display and timer formatting are now consistently handled by a single utility class.
+- Once you log in or verify your OTP, the debug console (Pretty Logger) will show the `Authorization: Bearer <token>` header in all future API requests.
+- You no longer need to manually pass tokens to your API methods.
+
+> [!IMPORTANT]
+> The `accessToken` and user data are now securely managed across app restarts via `SharePrefsHelper`.
