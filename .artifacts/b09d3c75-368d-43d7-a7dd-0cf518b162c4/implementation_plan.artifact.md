@@ -1,30 +1,34 @@
-# Implementation Plan - Logical Chat Navigation
+# Implementation Plan - OTP Verification Update
 
-Implement the logic to navigate from the message list (`ChatListScreen`) to the chat details (`MessageScreen`) while passing and displaying the correct conversation data.
+Update the OTP verification flow to support 6-digit codes and integrate the `/auth/verify-email` API.
 
 ## Proposed Changes
 
-### [Component] Chat List
-Handle the navigation and argument passing from the list to the details.
+### [Component] API Constants
 
-#### [MODIFY] [chat_list_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/chat_list_screen/controller/chat_list_controller.dart)
-- Update `onConversationTap` to pass the `ChatConversation` object as an argument using `Get.toNamed`.
+#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
+- Add `verifyEmail` endpoint: `/auth/verify-email`.
 
-### [Component] Message Screen (Chat Details)
-Retrieve and display the passed conversation data.
+### [Component] OTP Verification Controller
 
-#### [MODIFY] [message_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/controller/message_screen_controller.dart)
-- Add a reactive property to store the selected conversation.
-- In `onInit`, retrieve the conversation from `Get.arguments`.
-- Update `userId` and `chatId` based on the passed data.
+#### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
+- Update `checkOtpFunction` validation to require 6 digits.
+- Implement the POST request to `/auth/verify-email` with the required body: `{"email": "...", "otp": ...}`.
+- Parse OTP as an integer for the API call as per the provided documentation.
 
-#### [MODIFY] [message_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/message_screen.dart)
-- Wrap the `titleWidget` content with `Obx` to reactively display the conversation's name, role, and avatar.
-- Replace hardcoded "Sarah Jenkins, RN" with data from the controller.
+### [Component] OTP Verification Screen
+
+#### [MODIFY] [otp_verification_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/otp_verification_screen.dart)
+- Update instruction text to "6-digit code".
+- Change `MaterialPinField` `length` to 6.
+- Adjust `cellSize` and `spacing` of `MaterialPinField` to ensure 6 boxes fit on the screen without overflow.
 
 ## Verification Plan
 
 ### Manual Verification
-- Run the app and navigate to the "Message" tab.
-- Click on different conversations in the list.
-- Verify that the `MessageScreen` opens with the correct name, role, and avatar of the clicked person.
+- Navigate to the OTP screen.
+- Verify that 6 input boxes are displayed.
+- Enter a 6-digit code and click "Verify".
+- Check the console logs (Pretty Logger) to ensure the request is sent to `/auth/verify-email` with the correct body.
+- Verify that the success dialog appears and navigates to Login on a successful API response.
+- Verify error snackbars appear for invalid OTPs.

@@ -40,7 +40,10 @@ class WelcomeScreen extends StatelessWidget {
                     () => RoleCard(
                       isSelected: controller.selectedIndex.value == 0,
                       onTap: () {
-                        controller.selectedIndex.value = 0;
+                        if (!controller.isLoading.value) {
+                          controller.selectedIndex.value = 0;
+                          controller.registerUser();
+                        }
                       },
                       iconImage: Assets.icons.caregiver,
                       title: 'I am a Caregiver',
@@ -53,7 +56,10 @@ class WelcomeScreen extends StatelessWidget {
                     () => RoleCard(
                       isSelected: controller.selectedIndex.value == 1,
                       onTap: () {
-                        controller.selectedIndex.value = 1;
+                        if (!controller.isLoading.value) {
+                          controller.selectedIndex.value = 1;
+                          controller.registerUser();
+                        }
                       },
                       iconImage: Assets.icons.client,
                       title: 'I am a Client',
@@ -62,19 +68,17 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   48.height,
-                  CommonButton(
-                    titleText: 'Next Step',
-                    onTap: () {
-                      controller.selectedIndex.value != -1
-                          ? Get.toNamed(
-                              AppRoutes.instance.basicInfoScreen,
-                              arguments: {
-                                "isClient": controller.selectedIndex.value == 1,
-                              },
-                            )
-                          : null;
-                    },
-                    buttonWidth: double.infinity,
+                  Obx(
+                    () => CommonButton(
+                      isLoading: controller.isLoading.value,
+                      titleText: 'Next Step',
+                      onTap: () {
+                        if (controller.selectedIndex.value != -1 && !controller.isLoading.value) {
+                          controller.registerUser();
+                        }
+                      },
+                      buttonWidth: double.infinity,
+                    ),
                   ),
                 ],
               ),

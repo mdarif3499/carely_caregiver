@@ -1,3 +1,8 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/services/api/api_client.dart';
+import 'package:carely_caregiver/services/api/api_service.dart';
+import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
@@ -5,18 +10,16 @@ import '../../../../utils/error_log.dart';
 
 class SignUpController extends GetxController {
   ///////////object
-  TextEditingController fullNameTextEditingController = TextEditingController();
-  TextEditingController emailTextEditingController = TextEditingController();
-  TextEditingController locationTextEditingController = TextEditingController();
-  TextEditingController passwordTextEditingController = TextEditingController();
-  TextEditingController confirmPasswordTextEditingController = TextEditingController();
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final fullNameTextEditingController = TextEditingController();
+  final emailTextEditingController = TextEditingController();
+  final phoneTextEditingController = TextEditingController();
+  final locationTextEditingController = TextEditingController();
+  final passwordTextEditingController = TextEditingController();
+  final confirmPasswordTextEditingController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
-  void checkValidation() {
-    if (formKey.currentState!.validate()) {
-      Get.toNamed(AppRoutes.instance.otpVerificationScreen, arguments: emailTextEditingController.text);
-    }
-  }
+  final ApiClient _apiClient = DioApiClient();
+  RxBool isLoading = false.obs;
 
   //////////. user types
   RxBool userTypes = true.obs;
@@ -28,6 +31,46 @@ class SignUpController extends GetxController {
     }
   }
 
+  void checkValidation() {
+    if (formKey.currentState!.validate()) {
+      signUpUser();
+    } else {
+      showCustomSnackbar(message: "Please fill all required fields correctly", isError: true);
+    }
+  }
+
+  Future<void> signUpUser() async {
+    if (isLoading.value) return;
+
+    try {
+      isLoading.value = true;
+
+      Map<String, dynamic> body = {
+        "name": fullNameTextEditingController.text.trim(),
+        "email": emailTextEditingController.text.trim(),
+        "password": passwordTextEditingController.text,
+        "role": userTypes.value ? "CLIENT" : "AGENCY",
+        "phone": phoneTextEditingController.text.trim(),
+      };
+
+      final response = await _apiClient.post(AppApiEndPoint.signUp, body: body);
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: response.message, isError: false);
+        Get.toNamed(AppRoutes.instance.otpVerificationScreen, arguments: emailTextEditingController.text.trim());
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      errorLog("signUpUser", e);
+      showCustomSnackbar(message: "Registration failed. Please try again.", isError: true);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
   //////////// terms and conditions
   RxBool termsAndConditions = false.obs;
   void changeTermsAndConditions(bool value) {
@@ -38,6 +81,7 @@ class SignUpController extends GetxController {
     try {
       fullNameTextEditingController.dispose();
       emailTextEditingController.dispose();
+      phoneTextEditingController.dispose();
       locationTextEditingController.dispose();
       passwordTextEditingController.dispose();
       confirmPasswordTextEditingController.dispose();

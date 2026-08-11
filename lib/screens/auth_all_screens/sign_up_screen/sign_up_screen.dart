@@ -15,20 +15,23 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
+    final controller = Get.find<SignUpController>();
 
     return Scaffold(
-      body: GetBuilder(
-        init: SignUpController(),
-        builder: (controller) {
-          return Scaffold(
-            appBar: AppBar(title: CommonText(text: "Create New Account", fontSize: 18), centerTitle: true, surfaceTintColor: AppColors.instance.white50,),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: AppSize.width(value: 20.0)),
-                child: Form(
-                  key: controller.formKey,
-                  child: Column(
-                    children: [
+      body: Scaffold(
+        appBar: AppBar(
+          title: const CommonText(text: "Create New Account", fontSize: 18),
+          centerTitle: true,
+          surfaceTintColor: AppColors.instance.white50,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding:
+                EdgeInsets.symmetric(horizontal: AppSize.width(value: 20.0)),
+            child: Form(
+              key: controller.formKey,
+              child: Column(
+                children: [
                       CommonImage(src: AppAssertImage.instance.logo, width: AppSize.size.width * 0.6),
                       10.height,
                       Obx(
@@ -75,7 +78,11 @@ class SignUpScreen extends StatelessWidget {
                         borderColor: AppColors.instance.boxBg,
                         labelText: "Full Name",
                         hintText: "Enter full name",
-                        validationType: ValidationType.notRequired,
+                        validationType: ValidationType.validateRequired,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Full name is required";
+                          return null;
+                        },
                       ),
                       20.height,
                       CommonTextField(
@@ -84,14 +91,35 @@ class SignUpScreen extends StatelessWidget {
                         labelText: "Email",
                         hintText: "Enter your e-mail",
                         validationType: ValidationType.validateEmail,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Email is required";
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) return "Enter a valid email";
+                          return null;
+                        },
                       ),
-                     20.height,
+                      20.height,
+                      CommonTextField(
+                        controller: controller.phoneTextEditingController,
+                        borderColor: AppColors.instance.boxBg,
+                        labelText: "Phone Number",
+                        hintText: "Enter your phone number",
+                        validationType: ValidationType.validateRequired,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Phone number is required";
+                          return null;
+                        },
+                      ),
+                      20.height,
                       CommonTextField(
                         controller: controller.locationTextEditingController,
                         borderColor: AppColors.instance.boxBg,
                         labelText: "Location",
                         hintText: "Enter your location",
-                        validationType: ValidationType.notRequired,
+                        validationType: ValidationType.validateRequired,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Location is required";
+                          return null;
+                        },
                       ),
                       20.height,
                       CommonTextField(
@@ -100,6 +128,11 @@ class SignUpScreen extends StatelessWidget {
                         labelText: "Password",
                         hintText: "Enter your password",
                         validationType: ValidationType.validatePassword,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Password is required";
+                          if (value.length < 8) return "Password must be at least 8 characters";
+                          return null;
+                        },
                       ),
                       20.height,
                       CommonTextField(
@@ -109,6 +142,12 @@ class SignUpScreen extends StatelessWidget {
                         hintText: "Enter your confirm password",
                         textInputAction: TextInputAction.done,
                         validationType: ValidationType.validateConfirmPassword,
+                        originalPassword: () => controller.passwordTextEditingController.text,
+                        validation: (value) {
+                          if (value == null || value.trim().isEmpty) return "Confirm password is required";
+                          if (value != controller.passwordTextEditingController.text) return "Passwords do not match";
+                          return null;
+                        },
                       ),
                       20.height,
                       Obx(
@@ -171,11 +210,12 @@ class SignUpScreen extends StatelessWidget {
                      30.height,
                       Obx(
                         () => CommonButton(
+                          isLoading: controller.isLoading.value,
                           buttonColor: controller.termsAndConditions.value ? AppColors.instance.primary : AppColors.instance.dark100,
                           borderColor: controller.termsAndConditions.value ? AppColors.instance.primary : AppColors.instance.dark100,
                           titleText: "Next",
                           onTap:
-                              controller.termsAndConditions.value
+                              controller.termsAndConditions.value && !controller.isLoading.value
                                   ? () {
                                     controller.checkValidation();
                                   }
@@ -205,9 +245,7 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
     );
   }
 }
