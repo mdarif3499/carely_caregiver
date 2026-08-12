@@ -83,11 +83,12 @@ class OtpVerificationController extends GetxController {
 
       Map<String, dynamic> body = {
         type.value == 'email' ? 'email' : 'phone': identity.value,
+        'isResetPassword': false,
       };
       
-      appLog("Request Body: $body", source: "SEND_OTP_API");
+      appLog("Request Body: $body", source: "SEND_OTP_REG_API");
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
-      appLog("Response Body: ${response.data}", source: "SEND_OTP_API");
+      appLog("Response Body: ${response.data}", source: "SEND_OTP_REG_API");
 
       if (response.isSuccess) {
         startTimer();
@@ -126,12 +127,14 @@ class OtpVerificationController extends GetxController {
       final response = await _apiClient.post(AppApiEndPoint.verifyEmail, body: body);
       appLog("Response Body: ${response.data}", source: "VERIFY_EMAIL_API");
       if (response.isSuccess) {
-        final data = response.data;
-        final accessToken = data['accessToken'] ?? "";
-        final user = data['user'] ?? {};
+        final payload = response.data['data'] ?? {};
+        final accessToken = payload['accessToken'] ?? "";
+        final refreshToken = payload['refreshToken'] ?? "";
+        final user = payload['user'] ?? {};
 
         if (accessToken.toString().isNotEmpty) {
           await SharePrefsHelper.setString(SharedPreferenceValue.token, accessToken);
+          await SharePrefsHelper.setString(SharedPreferenceValue.refreshToken, refreshToken);
           await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
@@ -162,11 +165,19 @@ class OtpVerificationController extends GetxController {
     return value;
   }
 
+  bool _isDisposed = false;
+
   @override
   void onClose() {
-    _timer?.cancel();
-    otpController.dispose();
-    pinController.dispose();
+    if (_isDisposed) return;
+    try {
+      _timer?.cancel();
+      otpController.dispose();
+      pinController.dispose();
+      _isDisposed = true;
+    } catch (e) {
+      errorLog("onClose", e);
+    }
     super.onClose();
   }
 }

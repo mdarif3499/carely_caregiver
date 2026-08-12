@@ -1,20 +1,21 @@
-# Walkthrough - Token Persistence and Automatic Auth Headers
+# Walkthrough - Fixed Logout Logic
 
-I have implemented the logic to persist the authentication token and user information, and automatically include them in all subsequent API calls.
+I have implemented the fix for the logout functionality to ensure that user session data is completely cleared, preventing automatic re-login after logging out.
 
 ## Changes Made
 
-### Automatic Authentication Headers
-- **Auth Interceptor:** Created [auth_interceptor.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/auth_interceptor.dart). This interceptor automatically reads the stored token from `SharedPreferences` and adds it to the `Authorization` header as a Bearer token for every request.
-- **Service Integration:** Updated [DioApiClient](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_service.dart) to include the `AuthInterceptor` in its Dio instance.
+### Comprehensive Data Clearing
+Updated [SharePrefsHelper](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/share_pref_helper/share_pref_helper.dart) to include the `email` field in the `clearData()` method. This ensures that all critical authentication information is removed from local storage.
 
-### Data Persistence
-- **OTP Verification:** Updated [OtpVerificationController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart) to extract and save the `accessToken`, `userId`, `email`, and `role` to `SharedPreferences` upon successful verification.
-- **Login:** Updated [LoginScreenController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/controller/login_screen_controller.dart) to also persist the same information after a successful login. It also now dynamically determines the `isClient` argument for navigation based on the user's actual role.
+### Professional Logout Flow
+Modified the `logout()` method in [ProfileScreenController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart):
+- It now asynchronously calls `await SharePrefsHelper.clearData()` before navigating.
+- This guarantees that by the time the user reaches the Login screen, their token is gone.
 
 ## Verification
-- Once you log in or verify your OTP, the debug console (Pretty Logger) will show the `Authorization: Bearer <token>` header in all future API requests.
-- You no longer need to manually pass tokens to your API methods.
+1.  Navigate to the Profile screen and click "Logout".
+2.  The app will navigate to the Login screen.
+3.  If you restart the app now, the **Splash Screen** will correctly identify that the token is missing and keep you on the **Login screen** instead of jumping to the dashboard.
 
-> [!IMPORTANT]
-> The `accessToken` and user data are now securely managed across app restarts via `SharePrefsHelper`.
+> [!CAUTION]
+> Logging out now results in a complete session destruction. Users will need to enter their credentials again to log back in.

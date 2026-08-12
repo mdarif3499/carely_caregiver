@@ -1,4 +1,5 @@
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:get/get.dart';
 
 // ── Controller ───────────────────────────────────────────
@@ -10,7 +11,8 @@ class ProfileScreenController extends GetxController {
   final RxString memberSince = 'Member since January 2023'.obs;
 
 
-  void logout() {
+  void logout() async {
+    await SharePrefsHelper.clearData();
     Get.offAllNamed(AppRoutes.instance.loginScreen);
   }
 }

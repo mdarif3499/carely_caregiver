@@ -1,35 +1,27 @@
-# Implementation Plan - Token Persistence and Automatic Auth Headers
+# Implementation Plan - Fix Logout Logic
 
-Persist the `accessToken` and user information from the OTP verification response to `SharedPreferences` and ensure all subsequent API calls automatically include the Bearer token.
+The current logout functionality only navigates to the login screen without clearing the session data from `SharedPreferences`. This causes the splash screen to automatically redirect back to the dashboard on app restart. This plan ensures that all session data is cleared upon logout.
 
 ## Proposed Changes
 
-### [Component] API Service Layer
-Add an interceptor to automatically inject the stored token into outgoing requests.
+### [Component] Profile Screen Logic
 
-#### [NEW] [auth_interceptor.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/auth_interceptor.dart)
-- Create `AuthInterceptor` extending `InterceptorsWrapper`.
-- In `onRequest`, fetch the token from `SharePrefsHelper`.
-- If a token exists, add it to the `Authorization` header: `Bearer <token>`.
+#### [MODIFY] [profile_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart)
+- Import `SharePrefsHelper`.
+- Update the `logout()` method to call `SharePrefsHelper.clearData()` before navigating to the login screen.
 
-#### [MODIFY] [api_service.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_service.dart)
-- Import `AuthInterceptor`.
-- Add `AuthInterceptor()` to the `Dio` interceptors list.
+### [Component] Utilities
 
-### [Component] Controllers
-Handle successful responses by persisting data.
-
-#### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
-- In `checkOtpFunction`, upon success:
-    - Extract `accessToken` from `response.data['data']`.
-    - Extract user info (`id`, `email`, `role`) from `response.data['data']['user']`.
-    - Save these values using `SharePrefsHelper`.
+#### [MODIFY] [share_pref_helper.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/share_pref_helper/share_pref_helper.dart)
+- Update `clearData()` to also remove `email` to ensure a complete session cleanup.
 
 ## Verification Plan
 
 ### Manual Verification
-- Complete the registration and OTP verification flow.
-- Verify that the console logs show the successful verification.
-- Trigger another API call (like fetching a profile, if available) or check the next API request logs.
-- **Expected:** Every subsequent request in the debug console (Pretty Logger) should now contain the `Authorization: Bearer <token>` header.
-- Restart the app and verify that the session persists (if logic allows).
+1.  Open the app and ensure you are logged in (or log in).
+2.  Navigate to the Profile screen.
+3.  Click the "Logout" button.
+4.  Verify that you are taken to the Login screen.
+5.  Close the app completely (kill the process).
+6.  Reopen the app.
+7.  **Expected:** The splash screen should redirect you to the **Login screen**, not the dashboard.

@@ -11,52 +11,66 @@ class ForgotEmailInputScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
-      init: ForgotScreenController(),
-      builder: (controller) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SingleChildScrollView(
-                child: Form(
-                  key: controller.formKey1,
-                  child: Column(
-                    children: [
-                      CommonImage(src: AppAssertImage.instance.forgotEmailInput, width: AppSize.size.width * 0.6),
-                      10.height,
-                      CommonText(text: "Forgot password", fontSize: 25, fontWeight: FontWeight.w500),
-                      10.height,
-                      CommonText(text: "Enter your email to reset your \npassword.", fontSize: 16, fontWeight: FontWeight.w400, textAlign: TextAlign.center, height: 1.5),
-                      10.height,
-                      CommonTextField(
-                        labelText: "Email",
-                        hintText: "Enter your mail",
-                        validationType: ValidationType.validateEmail,
-                        borderColor: AppColors.instance.boxBg,
-                      ),
-                     10.height,
-                    ],
-                  ),
-                ),
-              ),
-
-              Column(
+    final controller = Get.find<ForgotScreenController>();
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SingleChildScrollView(
+            child: Form(
+              key: controller.formKey1,
+              child: Column(
                 children: [
-                  CommonButton(
+                  CommonImage(
+                      src: AppAssertImage.instance.forgotEmailInput,
+                      width: AppSize.size.width * 0.6),
+                  10.height,
+                  const CommonText(
+                      text: "Forgot password",
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                      textColor: Color(0xFF333333)),
+                  10.height,
+                  const CommonText(
+                      text: "Enter your email to reset your \npassword.",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      textAlign: TextAlign.center,
+                      height: 1.5,
+                      textColor: Color(0xFF6A7282)),
+                  20.height,
+                  CommonTextField(
+                    controller: controller.emailController,
+                    labelText: "Email",
+                    hintText: "Enter your mail",
+                    validationType: ValidationType.validateEmail,
+                    borderColor: AppColors.instance.boxBg,
+                    validation: (value) {
+                      if (value == null || value.trim().isEmpty) return "Email is required";
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) return "Enter a valid email";
+                      return null;
+                    },
+                  ),
+                  10.height,
+                ],
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Obx(() => CommonButton(
+                    isLoading: controller.isLoading.value,
                     titleText: "Get OTP",
                     onTap: () {
                       controller.checkEmailFunction();
                     },
-                  ),
-                  50.height,
-                ],
-              ),
+                  )),
+              50.height,
             ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

@@ -31,9 +31,9 @@ class ForgotOtpInputScreen extends StatelessWidget {
 
                   Column(
                     children: [
-                      const CommonText(text: "Verify your account", fontSize: 25, fontWeight: FontWeight.w500),
+                      const CommonText(text: "Verify your account", fontSize: 25, fontWeight: FontWeight.w600, textColor: Color(0xFF333333)),
                       5.height,
-                      CommonText(text: "We've Sent a Code to ${AppUtils.maskEmail(controller.emailController.text)}"),
+                      CommonText(text: "We've Sent a Code to ${AppUtils.maskEmail(controller.emailController.text)}", textColor: Color(0xFF6A7282)),
                       30.height,
                       Align(
                         alignment: Alignment.center,
@@ -68,15 +68,22 @@ class ForgotOtpInputScreen extends StatelessWidget {
                         () => RichText(
                           text: TextSpan(
                             text: "Resend code in ${AppUtils.formatSecondFunction(controller.secondsRemaining.value)} ",
-                            style: TextStyle(color: AppColors.instance.dark400, fontSize: 14),
+                            style: TextStyle(color: Color(0xFF333333).withOpacity(0.6), fontSize: 14),
                             children: [
                               TextSpan(
                                 text: "Resend",
-                                style: TextStyle(color: controller.secondsRemaining.value > 0 ? AppColors.instance.dark400 : AppColors.instance.primary500),
+                                style: TextStyle(
+                                  color: controller.secondsRemaining.value > 0 
+                                      ? Colors.grey 
+                                      : const Color(0xFFA53200),
+                                  fontWeight: FontWeight.w600,
+                                ),
                                 recognizer:
                                     TapGestureRecognizer()
                                       ..onTap = () {
-                                        controller.reSendOtp();
+                                        if (controller.secondsRemaining.value == 0) {
+                                          controller.reSendOtp();
+                                        }
                                       },
                               ),
                             ],
