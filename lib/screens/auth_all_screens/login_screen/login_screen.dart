@@ -1,4 +1,3 @@
-import 'package:carely_caregiver/app_all_enum/app_login_status.dart';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/widgets/phone_number_text_filed.dart';
@@ -69,18 +68,21 @@ class LoginScreen extends StatelessWidget {
                               () => controller.isSignInPage.value
                                   ? const SizedBox()
                                   : Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const AppContentHeader(text: 'Full Name'),
+                                        const AppContentHeader(
+                                            text: 'Full Name'),
                                         12.height,
                                         CommonTextField(
-                                          controller:
-                                              controller.fullNameTextEditingController,
+                                          controller: controller
+                                              .fullNameTextEditingController,
                                           validationType:
                                               ValidationType.validateRequired,
                                           hintText: 'Enter your Full Name',
                                           validation: (value) {
-                                            if (value == null || value.trim().isEmpty) {
+                                            if (value == null ||
+                                                value.trim().isEmpty) {
                                               return "Full Name is required";
                                             }
                                             return null;
@@ -100,7 +102,8 @@ class LoginScreen extends StatelessWidget {
                                 if (value == null || value.trim().isEmpty) {
                                   return "Email is required";
                                 }
-                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
+                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$')
+                                    .hasMatch(value)) {
                                   return "Enter a valid email";
                                 }
                                 return null;
@@ -111,15 +114,18 @@ class LoginScreen extends StatelessWidget {
                               () => controller.isSignInPage.value
                                   ? const SizedBox()
                                   : Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        const AppContentHeader(text: 'Phone Number'),
+                                        const AppContentHeader(
+                                            text: 'Phone Number'),
                                         12.height,
                                         PhoneTextField(
-                                          controller:
-                                              controller.phoneTextEditingController,
+                                          controller: controller
+                                              .phoneTextEditingController,
                                           validator: (value) {
-                                            if (value == null || value.trim().isEmpty) {
+                                            if (value == null ||
+                                                value.trim().isEmpty) {
                                               return "Phone number is required";
                                             }
                                             return null;
@@ -132,7 +138,8 @@ class LoginScreen extends StatelessWidget {
                             const AppContentHeader(text: 'Password'),
                             12.height,
                             CommonTextField(
-                              controller: controller.passwordTextEditingController,
+                              controller:
+                                  controller.passwordTextEditingController,
                               validationType: ValidationType.validatePassword,
                               hintText: 'Enter your Password',
                               validation: (value) {
@@ -152,7 +159,8 @@ class LoginScreen extends StatelessWidget {
                                       alignment: Alignment.centerRight,
                                       child: GestureDetector(
                                         onTap: () {
-                                          Get.toNamed(AppRoutes.instance.forgotScreen);
+                                          Get.toNamed(
+                                              AppRoutes.instance.forgotScreen);
                                         },
                                         child: CommonText(
                                           text: 'Forgot Password?',
@@ -177,7 +185,8 @@ class LoginScreen extends StatelessWidget {
                                         AppRoutes.instance.welcomeScreen,
                                         arguments: {
                                           "name": controller
-                                              .fullNameTextEditingController.text
+                                              .fullNameTextEditingController
+                                              .text
                                               .trim(),
                                           "email": controller
                                               .emailTextEditingController.text
@@ -185,8 +194,9 @@ class LoginScreen extends StatelessWidget {
                                           "phone": controller
                                               .phoneTextEditingController.text
                                               .trim(),
-                                          "password":
-                                              controller.passwordTextEditingController.text,
+                                          "password": controller
+                                              .passwordTextEditingController
+                                              .text,
                                         },
                                       );
                                     }
@@ -245,32 +255,30 @@ class LoginScreen extends StatelessWidget {
       },
     );
   }
-  }
+}
 
-  Widget _googleSignIn() {
-    return Column(
-      children: [
-        32.height,
-        Row(
-          children: [
-            Expanded(child: Divider()),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16),
-              child: CommonText(text: 'Or'),
-            ),
-            Expanded(child: Divider()),
-          ],
-        ),
-        32.height,
-        CommonButton(
-
-          buttonColor: AppColors.instance.white,
-          titleText: 'Continue with Google',
-          titleColor: AppColors.instance.textPrimary,
-          prefix: CommonImage(src: Assets.icons.google),
-          buttonWidth: double.infinity,
-        ),
-      ],
-    );
-  }
-
+Widget _googleSignIn() {
+  return Column(
+    children: [
+      32.height,
+      Row(
+        children: [
+          Expanded(child: Divider()),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16),
+            child: CommonText(text: 'Or'),
+          ),
+          Expanded(child: Divider()),
+        ],
+      ),
+      32.height,
+      CommonButton(
+        buttonColor: AppColors.instance.white,
+        titleText: 'Continue with Google',
+        titleColor: AppColors.instance.textPrimary,
+        prefix: CommonImage(src: Assets.icons.google),
+        buttonWidth: double.infinity,
+      ),
+    ],
+  );
+}
