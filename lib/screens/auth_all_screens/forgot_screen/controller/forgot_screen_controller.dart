@@ -14,7 +14,6 @@ class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
-  
   PageController pageController = PageController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
