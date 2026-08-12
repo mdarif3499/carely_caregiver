@@ -3,6 +3,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'api_client.dart';
 import 'api_response_handler.dart';
 import 'api_response_model.dart';
+import 'auth_interceptor.dart';
 import '../../constant/app_api_end_point.dart';
 
 class DioApiClient implements ApiClient {
@@ -20,15 +21,18 @@ class DioApiClient implements ApiClient {
       ),
     );
 
-    dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-      responseBody: true,
-      responseHeader: false,
-      error: true,
-      compact: true,
-      maxWidth: 90,
-    ));
+    dio.interceptors.addAll([
+      AuthInterceptor(),
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        compact: true,
+        maxWidth: 90,
+      ),
+    ]);
 
     return dio;
   }

@@ -1,37 +1,27 @@
-# Implementation Plan - Final Audit and Fixes for Auth Flow
+# Implementation Plan - Fix Logout Logic
 
-Ensure all authentication screens (Login, Signup, OTP, Forgot Password) are bug-free, professional, and consistent with the requested `MaterialPinField` and API integrations.
-
-## User Review Required
-
-> [!IMPORTANT]
-> I will standardize the OTP length to 6 digits across all OTP screens (Registration and Forgot Password) as per the latest API requirements.
+The current logout functionality only navigates to the login screen without clearing the session data from `SharedPreferences`. This causes the splash screen to automatically redirect back to the dashboard on app restart. This plan ensures that all session data is cleared upon logout.
 
 ## Proposed Changes
 
-### [Component] Authentication Screens
+### [Component] Profile Screen Logic
 
-#### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
-- Set timer to exactly 4 minutes (240 seconds).
-- Ensure `isLoading` is used correctly in the UI.
-- Add descriptive logs for API calls.
+#### [MODIFY] [profile_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart)
+- Import `SharePrefsHelper`.
+- Update the `logout()` method to call `SharePrefsHelper.clearData()` before navigating to the login screen.
 
-#### [MODIFY] [otp_verification_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/otp_verification_screen.dart)
-- Ensure no duplicate `Positioned` or layout issues.
-- Clean up unused imports.
+### [Component] Utilities
 
-#### [MODIFY] [forgot_otp_input_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/screens/forgot_otp_input_screen.dart)
-- Update `MaterialPinField` to have `length: 6`.
-- Add `onCompleted` callback to trigger the API call automatically.
-- Adjust `cellSize` and `spacing` for 6 digits.
-
-#### [MODIFY] [forgot_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/controller/forgot_screen_controller.dart)
-- Update `checkOtpFunction` to require 6 digits.
-- Ensure API call to `verifyEmail` is correctly implemented.
+#### [MODIFY] [share_pref_helper.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/share_pref_helper/share_pref_helper.dart)
+- Update `clearData()` to also remove `email` to ensure a complete session cleanup.
 
 ## Verification Plan
 
 ### Manual Verification
-- Test Registration OTP: Enter 6 digits and verify it calls the API and shows the success dialog.
-- Test Forgot Password OTP: Enter 6 digits and verify it navigates to the Create Password step.
-- Verify no "disposed controller" errors occur when navigating between these screens.
+1.  Open the app and ensure you are logged in (or log in).
+2.  Navigate to the Profile screen.
+3.  Click the "Logout" button.
+4.  Verify that you are taken to the Login screen.
+5.  Close the app completely (kill the process).
+6.  Reopen the app.
+7.  **Expected:** The splash screen should redirect you to the **Login screen**, not the dashboard.

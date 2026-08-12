@@ -31,14 +31,41 @@ class ForgotScreenController extends GetxController {
     pinController = PinInputController(textController: otpController);
   }
 
-  void checkEmailFunction() {
+  Future<void> checkEmailFunction() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      showCustomSnackbar(message: "Please enter your email", isError: true);
+      return;
+    }
+
+    if (isLoading.value) return;
+
     try {
-      if (formKey1.currentState!.validate()) {
+      isLoading.value = true;
+      update();
+
+      Map<String, dynamic> body = {
+        "email": email,
+        "isResetPassword": true,
+      };
+
+      appLog("Request Body: $body", source: "SEND_OTP_FORGOT_API");
+      final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
+      appLog("Response Body: ${response.data}", source: "SEND_OTP_FORGOT_API");
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: response.message, isError: false);
         pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
         startTimer();
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
       }
     } catch (e) {
-      errorLog("checkOtpFunction", e);
+      errorLog("checkEmailFunction", e);
+      showCustomSnackbar(message: "Failed to send OTP. Please try again.", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
 
@@ -89,7 +116,7 @@ class ForgotScreenController extends GetxController {
     }
   }
 
-  RxInt secondsRemaining = 60.obs;
+  RxInt secondsRemaining = 240.obs;
   Timer? _timer;
 
   Future<void> reSendOtp() async {
@@ -101,14 +128,15 @@ class ForgotScreenController extends GetxController {
 
       Map<String, dynamic> body = {
         'email': emailController.text.trim(),
+        'isResetPassword': true,
       };
       
-      appLog("Request Body: $body", source: "SEND_OTP_API");
+      appLog("Request Body: $body", source: "RESEND_OTP_FORGOT_API");
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
-      appLog("Response Body: ${response.data}", source: "SEND_OTP_API");
+      appLog("Response Body: ${response.data}", source: "RESEND_OTP_FORGOT_API");
 
       if (response.isSuccess) {
-        secondsRemaining.value = 60;
+        secondsRemaining.value = 240;
         startTimer();
         showCustomSnackbar(message: response.message, isError: false);
       } else {
@@ -125,11 +153,13 @@ class ForgotScreenController extends GetxController {
 
   void startTimer() {
     try {
+      _timer?.cancel();
+      secondsRemaining.value = 240;
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (secondsRemaining.value > 0) {
           secondsRemaining.value = secondsRemaining.value - 1;
         } else {
-          _timer?.cancel();
+          timer.cancel();
         }
       });
     } catch (e) {

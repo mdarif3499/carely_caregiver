@@ -19,13 +19,14 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
-    final controller = Get.find<LoginScreenController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.instance.screenBg,
-      body: FormBuilder(
-        entity: AuthEntity(),
-        builder: (context, formKey, entity) {
+    return GetBuilder<LoginScreenController>(
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: AppColors.instance.screenBg,
+          body: FormBuilder(
+            entity: AuthEntity(),
+            builder: (context, formKey, entity) {
               return SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -51,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                                 ),
                                 8.height,
                                 AppSecondaryText(
-                                  textAlign:TextAlign .center,
+                                  textAlign: TextAlign.center,
                                   text: controller.isSignInPage.value
                                       ? "Access your dashboard and care plans."
                                       : "Join our community of healthcare professionals and start providing quality care.",
@@ -73,12 +74,15 @@ class LoginScreen extends StatelessWidget {
                                         const AppContentHeader(text: 'Full Name'),
                                         12.height,
                                         CommonTextField(
-                                          controller: controller.fullNameTextEditingController,
+                                          controller:
+                                              controller.fullNameTextEditingController,
                                           validationType:
                                               ValidationType.validateRequired,
                                           hintText: 'Enter your Full Name',
                                           validation: (value) {
-                                            if (value == null || value.trim().isEmpty) return "Full Name is required";
+                                            if (value == null || value.trim().isEmpty) {
+                                              return "Full Name is required";
+                                            }
                                             return null;
                                           },
                                         ),
@@ -86,7 +90,6 @@ class LoginScreen extends StatelessWidget {
                                       ],
                                     ),
                             ),
-
                             const AppContentHeader(text: 'Email'),
                             12.height,
                             CommonTextField(
@@ -94,8 +97,12 @@ class LoginScreen extends StatelessWidget {
                               validationType: ValidationType.validateEmail,
                               hintText: 'Enter your email',
                               validation: (value) {
-                                if (value == null || value.trim().isEmpty) return "Email is required";
-                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) return "Enter a valid email";
+                                if (value == null || value.trim().isEmpty) {
+                                  return "Email is required";
+                                }
+                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
+                                  return "Enter a valid email";
+                                }
                                 return null;
                               },
                             ),
@@ -104,14 +111,17 @@ class LoginScreen extends StatelessWidget {
                               () => controller.isSignInPage.value
                                   ? const SizedBox()
                                   : Column(
-                                      crossAxisAlignment:CrossAxisAlignment .start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         const AppContentHeader(text: 'Phone Number'),
                                         12.height,
                                         PhoneTextField(
-                                          controller: controller.phoneTextEditingController,
+                                          controller:
+                                              controller.phoneTextEditingController,
                                           validator: (value) {
-                                            if (value == null || value.trim().isEmpty) return "Phone number is required";
+                                            if (value == null || value.trim().isEmpty) {
+                                              return "Phone number is required";
+                                            }
                                             return null;
                                           },
                                         ),
@@ -126,8 +136,12 @@ class LoginScreen extends StatelessWidget {
                               validationType: ValidationType.validatePassword,
                               hintText: 'Enter your Password',
                               validation: (value) {
-                                if (value == null || value.trim().isEmpty) return "Password is required";
-                                if (value.length < 8) return "Password must be at least 8 characters";
+                                if (value == null || value.trim().isEmpty) {
+                                  return "Password is required";
+                                }
+                                if (value.length < 8) {
+                                  return "Password must be at least 8 characters";
+                                }
                                 return null;
                               },
                             ),
@@ -136,14 +150,19 @@ class LoginScreen extends StatelessWidget {
                               () => controller.isSignInPage.value
                                   ? Align(
                                       alignment: Alignment.centerRight,
-                                      child: CommonText(
-                                        text: 'Forgot Password?',
-                                        textColor: AppColors.instance.error,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Get.toNamed(AppRoutes.instance.forgotScreen);
+                                        },
+                                        child: CommonText(
+                                          text: 'Forgot Password?',
+                                          textColor: AppColors.instance.error,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     )
-                                  : SizedBox(),
+                                  : const SizedBox(),
                             ),
                             32.height,
                             Obx(
@@ -157,10 +176,17 @@ class LoginScreen extends StatelessWidget {
                                       Get.toNamed(
                                         AppRoutes.instance.welcomeScreen,
                                         arguments: {
-                                          "name": controller.fullNameTextEditingController.text.trim(),
-                                          "email": controller.emailTextEditingController.text.trim(),
-                                          "phone": controller.phoneTextEditingController.text.trim(),
-                                          "password": controller.passwordTextEditingController.text,
+                                          "name": controller
+                                              .fullNameTextEditingController.text
+                                              .trim(),
+                                          "email": controller
+                                              .emailTextEditingController.text
+                                              .trim(),
+                                          "phone": controller
+                                              .phoneTextEditingController.text
+                                              .trim(),
+                                          "password":
+                                              controller.passwordTextEditingController.text,
                                         },
                                       );
                                     }
@@ -172,27 +198,6 @@ class LoginScreen extends StatelessWidget {
                                 buttonWidth: double.infinity,
                               ),
                             ),
-                            32.height,
-                            Obx(
-                              () => controller.isSignInPage.value?CommonButton(
-                                onTap: () {
-                                  if (formKey.currentState!.validate()) {
-                                    Get.toNamed(
-                                        AppRoutes.instance.appNavigationScreen,
-                                        arguments: {"isClient": false});
-                                  }
-                                },
-                                titleText: controller.isSignInPage.value
-                                    ? 'Login (Caregiver)'
-                                    : 'Continue',
-                                buttonWidth: double.infinity,
-                              ):SizedBox(),
-                            ),
-                            // Obx(
-                            //   () => controller.isSignInPage.value
-                            //       ? _googleSignIn()
-                            //       : SizedBox(),
-                            // ),
                             48.height,
                             Obx(
                               () => Align(
@@ -237,6 +242,9 @@ class LoginScreen extends StatelessWidget {
             },
           ),
         );
+      },
+    );
+  }
   }
 
   Widget _googleSignIn() {
@@ -255,6 +263,7 @@ class LoginScreen extends StatelessWidget {
         ),
         32.height,
         CommonButton(
+
           buttonColor: AppColors.instance.white,
           titleText: 'Continue with Google',
           titleColor: AppColors.instance.textPrimary,
@@ -264,4 +273,4 @@ class LoginScreen extends StatelessWidget {
       ],
     );
   }
-}
+

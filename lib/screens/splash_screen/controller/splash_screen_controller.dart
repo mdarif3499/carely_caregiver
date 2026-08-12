@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,20 +17,23 @@ class SplashScreenController extends GetxController {
         animation2.value = 1.0;
       });
 
-      // bool value =await SharePrefsHelper.getBool(SharedPreferenceValue.isOnboarding)??false;
-      Future.delayed(Duration(seconds: 3), () {
-      //   if (value) {
-      //     Get.offAllNamed(AppRoutes.instance.onBoardingScreen);
-          Get.offAllNamed(AppRoutes.instance.appNavigationScreen,arguments: {"isClient": true});
-        // } else {
-        //   Get.offAllNamed(AppRoutes.instance.wellCome);
-        // }
-      }
-      );
+      // Professional login check "from main"
+      String token = await SharePrefsHelper.getString(SharedPreferenceValue.token);
+      String role = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+
+      Future.delayed(const Duration(seconds: 3), () {
+        if (token.isNotEmpty) {
+          // Auto-login: Navigate to dashboard
+          Get.offAllNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": role == "CLIENT"});
+        } else {
+          // No token: Navigate to onboarding or login
+          Get.offAllNamed(AppRoutes.instance.loginScreen);
+        }
+      });
     } catch (e) {
       errorLog("onInitialDataLoadScreen", e);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.offAllNamed(AppRoutes.instance.errorScreen);
+        Get.offAllNamed(AppRoutes.instance.loginScreen);
       });
     }
   }

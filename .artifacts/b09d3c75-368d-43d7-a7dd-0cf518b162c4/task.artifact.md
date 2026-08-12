@@ -1,4 +1,3 @@
-- [ ] Add `verifyEmail` endpoint to `AppApiEndPoint`
-- [ ] Update `OtpVerificationController` for 6-digit API call
-- [ ] Update `OtpVerificationScreen` UI for 6-digit input
-- [ ] Verify API integration and UI layout
+- [x] Update `SharePrefsHelper.clearData()` to include email
+- [x] Update `ProfileScreenController.logout()` to clear data before navigating
+- [x] Verify auto-login behavior after logout

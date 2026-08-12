@@ -1,12 +1,13 @@
 import 'package:carely_caregiver/constant/app_api_end_point.dart';
-import 'package:carely_caregiver/services/api/api_client.dart';
-import 'package:carely_caregiver/services/api/api_service.dart';
+import 'package:carely_caregiver/repositories/auth_repository.dart';
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
+import '../../../../utils/log/app_log.dart';
 
 class LoginScreenController extends GetxController {
   ////////// object
@@ -14,11 +15,10 @@ class LoginScreenController extends GetxController {
   final fullNameTextEditingController = TextEditingController();
   final phoneTextEditingController = TextEditingController();
   final passwordTextEditingController = TextEditingController();
-  
+
   RxBool isSignInPage = true.obs;
   final formKey = GlobalKey<FormState>();
 
-  final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
 
   Future<void> loginUser() async {
@@ -28,25 +28,41 @@ class LoginScreenController extends GetxController {
       isLoading.value = true;
       update();
 
-      Map<String, dynamic> body = {
-        "email": emailTextEditingController.text.trim(),
-        "password": passwordTextEditingController.text,
-      };
-
-      appLog("Request Body: $body", source: "LOGIN_API");
-      final response = await _apiClient.post(AppApiEndPoint.login, body: body);
-      appLog("Response Body: ${response.data}", source: "LOGIN_API");
+      appLog("Attempting login for: ${emailTextEditingController.text.trim()}", source: "LOGIN_API");
+      
+      final response = await AuthRepository.instance.login(
+        emailTextEditingController.text.trim(),
+        passwordTextEditingController.text,
+      );
+      
+      appLog("Response Status: ${response.statusCode}, Body: ${response.data}", source: "LOGIN_API");
 
       if (response.isSuccess) {
-        showCustomSnackbar(message: response.message, isError: false);
-        // Navigate based on role or logic
-        Get.offAndToNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": true});
+        final payload = response.data['data'] ?? {};
+        final accessToken = payload['accessToken'] ?? "";
+        final refreshToken = payload['refreshToken'] ?? "";
+        final user = payload['user'] ?? {};
+
+        if (accessToken.toString().isNotEmpty) {
+          await SharePrefsHelper.setString(SharedPreferenceValue.token, accessToken);
+          await SharePrefsHelper.setString(SharedPreferenceValue.refreshToken, refreshToken);
+          await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
+          
+          showCustomSnackbar(message: response.message, isError: false);
+          
+          // Professional navigation after success based on actual role
+          Get.offAllNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": user['role'] == "CLIENT"});
+        } else {
+          showCustomSnackbar(message: "Authentication token missing from response.", isError: true);
+        }
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }
     } catch (e) {
       errorLog("loginUser", e);
-      showCustomSnackbar(message: "Login failed. Please try again.", isError: true);
+      showCustomSnackbar(message: "Login failed. Please check your connection.", isError: true);
     } finally {
       isLoading.value = false;
       update();
@@ -62,13 +78,17 @@ class LoginScreenController extends GetxController {
     }
   }
 
+  bool _isDisposed = false;
+
   ///////////. app. close
   void appOnClose() {
+    if (_isDisposed) return;
     try {
       fullNameTextEditingController.dispose();
       emailTextEditingController.dispose();
       phoneTextEditingController.dispose();
       passwordTextEditingController.dispose();
+      _isDisposed = true;
     } catch (e) {
       errorLog("appOnClose", e);
     }

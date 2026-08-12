@@ -81,6 +81,7 @@ class SharePrefsHelper {
     SharePrefsHelper.remove(SharedPreferenceValue.refreshToken);
     SharePrefsHelper.remove(SharedPreferenceValue.userId);
     SharePrefsHelper.remove(SharedPreferenceValue.role);
+    SharePrefsHelper.remove(SharedPreferenceValue.email);
   }
 
   //===========================Remove Value===================
