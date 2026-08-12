@@ -14,6 +14,7 @@ class SharedPreferenceValue {
   static const String teacherType = "teacherType";
   static const String number = "number";
   static const String password = "password";
+  static const String phone = "phone";
   static const String workshopId = "workshopId";
   static const String contactNumber = "contactNumber";
   static const String subscriptionId = "subscriptionId";

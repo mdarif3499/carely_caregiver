@@ -14,7 +14,6 @@ class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
-  
   PageController pageController = PageController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
@@ -33,6 +32,7 @@ class ForgotScreenController extends GetxController {
 
   Future<void> checkEmailFunction() async {
     final email = emailController.text.trim();
+
     if (email.isEmpty) {
       showCustomSnackbar(message: "Please enter your email", isError: true);
       return;

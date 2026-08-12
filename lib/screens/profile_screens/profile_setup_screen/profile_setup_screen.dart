@@ -198,14 +198,34 @@ class ProfileSetupScreen extends StatelessWidget {
     return Container(
       color: AppColors.instance.screenBg,
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      child: CommonButton(
-        titleText: 'Continue',
-        buttonWidth: double.infinity,
-        elevation: 0,
-        onTap: () {
-          Get.toNamed(AppRoutes.instance.clientHomeScreen);
-
-        },
+      child: Row(
+        children: [
+          Expanded(
+            child: CommonButton(
+              buttonColor: AppColors.instance.boxBg,
+              titleText: 'Back',
+              titleColor: AppColors.instance.textPrimary,
+              onTap: () {
+                Get.back();
+              },
+              buttonWidth: double.infinity,
+            ),
+          ),
+          16.width,
+          Expanded(
+            child: CommonButton(
+              titleText: 'Continue',
+              buttonWidth: double.infinity,
+              elevation: 0,
+              onTap: () {
+                Get.offAllNamed(
+                  AppRoutes.instance.appNavigationScreen,
+                  arguments: {"isClient": false},
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,20 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HealthProfileController extends GetxController {
-  final nameController = TextEditingController(text: 'Sarah Henderson');
-  final dobController = TextEditingController();
-  final medicalController = TextEditingController();
+  final nameController = TextEditingController();
+  final healthNeedsController = TextEditingController();
 
-  final RxString selectedGender = 'Select'.obs;
-  final RxString selectedLanguage = 'English'.obs;
+  final Rxn<String> selectedRelationship = Rxn<String>();
+  final Rxn<File> profileImage = Rxn<File>();
 
-  final List<String> genders = ['Male', 'Female', 'Other'];
-  final List<String> languages = ['English', 'Spanish', 'Other'];
+  final List<String> relationships = [
+    'Parent',
+    'Spouse',
+    'Sibling',
+    'Friend',
+    'Other',
+  ];
 
   void saveRecipient() {
-    Get.back();
-    Get.snackbar('Success', 'Recipient added successfully!');
+    // Implement save logic here
+    Get.snackbar('Success', 'Profile created successfully!');
   }
 
   void cancel() {
@@ -23,8 +29,8 @@ class HealthProfileController extends GetxController {
 
   @override
   void onClose() {
-    // Let GetX handle memory cleanup to avoid "used after disposed" errors 
-    // during screen exit animations.
+    nameController.dispose();
+    healthNeedsController.dispose();
     super.onClose();
   }
 }

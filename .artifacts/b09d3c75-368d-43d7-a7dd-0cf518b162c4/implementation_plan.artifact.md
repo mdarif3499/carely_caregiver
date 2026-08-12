@@ -1,27 +1,48 @@
-# Implementation Plan - Fix Logout Logic
+# Implementation Plan - Professional Profile Update Integration
 
-The current logout functionality only navigates to the login screen without clearing the session data from `SharedPreferences`. This causes the splash screen to automatically redirect back to the dashboard on app restart. This plan ensures that all session data is cleared upon logout.
+Implement the professional profile update functionality using the `/user/my-profile` (PATCH) endpoint with multipart/form-data support.
 
 ## Proposed Changes
 
+### [Component] API Service Layer
+Extend the API layer to support multipart (form-data) requests required for uploading profile images.
+
+#### [MODIFY] [api_client.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_client.dart)
+- Add `multipart` method definition to the interface.
+
+#### [MODIFY] [api_service.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/api_service.dart)
+- Implement the `multipart` method using `Dio`'s `FormData`.
+
+### [Component] Constants
+Add the new endpoint.
+
+#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
+- Add `updateProfile = "/user/my-profile"`.
+
+### [Component] Data Layer (Repository)
+Create a repository to handle user-related operations.
+
+#### [NEW] [user_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/user_repository.dart)
+- Implement `updateProfile` method which accepts name, phone, intakeCompleted, and an optional image file.
+
 ### [Component] Profile Screen Logic
 
-#### [MODIFY] [profile_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart)
-- Import `SharePrefsHelper`.
-- Update the `logout()` method to call `SharePrefsHelper.clearData()` before navigating to the login screen.
+#### [MODIFY] [basic_info_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/basic_info_screen/controller/basic_info_controller.dart)
+- Add a variable to store the selected profile image file.
+- Implement `updateProfile()` method:
+    - Capture data from controllers.
+    - Call `UserRepository.updateProfile`.
+    - Handle loading state and navigation upon success.
 
-### [Component] Utilities
-
-#### [MODIFY] [share_pref_helper.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/share_pref_helper/share_pref_helper.dart)
-- Update `clearData()` to also remove `email` to ensure a complete session cleanup.
+#### [MODIFY] [basic_info_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/basic_info_screen/basic_info_screen.dart)
+- Update `AppImagePicker` to pass the selected file to the controller via `onSaved`.
+- Bind the "Continue" / "Next Step" buttons to `controller.updateProfile()`.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  Open the app and ensure you are logged in (or log in).
-2.  Navigate to the Profile screen.
-3.  Click the "Logout" button.
-4.  Verify that you are taken to the Login screen.
-5.  Close the app completely (kill the process).
-6.  Reopen the app.
-7.  **Expected:** The splash screen should redirect you to the **Login screen**, not the dashboard.
+- Register a new user and verify OTP.
+- In `BasicInfoScreen`, change the name/phone and select a profile photo.
+- Click "Next Step" / "Continue".
+- Verify (via debug console logs) that a `PATCH` request is sent to `/user/my-profile` with `multipart/form-data`.
+- Confirm that the response is successful and the app proceeds to the next screen.

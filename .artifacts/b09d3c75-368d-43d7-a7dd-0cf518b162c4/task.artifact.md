@@ -1,3 +1,6 @@
-- [x] Update `SharePrefsHelper.clearData()` to include email
-- [x] Update `ProfileScreenController.logout()` to clear data before navigating
-- [x] Verify auto-login behavior after logout
+- [x] Update `OtpVerificationController` to handle user data on success
+- [x] Update `OtpVerificationScreen` success navigation logic
+- [x] Update `BasicInfoController` to receive and pre-fill user data
+- [x] Update `BasicInfoScreen` UI logic and bind controllers
+- [x] Implement role-based navigation flow (Caregiver vs Client)
+- [x] Verify the complete registration-to-profile flow

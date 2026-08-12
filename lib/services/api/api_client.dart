@@ -30,4 +30,10 @@ abstract class ApiClient {
     dynamic body,
     Map<String, String>? headers,
   });
+
+  Future<ApiResponseModel> multipart(
+    String url, {
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  });
 }

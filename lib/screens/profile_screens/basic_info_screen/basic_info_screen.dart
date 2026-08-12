@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:carely_caregiver/constant/app_colors.dart';
-import 'package:carely_caregiver/routes/app_routes.dart';
-import 'package:carely_caregiver/screens/auth_all_screens/login_screen/entity/auth_entity.dart';
+import 'package:carely_caregiver/widgets/app_image_picker.dart';
+import 'package:carely_caregiver/widgets/dashed_circle_painter.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/phone_number_text_filed.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
@@ -19,156 +21,142 @@ class BasicInfoScreen extends StatelessWidget {
 
     return DefaultBackgroundTemplate(
       appBarTitle: 'Create Your Profile',
-      child: Center(
-        child: FormBuilder(
-          entity: AuthEntity(),
-          builder: (context, formKey, entity) {
-            return Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  Obx(
-                    () => AuthScreenHeader(
-                      text: controller.isClient.value
-                          ? 'Basic Information'
-                          : "Who are you seeking care for?",
-                    ),
-                  ),
-                  8.height,
-                  Padding(
-                    padding: const EdgeInsets.only(left: 24.0, right: 24),
-                    child: Obx(
-                      () => AppSecondaryText(
-                        textAlign: TextAlign.center,
-                        text: controller.isClient.value
-                            ? "Let's start with the basics to help families get to know you."
-                            : "Provide details about the family member or person needing assistance to help us find the best match.",
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+          child: Column(
+            children: [
+              const AuthScreenHeader(
+                text: 'Basic Information',
+              ),
+              8.height,
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: AppSecondaryText(
+                  textAlign: TextAlign.center,
+                  text: "Let's start with the basics to help families get to know you.",
+                ),
+              ),
+              36.height,
+              Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CustomPaint(
+                      size: const Size(140, 140),
+                      painter: DashedCirclePainter(
+                        color: AppColors.instance.primary.withAlpha(150),
+                        dashWidth: 6,
+                        dashSpace: 4,
+                        strokeWidth: 1.5,
+                      ),
+                      child: Obx(
+                        () => Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.instance.primary.withAlpha(30),
+                          ),
+                          child: ClipOval(
+                            child: controller.profileImage.value != null
+                                ? Image.file(
+                                    controller.profileImage.value!,
+                                    fit: BoxFit.cover,
+                                    width: 140,
+                                    height: 140,
+                                  )
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.person,
+                                        size: 60,
+                                        color: AppColors.instance.textPrimary
+                                            .withAlpha(180),
+                                      ),
+                                      4.height,
+                                      Text(
+                                        'Add Photo',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.instance.textPrimary
+                                              .withAlpha(150),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
                       ),
                     ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: AppImagePicker(
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        pickerIcon: Icons.camera_alt,
+                        onChanged: (file) {
+                          if (file != null) {
+                            controller.profileImage.value = File(file.path);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              24.height,
+              const AppContentHeader(text: 'Profile Photo'),
+              8.height,
+              const AppSecondaryText(text: 'A clear photo helps build trust.'),
+              32.height,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppContentHeader(text: 'Full Name'),
+                  12.height,
+                  CommonTextField(
+                    controller: controller.fullNameController,
+                    validationType: ValidationType.notRequired,
+                    hintText: 'John Doe',
+                    backgroundColor: AppColors.instance.textFiledBg,
                   ),
-                  36.height,
-                  CommonImagePicker(width: 160, height: 160, borderRadius: 80),
-                  24.height,
-                  AppContentHeader(text: 'Profile Photo'),
-                  8.height,
-                  AppSecondaryText(text: 'A clear photo helps build trust.'),
-                  32.height,
+                  16.height,
+                  const AppContentHeader(text: 'Email'),
+                  12.height,
+                  CommonTextField(
+                    controller: controller.emailController,
+                    isReadOnly: true,
+                    validationType: ValidationType.notRequired,
+                    hintText: 'Enter your email',
+                    backgroundColor: AppColors.instance.textFiledBg,
+                  ),
+                  16.height,
+                  const AppContentHeader(text: 'Phone Number'),
+                  12.height,
+                  PhoneTextField(
+                    controller: controller.phoneController,
+                  ),
+                  48.height,
                   Obx(
-                    () => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        !controller.isClient.value
-                            ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppContentHeader(text: 'Full Name'),
-                                  12.height,
-                                  CommonTextField(
-                                    validationType: ValidationType.notRequired,
-                                    hintText: 'Enter your full name',
-                                  ),
-                                  16.height,
-                                  AppContentHeader(text: 'Email'),
-                                  12.height,
-                                  CommonTextField(
-                                    validationType: ValidationType.notRequired,
-                                    hintText: 'Enter your email',
-                                  ),
-                                  16.height,
-                                  AppContentHeader(text: 'Phone Number'),
-                                  12.height,
-                                  PhoneTextField(),
-                                ],
-                              )
-                            : SizedBox(),
-                        controller.isClient.value
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  16.height,
-                                  AppContentHeader(text: 'Recipient Full Name'),
-                                  12.height,
-                                  CommonTextField(
-                                    validationType: ValidationType.notRequired,
-                                    hintText:
-                                        'Enter name of the person you care for',
-                                  ),
-                                  16.height,
-                                  AppContentHeader(text: 'Your Relationship'),
-                                  12.height,
-                                  CommonDropDown(
-                                    hint:
-                                        'Chose your relationship with the care recipient',
-                                    enableInitalSelection: false,
-                                    items: [
-                                      'Parent',
-                                      'Spouse',
-                                      'Sibling',
-                                      'Friend',
-                                      'Other',
-                                    ],
-                                    onChanged: (value) {},
-                                    nameBuilder: (value) {
-                                      return value;
-                                    },
-                                  ),
-                                  16.height,
-                                  AppContentHeader(
-                                    text: 'Health Considerations & Care Needs',
-                                  ),
-                                  12.height,
-                                  CommonMultilineTextField(
-                                    borderColor: AppColors.instance.transparent,
-                                    height: 140,
-                                    validationType: ValidationType.notRequired,
-                                    hintText:
-                                        'List any allergies, mobility issues, or specific conditions (e.g., Diabetes, Dementia) ...',
-                                  ),
-                                  16.height,
-                                ],
-                              )
-                            : SizedBox(),
-                        48.height,
-
-                        controller.isClient.value
-                            ? Row(
-                                children: [
-                                  Expanded(
-                                    child: CommonButton(
-                                      buttonColor: AppColors.instance.boxBg,
-                                      titleText: 'Back',
-                                      titleColor:
-                                          AppColors.instance.textPrimary,
-                                      onTap: () {},
-                                      buttonWidth: double.infinity,
-                                    ),
-                                  ),
-                                  16.width,
-                                  Expanded(
-                                    child: CommonButton(
-                                      titleText: 'Continue',
-                                      onTap: () {
-                                        Get.toNamed(AppRoutes.instance.profileSetUpScreen);
-                                      },
-                                      buttonWidth: double.infinity,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            :       CommonButton(
-            titleText: 'Next Step',
-            onTap: () {
-              controller.isClient.value==false?Get.toNamed(AppRoutes.instance.profileSetUpScreen):null;
-            },
-            buttonWidth: double.infinity,
-            ),
-                      ],
+                    () => CommonButton(
+                      isLoading: controller.isLoading.value,
+                      titleText: 'Next Step',
+                      buttonColor: AppColors.instance.primary,
+                      onTap: () {
+                        controller.updateProfile();
+                      },
+                      buttonWidth: double.infinity,
                     ),
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
