@@ -32,6 +32,7 @@ class ForgotScreenController extends GetxController {
 
   Future<void> checkEmailFunction() async {
     final email = emailController.text.trim();
+
     if (email.isEmpty) {
       showCustomSnackbar(message: "Please enter your email", isError: true);
       return;

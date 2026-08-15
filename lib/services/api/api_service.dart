@@ -82,6 +82,16 @@ class DioApiClient implements ApiClient {
     return _request(url, method: 'DELETE', body: body, headers: headers);
   }
 
+  @override
+  Future<ApiResponseModel> multipart(
+    String url, {
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  }) async {
+    final formData = FormData.fromMap(body);
+    return _request(url, method: 'PATCH', body: formData, headers: headers);
+  }
+
   Future<ApiResponseModel> _request(
     String url, {
     required String method,

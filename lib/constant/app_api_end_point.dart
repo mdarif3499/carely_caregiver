@@ -16,6 +16,9 @@ class AppApiEndPoint {
   static const String sendOtp = "/auth/send-otp";
   static const String verifyEmail = "/auth/verify-email";
   static const String login = "/auth/login";
+
+  // User
+  static const String updateProfile = "/user/my-profile";
 }
 
 String _getDomain() {
@@ -25,7 +28,6 @@ String _getDomain() {
   try {
     if (kDebugMode) {
       localServer;
-      // return localServer;
     }
     return liveServer;
   } catch (e) {

@@ -1,0 +1,5 @@
+- `[x]` Update `BasicInfoController` for role-based navigation.
+- `[x]` Update `ProfileSetupScreen` (Caregiver UI) to match Screenshot 1.
+- `[x]` Redesign `NewRecipientProfileScreen` (Client UI) to match Screenshot 2.
+- `[x]` Update `HealthProfileController` (Client Logic) for new fields.
+- `[x]` Verify role-based navigation and UI designs.

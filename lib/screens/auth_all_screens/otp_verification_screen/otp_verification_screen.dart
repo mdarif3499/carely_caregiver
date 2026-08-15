@@ -86,10 +86,12 @@ class OtpVerificationScreen extends StatelessWidget {
                             pinController: controller.pinController,
                             onChanged: (value) {},
                             onCompleted: (value) {
-                              controller.checkOtpFunction(
-                                onSuccess: () => _showSuccessDialog(context),
-                              );
-                            },
+                          controller.checkOtpFunction(
+                            onSuccess: () =>
+                                _showSuccessDialog(context, controller),
+                          );
+                        },
+
                             theme: MaterialPinTheme(
                               shape: MaterialPinShape.outlined,
                               borderRadius: BorderRadius.circular(8.r),
@@ -119,7 +121,7 @@ class OtpVerificationScreen extends StatelessWidget {
                           onTap: () {
                             if (!controller.isLoading.value) {
                               controller.checkOtpFunction(
-                                onSuccess: () => _showSuccessDialog(context),
+                                onSuccess: () => _showSuccessDialog(context, controller),
                               );
                             }
                           },
@@ -211,7 +213,7 @@ class OtpVerificationScreen extends StatelessWidget {
     );
   }
 
-  void _showSuccessDialog(BuildContext context) {
+  void _showSuccessDialog(BuildContext context, OtpVerificationController controller) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
         context: context,
@@ -262,9 +264,18 @@ class OtpVerificationScreen extends StatelessWidget {
 
       Future.delayed(const Duration(seconds: 2), () {
         if (Get.isOverlaysOpen) {
-          Get.back(); // Close dialog if still open
+          Get.back();
         }
-        Get.offAllNamed(AppRoutes.instance.loginScreen);
+        final user = controller.userData;
+        Get.offAllNamed(
+          AppRoutes.instance.basicInfoScreen,
+          arguments: {
+            "isClient": user['role'] == "CLIENT",
+            "email": user['email'],
+            "name": user['name'] ?? "",
+            "phone": user['phone'] ?? "",
+          },
+        );
       });
     });
   }

@@ -26,6 +26,7 @@ class OtpVerificationController extends GetxController {
   
   RxString identity = "".obs; // email or phone
   RxString type = "email".obs; // 'email' or 'phone'
+  Map<String, dynamic> userData = {};
 
   RxInt timerSeconds = 180.obs; // 4 minutes
   Timer? _timer;
@@ -131,6 +132,7 @@ class OtpVerificationController extends GetxController {
         final accessToken = payload['accessToken'] ?? "";
         final refreshToken = payload['refreshToken'] ?? "";
         final user = payload['user'] ?? {};
+        userData = user;
 
         if (accessToken.toString().isNotEmpty) {
           await SharePrefsHelper.setString(SharedPreferenceValue.token, accessToken);
@@ -138,6 +140,7 @@ class OtpVerificationController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
+          await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
         }
 
         showCustomSnackbar(message: response.message, isError: false);
