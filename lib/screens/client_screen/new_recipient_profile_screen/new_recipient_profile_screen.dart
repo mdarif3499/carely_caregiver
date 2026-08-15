@@ -26,7 +26,7 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                     text: 'Who are you seeking care for?',
                   ),
                   const SizedBox(height: 8),
-                  Padding(
+                  const Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: AppSecondaryText(
                       textAlign: TextAlign.center,
@@ -36,7 +36,6 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                   ),
                   const SizedBox(height: 36),
 
-                  // ── Fields ──
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -85,7 +84,6 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
               ),
             ),
           ),
-          // ── Bottom Buttons ──
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
             child: Row(
