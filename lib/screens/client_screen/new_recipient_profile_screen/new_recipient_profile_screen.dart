@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/controller/health_profile_controller.dart';
-import 'package:carely_caregiver/widgets/app_image_picker.dart';
-import 'package:carely_caregiver/widgets/dashed_circle_painter.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
 import 'package:core_kit/core_kit.dart';
@@ -39,85 +35,6 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                     ),
                   ),
                   const SizedBox(height: 36),
-
-                  // ── Photo Picker ──
-                  Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CustomPaint(
-                          size: const Size(140, 140),
-                          painter: DashedCirclePainter(
-                            color: colors.primary.withAlpha(150),
-                            dashWidth: 6,
-                            dashSpace: 4,
-                            strokeWidth: 1.5,
-                          ),
-                          child: Obx(
-                            () => Container(
-                              width: 140,
-                              height: 140,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: colors.primary.withAlpha(30),
-                              ),
-                              child: ClipOval(
-                                child: controller.profileImage.value != null
-                                    ? Image.file(
-                                        controller.profileImage.value!,
-                                        fit: BoxFit.cover,
-                                        width: 140,
-                                        height: 140,
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.person,
-                                            size: 60,
-                                            color: colors.textPrimary
-                                                .withAlpha(180),
-                                          ),
-                                          4.height,
-                                          Text(
-                                            'Add Photo',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: colors.textPrimary
-                                                  .withAlpha(150),
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 5,
-                          right: 5,
-                          child: AppImagePicker(
-                            width: 40,
-                            height: 40,
-                            borderRadius: 20,
-                            pickerIcon: Icons.camera_alt,
-                            onChanged: (file) {
-                              if (file != null) {
-                                controller.profileImage.value = File(file.path);
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const AppContentHeader(text: 'Profile Photo'),
-                  const SizedBox(height: 8),
-                  const AppSecondaryText(text: 'A clear photo helps build trust.'),
-                  const SizedBox(height: 32),
 
                   // ── Fields ──
                   Column(
@@ -184,10 +101,13 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: CommonButton(
-                    titleText: 'Continue',
-                    onTap: controller.saveRecipient,
-                    buttonWidth: double.infinity,
+                  child: Obx(
+                    () => CommonButton(
+                      isLoading: controller.isLoading.value,
+                      titleText: 'Continue',
+                      onTap: controller.saveRecipient,
+                      buttonWidth: double.infinity,
+                    ),
                   ),
                 ),
               ],
