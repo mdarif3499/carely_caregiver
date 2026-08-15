@@ -84,6 +84,12 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
               ),
             ),
           ),
+
+
+      ///      {: true message: Email verified successfully, data: {accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhODAwNzI2MDBjMDIwN2MzMmJmNmFjZCIsImVtYWlsIjoiZG9wb3Q3MDgzM0BiZWl3b2guY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc4Njc3NTM2MiwiZXhwIjoxNzg2ODYxNzYyfQ.WaL611GN2vIh0K4HcrC8rNrVbd_pb97DbO1492TYI24, user: {id: 6a80072600c0207c32bf6acd, name: dopot, email: dopot70833@beiwoh.com, role: CLIENT, phone: (123) 456-7893, verificationStatus: verified, intakeCompleted: false}}}
+
+
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
             child: Row(
@@ -116,3 +122,5 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
     );
   }
 }
+
+/// VERIFY_EMAIL_API
