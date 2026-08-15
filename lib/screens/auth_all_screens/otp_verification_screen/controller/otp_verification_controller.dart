@@ -39,6 +39,13 @@ class OtpVerificationController extends GetxController {
     _loadInitialData();
   }
 
+
+    ///   PHASE_CLIENT_ON_CONTROLS_CHANGED
+   ///   PHASE_CLIENT_ON_CONTROLS_CHANGED
+  ///   requestedVisibleTypes to 503 (was 511)
+
+
+
   void _loadInitialData() {
     try {
       final argData = Get.arguments;
