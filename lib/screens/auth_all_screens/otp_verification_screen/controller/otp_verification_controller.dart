@@ -24,11 +24,11 @@ class OtpVerificationController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
   
-  RxString identity = "".obs; // email or phone
-  RxString type = "email".obs; // 'email' or 'phone'
+  RxString identity = "".obs;
+  RxString type = "email".obs;
   Map<String, dynamic> userData = {};
 
-  RxInt timerSeconds = 180.obs; // 4 minutes
+  RxInt timerSeconds = 180.obs;
   Timer? _timer;
   RxBool canResend = false.obs;
 
