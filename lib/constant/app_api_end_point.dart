@@ -19,6 +19,9 @@ class AppApiEndPoint {
 
   // User
   static const String updateProfile = "/user/my-profile";
+
+  // Care Recipient
+  static const String createCareRecipient = "/care-recipient";
 }
 
 String _getDomain() {

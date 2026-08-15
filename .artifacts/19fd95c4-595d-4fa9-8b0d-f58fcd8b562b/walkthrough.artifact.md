@@ -1,33 +1,39 @@
-# Walkthrough - Role-Based Profile Setup Flow
+# Walkthrough - Profile Setup Redesign & API Integration
 
-I have implemented the multi-role onboarding flow, ensuring that both Caregivers and Clients have a tailored experience that matches your design screenshots.
+I have implemented the role-based profile setup flow and integrated the `care-recipient` API for clients. The screens now match your provided designs exactly.
 
 ## Changes Made
 
 ### 1. Role-Based Navigation
-- **BasicInfoController:** Updated the `updateProfile` success logic.
-    - **Clients** are now navigated to the "Who are you seeking care for?" screen (`NewRecipientProfileScreen`).
-    - **Caregivers** are navigated to the "Professional Details" screen (`ProfileSetupScreen`).
-    - Changed navigation to `Get.toNamed` to allow users to go back and correct information if needed.
+- **BasicInfoController:** Updated to intelligently route users after a successful profile update.
+    - **Clients** go to the "Who are you seeking care for?" screen (`NewRecipientProfileScreen`).
+    - **Caregivers** go to the "Professional Details" screen (`ProfileSetupScreen`).
 
-### 2. Caregiver Profile Setup (Screenshot 1)
-- **ProfileSetupScreen:** Updated the bottom navigation to include both **Back** and **Continue** buttons side-by-side, matching the professional details layout.
+### 2. Caregiver Flow (Screenshot 1)
+- **ProfileSetupScreen:** Updated the UI to include both "Back" and "Continue" buttons at the bottom, matching the professional details design.
 
-### 3. Client Profile Setup (Screenshot 2)
-- **NewRecipientProfileScreen:** Completely redesigned to match the "Who are you seeking care for?" design.
-    - Added the **Dashed Circular Photo Picker** with real-time reactive preview.
-    - Implemented fields: **Recipient Full Name**, **Your Relationship** (dropdown), and **Health Considerations & Care Needs** (multiline).
-    - Added the **Back** and **Continue** buttons at the bottom.
-- **HealthProfileController:** Updated to handle the new fields, including the reactive `profileImage` and relationship selection.
+### 3. Client Flow (Screenshot 2 & API)
+- **NewRecipientProfileScreen:** Redesigned the entire screen:
+    - **Header:** Centered "Who are you seeking care for?".
+    - **Fields:** Added `Recipient Full Name`, `Your Relationship` dropdown, and a multiline `Health Considerations` field.
+    - **Styling:** All fields now use the consistent lavender background (`textFiledBg`).
+    - **Buttons:** Added side-by-side "Back" and "Continue" buttons.
+- **API Integration:**
+    - Added the `POST /care-recipient` endpoint.
+    - Created `ClientRepository` to handle the data transmission.
+    - Updated `HealthProfileController` to gather UI data and send it to the server via the repository.
+    - **Success Handling:** Navigates to the home screen after successfully creating a care recipient.
 
-## Verification Results
+## Verification
 
-### Navigation
-- Verified that the `isClient` flag correctly routes users to the appropriate next step.
-- Verified that "Back" buttons correctly return users to the `BasicInfoScreen`.
+### UI Matches
+- **Caregiver Screen:** Matches Screenshot 1 with the added Back button and centered header.
+- **Client Screen:** Matches Screenshot 2 perfectly (minus the photo picker as requested earlier).
 
-### UI Design
-- **Caregiver Screen:** Title, subtext, and bottom buttons now match Screenshot 1.
-- **Client Screen:** Circular picker, layout, and field labels now match Screenshot 2. All fields use the consistent lavender background (`textFiledBg`).
+### API Data Flow
+- The `saveRecipient` method correctly sends:
+    - `fullName` -> From "Recipient Full Name" field.
+    - `relationship` -> From "Your Relationship" selection.
+    - `medicalConditions` -> From "Health Considerations" text.
 
-This implementation completes the multi-role profile setup wizard as per your requirements.
+This completes the multi-role onboarding experience with live API integration.
