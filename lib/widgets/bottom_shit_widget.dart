@@ -326,7 +326,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SectionTitle(title: 'Language'),
+                            const _SectionTitle(title: 'Language'),
                             const SizedBox(height: 12),
                             _DropdownSelector<String>(
                               hint: 'EN',
