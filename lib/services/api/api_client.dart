@@ -34,6 +34,7 @@ abstract class ApiClient {
   Future<ApiResponseModel> multipart(
     String url, {
     required Map<String, dynamic> body,
+    String method = 'POST',
     Map<String, String>? headers,
   });
 }

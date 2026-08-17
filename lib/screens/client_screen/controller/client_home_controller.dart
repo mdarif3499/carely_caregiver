@@ -40,10 +40,6 @@ class ClientHomeController extends GetxController {
   final RxString searchQuery = ''.obs;
   void onSearchChanged(String val) => searchQuery.value = val;
 
-  // User info
-  final String userName = 'Jane Cooper';
-  final String userAvatarUrl = '';
-
   // Upcoming booking
   final Rx<BookingModel> upcomingBooking = Rx<BookingModel>(
     const BookingModel(

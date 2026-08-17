@@ -31,7 +31,7 @@ class UserRepository {
       );
     }
 
-    return await _apiClient.multipart(AppApiEndPoint.updateProfile, body: body);
+    return await _apiClient.multipart(AppApiEndPoint.updateProfile, body: body, method: 'PATCH');
   }
 
   Future<ApiResponseModel> getMyProfile() async {

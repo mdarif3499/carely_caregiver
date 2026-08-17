@@ -86,10 +86,11 @@ class DioApiClient implements ApiClient {
   Future<ApiResponseModel> multipart(
     String url, {
     required Map<String, dynamic> body,
+    String method = 'POST',
     Map<String, String>? headers,
   }) async {
     final formData = FormData.fromMap(body);
-    return _request(url, method: 'PATCH', body: formData, headers: headers);
+    return _request(url, method: method, body: formData, headers: headers);
   }
 
   Future<ApiResponseModel> _request(

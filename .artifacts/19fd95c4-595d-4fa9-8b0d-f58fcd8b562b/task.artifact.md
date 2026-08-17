@@ -1,4 +1,5 @@
-- `[x]` Update `LoginScreenController` with professional API integration.
-- `[x]` Save user data and tokens to `SharedPreferences`.
-- `[x]` Implement smart navigation based on `intakeCompleted`.
-- `[x]` Verify the login flow.
+- `[x]` Update `CareGiverHomeController` to remove hardcoded user data.
+- `[x]` Update `ClientHomeController` to remove hardcoded user data.
+- `[x]` Update `CareGiverHomeScreen` UI to show real user data in the header.
+- `[x]` Update `ClientHomeScreen` UI to show real user data in the header.
+- `[x]` Verify the dynamic headers on both Caregiver and Client home screens.
