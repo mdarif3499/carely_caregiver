@@ -10,7 +10,6 @@ class ApiResponseHandler {
     if (error is DioException) return _mapDioError(error);
     return ApiResponseModel(500, {'message': "Something went wrong."});
   }
-
   static ApiResponseModel _mapDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
