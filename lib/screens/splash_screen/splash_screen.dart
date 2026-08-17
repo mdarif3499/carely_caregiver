@@ -85,7 +85,7 @@ class SplashScreen extends StatelessWidget {
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.5,
                                       ),
-                                      children:  [
+                                      children:  const [
                                         TextSpan(
                                           text: 'Caregiver',
                                           style: TextStyle(
