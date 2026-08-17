@@ -23,6 +23,10 @@ class AppApiEndPoint {
 
   // Care Recipient
   static const String createCareRecipient = "/care-recipient";
+
+  // Caregiver
+  static const String uploadDocument = "/document/upload";
+  static const String updateCaregiverProfile = "/caregiver-profiles/me";
 }
 
 String _getDomain() {

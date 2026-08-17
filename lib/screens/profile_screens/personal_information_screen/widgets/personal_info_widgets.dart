@@ -1,14 +1,17 @@
+import 'dart:io';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
 class EditableProfilePhoto extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
+  final File? file;
   final VoidCallback onUploadTap;
 
   const EditableProfilePhoto({
     super.key,
-    required this.imageUrl,
+    this.imageUrl,
+    this.file,
     required this.onUploadTap,
   });
 
@@ -28,10 +31,13 @@ class EditableProfilePhoto extends StatelessWidget {
                   border: Border.all(color: colors.border.withAlpha(100), width: 4),
                 ),
                 child: ClipOval(
-                  child: CommonImage(
-                    src: imageUrl,
-                    fill: BoxFit.cover,
-                  ),
+                  child: file != null
+                      ? Image.file(file!, fit: BoxFit.cover)
+                      : CommonImage(
+                          src: imageUrl ??
+                              'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=1000&auto=format&fit=crop',
+                          fill: BoxFit.cover,
+                        ),
                 ),
               ),
               Positioned(

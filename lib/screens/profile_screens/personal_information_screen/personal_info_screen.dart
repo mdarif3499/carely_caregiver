@@ -26,8 +26,9 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
                   // ── Profile Photo ──
                   Obx(
                     () => EditableProfilePhoto(
-                      imageUrl: controller.avatarUrl.value,
-                      onUploadTap: () {},
+                      file: controller.pickedImage.value,
+                      imageUrl: controller.profileController.userModel.value?.profileImage,
+                      onUploadTap: controller.pickProfileImage,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -50,6 +51,7 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
                   const SizedBox(height: 12),
                   CommonTextField(
                     controller: controller.emailController,
+                    isReadOnly: true,
                     hintText: 'Enter your email',
                     backgroundColor: colors.textFiledBg,
                     borderColor: Colors.transparent,
@@ -96,10 +98,13 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
           // ── Bottom Button ──
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-            child: CommonButton(
-              titleText: 'Save Changes',
-              onTap: controller.saveChanges,
-              buttonWidth: double.infinity,
+            child: Obx(
+              () => CommonButton(
+                isLoading: controller.isLoading.value,
+                titleText: 'Save Changes',
+                onTap: controller.saveChanges,
+                buttonWidth: double.infinity,
+              ),
             ),
           ),
         ],

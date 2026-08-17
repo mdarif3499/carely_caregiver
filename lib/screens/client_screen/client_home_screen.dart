@@ -6,20 +6,25 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app_navigation_screen/controller/app_navigation_screen_controller.dart';
+
 class ClientHomeScreen extends StatelessWidget {
   const ClientHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ClientHomeController>();
+    final navC = Get.find<AppNavigationScreenController>();
     final colors = AppColors.instance;
 
     return DefaultBackgroundTemplate(
-      titleWidget: ClientHomeHeader(
-        userName: controller.userName,
-        avatarUrl: controller.userAvatarUrl,
-        onFilterTap: controller.onFilterTap,
-        onNotificationTap: controller.onNotificationTap,
+      titleWidget: Obx(
+        () => ClientHomeHeader(
+          userName: navC.userModel.value?.name ?? "...",
+          avatarUrl: navC.userModel.value?.profileImage ?? "",
+          onFilterTap: controller.onFilterTap,
+          onNotificationTap: controller.onNotificationTap,
+        ),
       ),
       hideBackButton: true,
       child: SingleChildScrollView(

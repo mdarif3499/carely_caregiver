@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/screens/app_navigation_screen/controller/app_navigation_screen_controller.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/care_giver_home_screen/controller/care_giver_home_controller.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/care_giver_home_screen/widgets/care_giver_home_widgets.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/earning_screen/widgets/earning_widgets.dart';
@@ -14,13 +15,16 @@ class CareGiverHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Get.find<CareGiverHomeController>();
+    final navC = Get.find<AppNavigationScreenController>();
     final colors = AppColors.instance;
 
     return DefaultBackgroundTemplate(
-      titleWidget: CareGiverHeader(
-        userName: c.userName,
-        avatarUrl: c.userAvatarUrl,
-        onNotificationTap: c.onNotificationTap,
+      titleWidget: Obx(
+        () => CareGiverHeader(
+          userName: navC.userModel.value?.name ?? "...",
+          avatarUrl: navC.userModel.value?.profileImage ?? "",
+          onNotificationTap: c.onNotificationTap,
+        ),
       ),
       hideBackButton: true,
       child: SingleChildScrollView(

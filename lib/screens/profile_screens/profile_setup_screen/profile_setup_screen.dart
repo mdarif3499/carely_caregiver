@@ -35,7 +35,7 @@ class ProfileSetupScreen extends StatelessWidget {
                   const SizedBox(height: 28),
                   _buildSectionTitle('Work Experience'),
                   const SizedBox(height: 10),
-                  AppContentHeader(text: 'Total Years in Caregiving'),
+                  const AppContentHeader(text: 'Total Years in Caregiving'),
                   const SizedBox(height: 10),
                   _buildExperienceDropdown(controller),
                   const SizedBox(height: 28),
@@ -49,7 +49,7 @@ class ProfileSetupScreen extends StatelessWidget {
           ),
 
           // ── Fixed bottom buttons ──
-          _buildBottomButtons(context),
+          _buildBottomButtons(context, controller),
           20.height,
         ],
       ),
@@ -61,13 +61,13 @@ class ProfileSetupScreen extends StatelessWidget {
   // ─────────────────────────────
 
   Widget _buildHeader() {
-    return Center(
+    return const Center(
       child: Column(
         children: [
           AuthScreenHeader(text: 'Professional Details'),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12),
             child: AppSecondaryText(
               textAlign: TextAlign.center,
               text:
@@ -179,12 +179,22 @@ class ProfileSetupScreen extends StatelessWidget {
             ),
           ),
 
+          // Uploading state
+          if (controller.isUploading.value)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+
           // Add new card
-          AddCertificationCard(
-            onTap: () {
-              // TODO: open add certification bottom sheet
-            },
-          ),
+          if (!controller.isUploading.value)
+            AddCertificationCard(
+              onTap: () {
+                controller.pickAndUploadFile();
+              },
+            ),
         ],
       ),
     );
@@ -194,7 +204,7 @@ class ProfileSetupScreen extends StatelessWidget {
   //  Bottom buttons
   // ─────────────────────────────
 
-  Widget _buildBottomButtons(BuildContext context) {
+  Widget _buildBottomButtons(BuildContext context, ProfileSetupScreenController controller) {
     return Container(
       color: AppColors.instance.screenBg,
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -213,16 +223,16 @@ class ProfileSetupScreen extends StatelessWidget {
           ),
           16.width,
           Expanded(
-            child: CommonButton(
-              titleText: 'Continue',
-              buttonWidth: double.infinity,
-              elevation: 0,
-              onTap: () {
-                Get.offAllNamed(
-                  AppRoutes.instance.appNavigationScreen,
-                  arguments: {"isClient": false},
-                );
-              },
+            child: Obx(
+              () => CommonButton(
+                isLoading: controller.isSubmitting.value,
+                titleText: 'Continue',
+                buttonWidth: double.infinity,
+                elevation: 0,
+                onTap: () {
+                  controller.updateProfile();
+                },
+              ),
             ),
           ),
         ],

@@ -23,8 +23,9 @@ class ApiResponseHandler {
           error.response?.statusCode,
           error.response?.data,
         );
-      default:
-        return ApiResponseModel(400, {'message': "An unexpected error occurred."});
+      default: return ApiResponseModel(400, {'message': "An unexpected error occurred."});
+
+
     }
   }
 }

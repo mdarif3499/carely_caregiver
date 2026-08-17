@@ -1,6 +1,7 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/care_giver_home_screen/controller/care_giver_home_controller.dart';
+import 'package:carely_caregiver/utils/app_utils.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,7 @@ class CareGiverHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CommonText(
-                text: 'Good Morning',
+                text: AppUtils.getGreeting(),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 textColor: colors.secondaryText,
