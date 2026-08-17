@@ -100,7 +100,7 @@ class SplashScreen extends StatelessWidget {
 
                                   8.height,
 
-                                  // ── Subtitle ─────────────────────────
+
                                   CommonText(
                                     text: 'Empowering your care journey',
                                     fontSize: 16,
