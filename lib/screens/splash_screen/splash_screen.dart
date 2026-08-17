@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'dart:ui';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/gen/assets.gen.dart';
-import '../../constant/app_assert_image.dart';
 import '../../utils/app_size.dart';
 import 'controller/splash_screen_controller.dart';
 
@@ -23,16 +22,12 @@ class SplashScreen extends StatelessWidget {
           body: Stack(
             fit: StackFit.expand,
             children: [
-              // ── Background image ──────────────────────────────────────
               CommonImage(
                 src: Assets.images.splashBg.path,
                 height: size.height,
                 width: size.width,
               ),
 
-              // ── Subtle dark overlay ───────────────────────────────────
-
-              // ── Animated glass card ───────────────────────────────────
               Obx(
                     () => Center(
                   child: Padding(
@@ -66,7 +61,6 @@ class SplashScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // ── Logo ─────────────────────────────
                                   CommonImage(
                                     src: Assets.logo.appLogoPng.path,
                                     height: 150,
@@ -75,7 +69,6 @@ class SplashScreen extends StatelessWidget {
 
                                   24.height,
 
-                                  // ── Title ────────────────────────────
                                   RichText(
                                     text: TextSpan(
                                       text: 'Carely ',
