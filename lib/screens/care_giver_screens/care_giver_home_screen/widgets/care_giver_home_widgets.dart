@@ -1,5 +1,4 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
-import 'package:carely_caregiver/gen/assets.gen.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/care_giver_home_screen/controller/care_giver_home_controller.dart';
 import 'package:core_kit/core_kit.dart';

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
@@ -67,7 +66,7 @@ class OtpVerificationController extends GetxController {
       errorLog("loadInitialData", e);
     }
   }
-
+  /// 🌐║ POST ║ Status: 200 OK  ║📡
   void startTimer() {
     _timer?.cancel();
     canResend.value = false;

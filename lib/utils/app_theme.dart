@@ -36,12 +36,12 @@ hintStyle: TextStyle(
   elevatedButtonTheme: ElevatedButtonThemeData(
 
     style: ButtonStyle(
-      elevation: MaterialStatePropertyAll(
+      elevation: const WidgetStatePropertyAll(
         0,
       ),
-      backgroundColor: MaterialStatePropertyAll(AppColors.instance.primary),
-      overlayColor: MaterialStatePropertyAll(AppColors.instance.transparent),
-      mouseCursor: MaterialStatePropertyAll(MouseCursor.defer),
+      backgroundColor: WidgetStatePropertyAll(AppColors.instance.primary),
+      overlayColor: WidgetStatePropertyAll(AppColors.instance.transparent),
+      mouseCursor: const WidgetStatePropertyAll(MouseCursor.defer),
 
       // OR minimumSize if you want it to grow with child
       // minimumSize: MaterialStatePropertyAll(Size(double.infinity, 50)),
@@ -49,10 +49,10 @@ hintStyle: TextStyle(
   ),
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
-      overlayColor: MaterialStatePropertyAll(AppColors.instance.transparent),
-      mouseCursor: MaterialStatePropertyAll(MouseCursor.defer),
-      fixedSize: MaterialStatePropertyAll(
-        const Size(double.infinity, 44),
+      overlayColor: WidgetStatePropertyAll(AppColors.instance.transparent),
+      mouseCursor: const WidgetStatePropertyAll(MouseCursor.defer),
+      fixedSize: const WidgetStatePropertyAll(
+        Size(double.infinity, 44),
       ),
     ),
   ),

@@ -95,41 +95,51 @@ class ProfileScreen extends StatelessWidget {
     return DefaultBackgroundTemplate(
       appBarTitle: 'Profile',
       hideBackButton: true,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header ──
-            Obx(
-              () => ProfileAvatarHeader(
-                name: controller.name.value,
-                memberSince: controller.memberSince.value,
-                avatarUrl: controller.avatarUrl.value,
+      child: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final user = controller.userModel.value;
+        if (user == null) {
+          return const Center(child: Text("Failed to load profile"));
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header ──
+              ProfileAvatarHeader(
+                name: user.name,
+                memberSince: user.memberSince,
+                avatarUrl: user.profileImage ??
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
                 showCameraIcon: isClient,
               ),
-            ),
-            const SizedBox(height: 32),
+              const SizedBox(height: 32),
 
-            // ── Account Section ──
-            ProfileSection(
-              title: 'Account',
-              items: isClient ? clientAccountItems : caregiverAccountItems,
-            ),
-            const SizedBox(height: 24),
+              // ── Account Section ──
+              ProfileSection(
+                title: 'Account',
+                items: isClient ? clientAccountItems : caregiverAccountItems,
+              ),
+              const SizedBox(height: 24),
 
-            // ── Settings Section ──
-            ProfileSection(
-              title: 'Settings',
-              items: settingsItems,
-            ),
-            const SizedBox(height: 32),
+              // ── Settings Section ──
+              ProfileSection(
+                title: 'Settings',
+                items: settingsItems,
+              ),
+              const SizedBox(height: 32),
 
-            // ── Logout ──
-            LogoutButton(onTap: controller.logout),
-          ],
-        ),
-      ),
+              // ── Logout ──
+              LogoutButton(onTap: controller.logout),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

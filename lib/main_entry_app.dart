@@ -35,7 +35,7 @@ class MainEntryApp extends StatelessWidget {
               onBack: (){
               Get.back();
             },
-            backButton: Icon(Icons.arrow_back_ios)
+            backButton: const Icon(Icons.arrow_back_ios)
             // backIcon:
           ),
 
@@ -54,7 +54,7 @@ class MainEntryApp extends StatelessWidget {
             enableDebugLogs: true,
           ),
           tokenProvider: TokenProvider(
-            accessToken: () async => (await SharePrefsHelper.getString(SharedPreferenceValue.token)) ?? '',
+            accessToken: () async => (await SharePrefsHelper.getString(SharedPreferenceValue.token)),
             refreshToken: () async {
               AppLogger.debug(
                 (await SharePrefsHelper.getString(SharedPreferenceValue.refreshToken)).toString(),

@@ -1,8 +1,4 @@
-- `[x]` Create `DashedCirclePainter` widget.
-- `[x]` Update `BasicInfoScreen` UI to match the design image.
-- `[x]` Remove `isClient` conditional UI logic for a unified experience.
-- `[x]` Update `BasicInfoController` for role-based navigation.
-- `[x]` Add `createCareRecipient` API endpoint and repository.
-- `[x]` Redesign `ProfileSetupScreen` (Caregiver) UI to match Screenshot 1.
-- `[x]` Redesign `NewRecipientProfileScreen` (Client) UI to match Screenshot 2 and integrate API.
-- `[x]` Verify role-based navigation and UI/API integration.
+- `[x]` Update `LoginScreenController` with professional API integration.
+- `[x]` Save user data and tokens to `SharedPreferences`.
+- `[x]` Implement smart navigation based on `intakeCompleted`.
+- `[x]` Verify the login flow.

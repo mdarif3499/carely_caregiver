@@ -1,5 +1,4 @@
 import 'package:carely_caregiver/routes/app_routes.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 // ── Model ─────────────────────────────────────────────

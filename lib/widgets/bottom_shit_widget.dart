@@ -204,7 +204,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Skills ──────────────────────────────
-                  _SectionTitle(title: 'Skills'),
+                  const _SectionTitle(title: 'Skills'),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
@@ -229,7 +229,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   const SizedBox(height: 24),
 
                   // ── Availability ─────────────────────────
-                  _SectionTitle(title: 'Availability'),
+                  const _SectionTitle(title: 'Availability'),
                   const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -253,7 +253,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   const SizedBox(height: 24),
 
                   // ── Price Range ──────────────────────────
-                  _SectionTitle(title: 'Price Range'),
+                  const _SectionTitle(title: 'Price Range'),
                   const SizedBox(height: 8),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
@@ -308,7 +308,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SectionTitle(title: 'Rating'),
+                            const _SectionTitle(title: 'Rating'),
                             const SizedBox(height: 12),
                             _DropdownSelector<String>(
                               hint: 'Select rating',
