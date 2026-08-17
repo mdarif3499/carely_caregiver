@@ -76,7 +76,7 @@ class HomeHeaderWidget extends StatelessWidget {
         const SizedBox(width: 8),
 
         // Notification icon
-        AppIconButton(
+        const AppIconButton(
           icon: Icons.notifications_outlined,
           hasBadge: true,
         ),

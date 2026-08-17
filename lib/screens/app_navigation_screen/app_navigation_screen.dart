@@ -2,15 +2,12 @@ import 'package:carely_caregiver/screens/app_navigation_screen/widget/custom_nav
 import 'package:carely_caregiver/screens/care_giver_screens/booking_request_screen/booking_request_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/earning_screen/earning_screen.dart';
 import 'package:carely_caregiver/screens/chat_list_screen/chat_list_screen.dart';
-import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/care_giver_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/client_home_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/find_caregiver_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../app_all_enum/app_login_status.dart';
 import '../care_giver_screens/care_giver_home_screen/care_giver_home_screen.dart';
-import '../client_screen/book_caregiver_screen/book_caregiver_screen.dart';
-import '../client_screen/review_booking_screen/review_booking_screen.dart';
 import '../client_screen/select_service_type_screen/select_service_type_screen.dart';
 import '../profile_screens/profile_screen/profile_screen.dart';
 import 'controller/app_navigation_screen_controller.dart';

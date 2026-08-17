@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../constant/app_assert_image.dart';
-import '../../../../constant/app_colors.dart';
 import '../../../../utils/app_size.dart';
 import '../controller/forgot_screen_controller.dart';
 

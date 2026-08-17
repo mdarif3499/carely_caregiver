@@ -1,8 +1,6 @@
-import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/repositories/auth_repository.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';
@@ -38,6 +36,10 @@ class LoginScreenController extends GetxController {
       appLog("Response Status: ${response.statusCode}, Body: ${response.data}", source: "LOGIN_API");
 
       if (response.isSuccess) {
+
+
+
+
         final payload = response.data['data'] ?? {};
         final accessToken = payload['accessToken'] ?? "";
         final refreshToken = payload['refreshToken'] ?? "";
@@ -49,11 +51,26 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.userId, user['id'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
-          
+          await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
+
           showCustomSnackbar(message: response.message, isError: false);
-          
-          // Professional navigation after success based on actual role
-          Get.offAllNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": user['role'] == "CLIENT"});
+
+          if (user['intakeCompleted'] == true) {
+            Get.offAllNamed(
+              AppRoutes.instance.appNavigationScreen,
+              arguments: {"isClient": user['role'] == "CLIENT"},
+            );
+          } else {
+            Get.offAllNamed(
+              AppRoutes.instance.basicInfoScreen,
+              arguments: {
+                "isClient": user['role'] == "CLIENT",
+                "email": user['email'],
+                "name": user['name'] ?? "",
+                "phone": user['phone'] ?? "",
+              },
+            );
+          }
         } else {
           showCustomSnackbar(message: "Authentication token missing from response.", isError: true);
         }

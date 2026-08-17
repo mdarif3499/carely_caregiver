@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:core_kit/utils/app_log.dart';
 import 'package:flutter/material.dart';

@@ -2,7 +2,6 @@ import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/services/api/api_client.dart';
 import 'package:carely_caregiver/services/api/api_service.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';

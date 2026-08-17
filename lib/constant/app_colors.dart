@@ -30,7 +30,7 @@ class AppColors {
   final Color highlight = const Color(0xFF8DB501);
   final Color textFiledBg = const Color(0xFFEEEDF9);
   final Color transparent = Colors.transparent;
-  final Color backgroundColor = Color(0xffF8F8F8);
+   Color backgroundColor = const Color(0xffF8F8F8);
 
   ////////////////  app primary use blue color
   final Color primary50 = const Color(0xffe6f2ff);

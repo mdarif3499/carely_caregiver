@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
@@ -24,11 +23,11 @@ class OtpVerificationController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
   
-  RxString identity = "".obs; // email or phone
-  RxString type = "email".obs; // 'email' or 'phone'
+  RxString identity = "".obs;
+  RxString type = "email".obs;
   Map<String, dynamic> userData = {};
 
-  RxInt timerSeconds = 180.obs; // 4 minutes
+  RxInt timerSeconds = 180.obs;
   Timer? _timer;
   RxBool canResend = false.obs;
 
@@ -38,6 +37,13 @@ class OtpVerificationController extends GetxController {
     pinController = PinInputController(textController: otpController);
     _loadInitialData();
   }
+
+
+    ///   PHASE_CLIENT_ON_CONTROLS_CHANGED
+   ///   PHASE_CLIENT_ON_CONTROLS_CHANGED
+  ///   requestedVisibleTypes to 503 (was 511)
+
+
 
   void _loadInitialData() {
     try {
@@ -60,7 +66,7 @@ class OtpVerificationController extends GetxController {
       errorLog("loadInitialData", e);
     }
   }
-
+  /// 🌐║ POST ║ Status: 200 OK  ║📡
   void startTimer() {
     _timer?.cancel();
     canResend.value = false;

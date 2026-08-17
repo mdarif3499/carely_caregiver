@@ -1,4 +1,3 @@
-import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/role_card.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';

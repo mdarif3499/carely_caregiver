@@ -12,7 +12,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: AppSize.width(value: 20.0)),
         child:
-        CommonText(
+        const CommonText(
         fontSize: 16,
           height: 1.8,
           text:

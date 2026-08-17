@@ -24,7 +24,7 @@ Future<void> main() async {
   Get.put(ConnectivityService());
   /////////  flutter main widget call
 
-  runApp(MainEntryApp());
+  runApp(const MainEntryApp());
 }
 
 class MyHttpOverrides extends HttpOverrides {
