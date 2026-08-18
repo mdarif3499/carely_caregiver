@@ -1,5 +1,5 @@
-- `[x]` Update `CareGiverHomeController` to remove hardcoded user data.
-- `[x]` Update `ClientHomeController` to remove hardcoded user data.
-- `[x]` Update `CareGiverHomeScreen` UI to show real user data in the header.
-- `[x]` Update `ClientHomeScreen` UI to show real user data in the header.
-- `[x]` Verify the dynamic headers on both Caregiver and Client home screens.
+- `[x]` Update app `build.gradle.kts` to SDK 36.
+- `[x]` Force SDK 36 in root `build.gradle.kts`.
+- `[x]` Run `fvm flutter clean`.
+- `[x]` Run `fvm flutter pub get`.
+- `[x]` Run `fvm flutter build apk --debug`.

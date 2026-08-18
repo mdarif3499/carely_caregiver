@@ -60,14 +60,14 @@ class ProfileSetupScreenController extends GetxController {
 
   Future<void> pickAndUploadFile() async {
     try {
-      final PlatformFile? result = await FilePicker.pickFile(
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       );
 
-      if (result != null && result.path != null) {
-        File file = File(result.path!);
-        String fileName = result.name;
+      if (result != null && result.files.single.path != null) {
+        File file = File(result.files.single.path!);
+        String fileName = result.files.single.name;
         
         await uploadFile(file, fileName);
       }
