@@ -57,9 +57,11 @@ class ForgotScreenController extends GetxController {
       appLog("Response Body: ${response.data}", source: "SEND_OTP_FORGOT_API");
 
       if (response.isSuccess) {
-        showCustomSnackbar(message: response.message, isError: false);
-        pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
-        startTimer();
+        if (!isClosed) {
+          showCustomSnackbar(message: response.message, isError: false);
+          pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
+          startTimer();
+        }
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }
@@ -67,8 +69,10 @@ class ForgotScreenController extends GetxController {
       errorLog("checkEmailFunction", e);
       showCustomSnackbar(message: "Failed to send OTP. Please try again.", isError: true);
     } finally {
-      isLoading.value = false;
-      update();
+      if (!isClosed) {
+        isLoading.value = false;
+        update();
+      }
     }
   }
 
@@ -106,8 +110,10 @@ class ForgotScreenController extends GetxController {
       errorLog("checkOtpFunction", e);
       showCustomSnackbar(message: "Verification failed. Please try again.", isError: true);
     } finally {
-      isLoading.value = false;
-      update();
+      if (!isClosed) {
+        isLoading.value = false;
+        update();
+      }
     }
   }
 
@@ -136,8 +142,10 @@ class ForgotScreenController extends GetxController {
       errorLog("checkCreateFunction", e);
       showCustomSnackbar(message: "Failed to reset password", isError: true);
     } finally {
-      isLoading.value = false;
-      update();
+      if (!isClosed) {
+        isLoading.value = false;
+        update();
+      }
     }
   }
 
@@ -171,8 +179,10 @@ class ForgotScreenController extends GetxController {
       errorLog("reSendOtp", e);
       showCustomSnackbar(message: "Failed to resend OTP", isError: true);
     } finally {
-      isResending.value = false;
-      update();
+      if (!isClosed) {
+        isResending.value = false;
+        update();
+      }
     }
   }
 

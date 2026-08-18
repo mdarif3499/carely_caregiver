@@ -1,46 +1,30 @@
-# Implementation Plan - Forgot Password Flow Integration
+# Implementation Plan - Fix "Controller Used After Disposed" Error
 
-The goal is to complete the forgot password flow by capturing the `resetToken` from the OTP verification response and using it to reset the password in the final step.
+The goal is to resolve the `TextEditingController` disposal errors occurring during navigation in the login and forgot password flows. This typically happens when asynchronous tasks or focus listeners attempt to interact with a controller that has already been disposed.
 
 ## Proposed Changes
 
-### [Component] API Integration Layer
+### [Component] Authentication Controllers
 
-#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
-- Add `static const String resetPassword = "/auth/reset-password";`
-
-#### [MODIFY] [auth_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/auth_repository.dart)
-- Implement `resetPassword` method to handle the final password update POST request.
-- This method will accept `newPassword`, `confirmPassword`, and the `resetToken`.
-
----
-
-### [Component] Forgot Password Logic
+#### [MODIFY] [login_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/controller/login_screen_controller.dart)
+- **Safe State Updates:** Update the `finally` block in `loginUser()` to check `if (!isClosed)` before calling `update()`. This prevents triggering a UI rebuild on a controller that is being disposed.
+- **Improved Disposal:** Ensure `appOnClose` is called safely and doesn't conflict with pending microtasks.
 
 #### [MODIFY] [forgot_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/controller/forgot_screen_controller.dart)
-- **State:** Add a `String resetToken = "";` to store the token received from the OTP verification success response.
-- **OTP Verification:** Update `checkOtpFunction` to:
-    - Extract `resetToken` from `response.data['data']['resetToken']`.
-    - Store it in the controller.
-    - Navigate to the "Create Password" step on the `PageView`.
-- **Password Reset:** Refactor `checkCreateFunction` to be `async` and:
-    - Validate the form.
-    - Call `AuthRepository.instance.resetPassword` with the new passwords and stored `resetToken`.
-    - On success, show a snackbar and navigate to the login screen.
-    - Handle loading states correctly.
+- **Safe State Updates:** Apply the same `if (!isClosed)` check in `checkEmailFunction()`, `checkOtpFunction()`, `checkCreateFunction()`, and `reSendOtp()`.
+- **Navigation Safety:** Ensure navigation happens only if the controller is still active.
 
----
+#### [MODIFY] [otp_verification_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/otp_verification_screen/controller/otp_verification_controller.dart)
+- **Safe State Updates:** Apply `if (!isClosed)` check in `reSendOtp()` and `checkOtpFunction()`.
 
-### [Component] UI Enhancements
+### [Component] UI Layer
 
-#### [MODIFY] [forgot_screen_create_password_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/screens/forgot_screen_create_password_screen.dart)
-- Wrap the "Update Password" button in an `Obx` to show the loading indicator when `controller.isLoading` is true.
+#### [MODIFY] [login_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/login_screen.dart)
+- **Debounce / Disable Buttons:** Ensure the login/continue button is truly disabled while `isLoading` is true to prevent multiple quick taps that can trigger race conditions during navigation.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  **Request OTP:** Enter an email in the forgot password screen and verify OTP is sent.
-2.  **Verify OTP:** Enter the correct OTP and verify the app moves to the "Create Password" screen (and the `resetToken` is captured in logs).
-3.  **Reset Password:** Enter a new password and confirm it.
-4.  **Success:** Verify that clicking "Update Password" calls the API and redirects to the Login screen with a success message.
-5.  **Error States:** Verify that invalid OTPs or failed password resets (e.g., mismatch) show appropriate error snackbars.
+1.  **Rapid Tapping:** Perform rapid taps on the "Login" or "Update Password" buttons. Verify that no "used after disposed" assertions are thrown.
+2.  **Navigation Flow:** Navigate through Login -> Basic Info and Forgot Password -> OTP -> Create Password. Verify that transitions are smooth and error-free.
+3.  **Keyboard Interaction:** Keep the keyboard open during navigation. Verify that focus changes don't trigger crashes.

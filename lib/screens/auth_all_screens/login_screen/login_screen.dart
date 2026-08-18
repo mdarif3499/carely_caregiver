@@ -176,7 +176,9 @@ class LoginScreen extends StatelessWidget {
                             Obx(
                               () => CommonButton(
                                 isLoading: controller.isLoading.value,
-                                onTap: () {
+                                onTap: controller.isLoading.value 
+                                  ? null 
+                                  : () {
                                   if (formKey.currentState!.validate()) {
                                     if (controller.isSignInPage.value) {
                                       controller.loginUser();

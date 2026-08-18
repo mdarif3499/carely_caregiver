@@ -81,8 +81,10 @@ class LoginScreenController extends GetxController {
       errorLog("loginUser", e);
       showCustomSnackbar(message: "Login failed. Please check your connection.", isError: true);
     } finally {
-      isLoading.value = false;
-      update();
+      if (!isClosed) {
+        isLoading.value = false;
+        update();
+      }
     }
   }
   void checkValidation() {

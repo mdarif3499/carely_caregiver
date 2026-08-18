@@ -107,8 +107,10 @@ class OtpVerificationController extends GetxController {
       errorLog("reSendOtp", e);
       showCustomSnackbar(message: "Failed to resend OTP", isError: true);
     } finally {
-      isResending.value = false;
-      update();
+      if (!isClosed) {
+        isResending.value = false;
+        update();
+      }
     }
   }
 
@@ -158,8 +160,10 @@ class OtpVerificationController extends GetxController {
       errorLog("checkOtpFunction", e);
       showCustomSnackbar(message: "Verification failed. Please try again.", isError: true);
     } finally {
-      isLoading.value = false;
-      update();
+      if (!isClosed) {
+        isLoading.value = false;
+        update();
+      }
     }
   }
 
