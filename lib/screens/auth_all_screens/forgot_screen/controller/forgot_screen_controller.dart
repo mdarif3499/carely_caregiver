@@ -15,11 +15,11 @@ class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
-  PageController pageController = PageController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordTextEditingController = TextEditingController();
-  TextEditingController confirmPasswordTextEditingController = TextEditingController();
-  TextEditingController otpController = TextEditingController();
+  late final PageController pageController;
+  late final TextEditingController emailController;
+  late final TextEditingController passwordTextEditingController;
+  late final TextEditingController confirmPasswordTextEditingController;
+  late final TextEditingController otpController;
   late final PinInputController pinController;
   GlobalKey<FormState> formKey1 = GlobalKey<FormState>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
@@ -30,6 +30,11 @@ class ForgotScreenController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    pageController = PageController();
+    emailController = TextEditingController();
+    passwordTextEditingController = TextEditingController();
+    confirmPasswordTextEditingController = TextEditingController();
+    otpController = TextEditingController();
     pinController = PinInputController(textController: otpController);
   }
 
@@ -59,6 +64,10 @@ class ForgotScreenController extends GetxController {
       if (response.isSuccess) {
         if (!isClosed) {
           showCustomSnackbar(message: response.message, isError: false);
+          
+          // Unfocus to prevent keyboard glitches during page transition
+          FocusManager.instance.primaryFocus?.unfocus();
+          
           pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
           startTimer();
         }
@@ -102,6 +111,9 @@ class ForgotScreenController extends GetxController {
         final payload = response.data['data'] ?? {};
         resetToken = payload['resetToken'] ?? "";
         
+        // Unfocus to prevent keyboard glitches during page transition
+        FocusManager.instance.primaryFocus?.unfocus();
+        
         pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
       } else {
         showCustomSnackbar(message: response.message, isError: true);
@@ -133,7 +145,15 @@ class ForgotScreenController extends GetxController {
 
         if (response.isSuccess) {
           showCustomSnackbar(message: response.message, title: '', isError: false);
-          Get.offAllNamed(AppRoutes.instance.loginScreen);
+          
+          // 1. Force keyboard to close and clear focus
+          FocusManager.instance.primaryFocus?.unfocus();
+          
+          // 2. Wait for the keyboard animation to finish and for the framework 
+          // to unlock the widget tree before wiping the stack.
+          Future.delayed(const Duration(milliseconds: 500), () {
+             Get.offAllNamed(AppRoutes.instance.loginScreen);
+          });
         } else {
           showCustomSnackbar(message: response.message, isError: true);
         }
@@ -205,11 +225,8 @@ class ForgotScreenController extends GetxController {
   void onAppClose() {
     try {
       _timer?.cancel();
-      emailController.dispose();
-      otpController.dispose();
-      passwordTextEditingController.dispose();
-      confirmPasswordTextEditingController.dispose();
-      pageController.dispose();
+      // Manual disposal of controllers removed to prevent "used after disposed" crash 
+      // during stack-wipe transitions (Get.offAllNamed).
     } catch (e) {
       errorLog("onAppClose", e);
     }

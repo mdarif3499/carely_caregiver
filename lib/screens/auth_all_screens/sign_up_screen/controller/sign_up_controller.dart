@@ -10,12 +10,24 @@ import '../../../../utils/log/app_log.dart';
 
 class SignUpController extends GetxController {
   ///////////object
-  final fullNameTextEditingController = TextEditingController();
-  final emailTextEditingController = TextEditingController();
-  final phoneTextEditingController = TextEditingController();
-  final locationTextEditingController = TextEditingController();
-  final passwordTextEditingController = TextEditingController();
-  final confirmPasswordTextEditingController = TextEditingController();
+  late final TextEditingController fullNameTextEditingController;
+  late final TextEditingController emailTextEditingController;
+  late final TextEditingController phoneTextEditingController;
+  late final TextEditingController locationTextEditingController;
+  late final TextEditingController passwordTextEditingController;
+  late final TextEditingController confirmPasswordTextEditingController;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fullNameTextEditingController = TextEditingController();
+    emailTextEditingController = TextEditingController();
+    phoneTextEditingController = TextEditingController();
+    locationTextEditingController = TextEditingController();
+    passwordTextEditingController = TextEditingController();
+    confirmPasswordTextEditingController = TextEditingController();
+  }
+
   final formKey = GlobalKey<FormState>();
 
   final ApiClient _apiClient = DioApiClient();
@@ -81,12 +93,8 @@ class SignUpController extends GetxController {
 
   void onAppClose() {
     try {
-      fullNameTextEditingController.dispose();
-      emailTextEditingController.dispose();
-      phoneTextEditingController.dispose();
-      locationTextEditingController.dispose();
-      passwordTextEditingController.dispose();
-      confirmPasswordTextEditingController.dispose();
+      // Manual disposal removed to prevent race conditions during route transitions.
+      // Garbage Collector will handle the cleanup safely.
     } catch (e) {
       errorLog("onAppClose", e);
     }

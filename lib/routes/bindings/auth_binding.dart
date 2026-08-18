@@ -9,11 +9,11 @@ import '../../screens/auth_all_screens/sign_up_screen/controller/sign_up_control
 class AuthBinding extends Bindings {
   @override
   dependencies() {
-    Get.lazyPut(() => LoginScreenController());
-    Get.lazyPut(() => ForgotScreenController());
-    Get.lazyPut(() => OtpVerificationController());
-    Get.lazyPut(() => OnBoardingScreenController());
-    Get.lazyPut(() => SignUpController());
-    Get.lazyPut(() => ChangePasswordScreenController());
+    Get.lazyPut(() => LoginScreenController(), fenix: true);
+    Get.lazyPut(() => ForgotScreenController(), fenix: true);
+    Get.lazyPut(() => OtpVerificationController(), fenix: true);
+    Get.lazyPut(() => OnBoardingScreenController(), fenix: true);
+    Get.lazyPut(() => SignUpController(), fenix: true);
+    Get.lazyPut(() => ChangePasswordScreenController(), fenix: true);
   }
 }

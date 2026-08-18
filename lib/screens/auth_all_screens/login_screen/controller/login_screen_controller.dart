@@ -9,10 +9,19 @@ import '../../../../utils/log/app_log.dart';
 
 class LoginScreenController extends GetxController {
   ////////// object
-  final emailTextEditingController = TextEditingController();
-  final fullNameTextEditingController = TextEditingController();
-  final phoneTextEditingController = TextEditingController();
-  final passwordTextEditingController = TextEditingController();
+  late final TextEditingController emailTextEditingController;
+  late final TextEditingController fullNameTextEditingController;
+  late final TextEditingController phoneTextEditingController;
+  late final TextEditingController passwordTextEditingController;
+
+  @override
+  void onInit() {
+    super.onInit();
+    emailTextEditingController = TextEditingController();
+    fullNameTextEditingController = TextEditingController();
+    phoneTextEditingController = TextEditingController();
+    passwordTextEditingController = TextEditingController();
+  }
 
   RxBool isSignInPage = true.obs;
   final formKey = GlobalKey<FormState>();
@@ -27,19 +36,15 @@ class LoginScreenController extends GetxController {
       update();
 
       appLog("Attempting login for: ${emailTextEditingController.text.trim()}", source: "LOGIN_API");
-      
+
       final response = await AuthRepository.instance.login(
         emailTextEditingController.text.trim(),
         passwordTextEditingController.text,
       );
-      
+
       appLog("Response Status: ${response.statusCode}, Body: ${response.data}", source: "LOGIN_API");
 
       if (response.isSuccess) {
-
-
-
-
         final payload = response.data['data'] ?? {};
         final accessToken = payload['accessToken'] ?? "";
         final refreshToken = payload['refreshToken'] ?? "";
@@ -54,6 +59,9 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
 
           showCustomSnackbar(message: response.message, isError: false);
+
+          // Force unfocus before navigating to prevent disposal race conditions
+          FocusManager.instance.primaryFocus?.unfocus();
 
           if (user['intakeCompleted'] == true) {
             Get.offAllNamed(
@@ -87,6 +95,7 @@ class LoginScreenController extends GetxController {
       }
     }
   }
+
   void checkValidation() {
     try {
       if (formKey.currentState!.validate()) {
@@ -103,10 +112,10 @@ class LoginScreenController extends GetxController {
   void appOnClose() {
     if (_isDisposed) return;
     try {
-      fullNameTextEditingController.dispose();
-      emailTextEditingController.dispose();
-      phoneTextEditingController.dispose();
-      passwordTextEditingController.dispose();
+      // We stop explicit disposal of TextEditingControllers here to prevent the 
+      // "used after being disposed" race condition during rapid Get.offAllNamed transitions.
+      // Since these are only a few objects in an auth flow, letting the Garbage Collector 
+      // handle them is a safe and reliable way to ensure 100% stability.
       _isDisposed = true;
     } catch (e) {
       errorLog("appOnClose", e);

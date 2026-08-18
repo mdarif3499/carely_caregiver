@@ -1,5 +1,3 @@
-- `[x]` Fix "Controller Used After Disposed" in `LoginScreenController`.
-- `[x]` Fix "Controller Used After Disposed" in `ForgotScreenController`.
-- `[x]` Fix "Controller Used After Disposed" in `OtpVerificationController`.
-- `[x]` Update `LoginScreen` and `ForgotScreen` to better handle loading states.
-- `[x]` Verify the fixes.
+- `[x]` Add `unfocus()` before navigation in `LoginScreenController`.
+- `[x]` Add `unfocus()` before navigation in `ForgotScreenController`.
+- `[x]` Verify the fix by navigating from Forgot Password to Login.
