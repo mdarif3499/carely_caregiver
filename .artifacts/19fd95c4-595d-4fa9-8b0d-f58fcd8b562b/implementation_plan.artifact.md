@@ -1,35 +1,22 @@
-# Implementation Plan - Dynamic Home Header Integration
+# Implementation Plan - Bump Android SDK to 36
 
-The goal is to replace the hardcoded "Jane Cooper" and static avatars in the Home headers with real data fetched from the `{{base_url}}/user/my-profile` API.
+The goal is to resolve dependency conflicts where libraries (activity-ktx, core-ktx, etc.) require Android SDK 36, but the project is currently set to SDK 34.
 
 ## Proposed Changes
 
-### [Component] Home Controllers
+### [Component] Android Build Configuration
 
-#### [MODIFY] [care_giver_home_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/care_giver_home_screen/controller/care_giver_home_controller.dart)
-- Remove hardcoded `userName` and `userAvatarUrl`.
-- Add a reference to `AppNavigationScreenController` to access the loaded profile.
+#### [MODIFY] [build.gradle.kts (App)](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/android/app/build.gradle.kts)
+- Set `compileSdk = 36` in the `android` block.
+- Set `targetSdk = 36` in the `defaultConfig` block.
 
-#### [MODIFY] [client_home_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/controller/client_home_controller.dart)
-- Remove hardcoded `userName` and `userAvatarUrl`.
-- Add a reference to `AppNavigationScreenController`.
-
----
-
-### [Component] Home Screens UI
-
-#### [MODIFY] [care_giver_home_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/care_giver_home_screen/care_giver_home_screen.dart)
-- Access `AppNavigationScreenController` to pass real user data to the `CareGiverHeader`.
-- Wrap the `CareGiverHeader` in an `Obx` to ensure it updates when the profile finishes loading.
-
-#### [MODIFY] [client_home_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/client_home_screen.dart)
-- Access `AppNavigationScreenController` to pass real user data to the `ClientHomeHeader`.
-- Wrap the `ClientHomeHeader` in an `Obx` for reactive updates.
+#### [MODIFY] [build.gradle.kts (Root)](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/android/build.gradle.kts)
+- (Optional but recommended) Add a `subprojects` block to force all subprojects to use `compileSdk = 36` and `targetSdk = 36`. This ensures that all plugins are compiled against the same version and resolves potential conflicts where a plugin might still be pointing to an older (or newer) version.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  **Login:** Log into the app with a valid user.
-2.  **Home Header:** Verify that the header shows the correct name (e.g., "dopot") instead of "Jane Cooper".
-3.  **Avatar:** Verify that the profile image shows the user's real avatar from the API (if available) or the default placeholder.
-4.  **Loading State:** Ensure the app doesn't crash if the profile is still being fetched when the home screen loads.
+1.  Run `fvm flutter clean`.
+2.  Run `fvm flutter pub get`.
+3.  Run `fvm flutter build apk --debug`.
+4.  Verify that the build completes successfully and the SDK 36 requirement errors are gone.

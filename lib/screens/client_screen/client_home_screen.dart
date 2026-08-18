@@ -61,6 +61,9 @@ class ClientHomeScreen extends StatelessWidget {
                 ),
               ],
             ),
+
+            ///
+
             const SizedBox(height: 16),
             Obx(
               () => ClientUpcomingBookingCard(
