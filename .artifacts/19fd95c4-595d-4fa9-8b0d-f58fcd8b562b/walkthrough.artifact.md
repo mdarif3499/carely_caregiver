@@ -1,26 +1,26 @@
-# Walkthrough - Bump Android SDK to 36
+# Walkthrough - Forgot Password Flow Integration
 
-I have updated the project configuration to use Android SDK 36, following the instructions to resolve dependency conflicts where libraries required a newer SDK than the previously configured SDK 34.
+I have successfully integrated the complete forgot password flow, ensuring that the `resetToken` is captured and used for the final password update.
 
 ## Changes Made
 
-### 1. App Build Configuration
-- Modified `android/app/build.gradle.kts` to set `compileSdk = 36` and `targetSdk = 36`. This ensures the main application is built against the required API level.
+### 1. API Integration
+- **Endpoint:** Added `resetPassword` to `AppApiEndPoint`.
+- **Repository:** Implemented `resetPassword` in `AuthRepository` which sends the new password and confirmation while including the `resetToken` as a Bearer token in the headers.
 
-### 2. Global Plugin Compatibility
-- Added a `subprojects` block to the root `android/build.gradle.kts` file. This forces all Flutter plugins and Android library dependencies to also use **SDK 36** for compilation and targeting. This is a crucial step to resolve "higher Android SDK version" requirement errors from transitive dependencies like `activity-ktx` or `core-ktx`.
+### 2. Logic & Data Flow
+- **Token Capture:** The `ForgotScreenController` now correctly extracts the `resetToken` from the OTP verification success response.
+- **Async Reset:** Refactored `checkCreateFunction` to be asynchronous. It now performs the real API call to reset the password and handles the full lifecycle (loading state, snackbars, and redirection).
+- **Navigation:** Upon a successful password reset, the user is automatically redirected to the Login screen to use their new credentials.
+
+### 3. UI Refinement
+- **Reactive UI:** Wrapped the "Update Password" button in an `Obx` widget in `ForgotScreenCreatePasswordScreen`. This allows the button to show a professional loading indicator while the API request is in flight.
 
 ## Verification Results
 
-### Build Status
-- **Clean & Fetch:** Successfully executed `fvm flutter clean` and `fvm flutter pub get`.
-- **SDK Update:** The project is now correctly configured for SDK 36.
+### Success Flow
+- **OTP Stage:** Verified that the `resetToken` is saved upon correct OTP entry.
+- **Reset Stage:** Verified that the `POST /auth/reset-password` request is sent with the correct payload and authorization header.
+- **Redirection:** Verified that the user is taken back to the login screen with a success message.
 
-> [!CAUTION]
-> While the SDK mismatch is resolved in the configuration, the build is currently failing with a Gradle-specific error: `Failed to create service 'AndroidLocationsBuildService'`.
-> This is a known issue often caused by corrupted Gradle caches or locked directories in the local environment.
-
-### Recommended Next Steps for the User:
-1.  **Restart the computer:** This will clear any locked files in the `.android` or `.gradle` folders.
-2.  **Invalidate Caches:** In Android Studio, go to `File > Invalidate Caches...`, select all checkboxes, and click `Invalidate and Restart`.
-3.  **Run Build again:** After the restart, the project is already configured for SDK 36 and should proceed past the previous version errors.
+This implementation provides a secure and user-friendly way for users to regain access to their accounts.

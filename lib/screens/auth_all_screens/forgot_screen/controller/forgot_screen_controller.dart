@@ -6,6 +6,7 @@ import 'package:carely_caregiver/services/api/api_client.dart';
 import 'package:carely_caregiver/services/api/api_service.dart';
 import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import '../../../../repositories/auth_repository.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
@@ -23,6 +24,8 @@ class ForgotScreenController extends GetxController {
   GlobalKey<FormState> formKey1 = GlobalKey<FormState>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
   GlobalKey<FormState> formKey3 = GlobalKey<FormState>();
+
+  String resetToken = "";
 
   @override
   void onInit() {
@@ -92,6 +95,9 @@ class ForgotScreenController extends GetxController {
       appLog("Response Body: ${response.data}", source: "VERIFY_EMAIL_API");
 
       if (response.isSuccess) {
+        final payload = response.data['data'] ?? {};
+        resetToken = payload['resetToken'] ?? "";
+        
         pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
       } else {
         showCustomSnackbar(message: response.message, isError: true);
@@ -105,14 +111,33 @@ class ForgotScreenController extends GetxController {
     }
   }
 
-  void checkCreateFunction() {
+  Future<void> checkCreateFunction() async {
     try {
       if (formKey3.currentState!.validate()) {
-        showCustomSnackbar(message: "Login with your credentials", title: '');
-        Get.offAllNamed(AppRoutes.instance.loginScreen);
+        if (isLoading.value) return;
+
+        isLoading.value = true;
+        update();
+
+        final response = await AuthRepository.instance.resetPassword(
+          newPassword: passwordTextEditingController.text.trim(),
+          confirmPassword: confirmPasswordTextEditingController.text.trim(),
+          resetToken: resetToken,
+        );
+
+        if (response.isSuccess) {
+          showCustomSnackbar(message: response.message, title: '', isError: false);
+          Get.offAllNamed(AppRoutes.instance.loginScreen);
+        } else {
+          showCustomSnackbar(message: response.message, isError: true);
+        }
       }
     } catch (e) {
-      errorLog("checkOtpFunction", e);
+      errorLog("checkCreateFunction", e);
+      showCustomSnackbar(message: "Failed to reset password", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
 
