@@ -1,5 +1,5 @@
-- `[x]` Add `resetPassword` endpoint to `AppApiEndPoint`.
-- `[x]` Implement `resetPassword` in `AuthRepository`.
-- `[x]` Update `ForgotScreenController` to store `resetToken` and handle password reset.
-- `[x]` Update `ForgotScreenCreatePasswordScreen` UI for loading state.
-- `[x]` Verify the full forgot password flow.
+- `[x]` Fix "Controller Used After Disposed" in `LoginScreenController`.
+- `[x]` Fix "Controller Used After Disposed" in `ForgotScreenController`.
+- `[x]` Fix "Controller Used After Disposed" in `OtpVerificationController`.
+- `[x]` Update `LoginScreen` and `ForgotScreen` to better handle loading states.
+- `[x]` Verify the fixes.

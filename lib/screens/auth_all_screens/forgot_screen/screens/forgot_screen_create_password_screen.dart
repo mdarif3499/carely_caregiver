@@ -78,7 +78,9 @@ class ForgotScreenCreatePasswordScreen extends StatelessWidget {
                 () => CommonButton(
                   isLoading: controller.isLoading.value,
                   titleText: "Update Password",
-                  onTap: () {
+                  onTap: controller.isLoading.value 
+                    ? null 
+                    : () {
                     controller.checkCreateFunction();
                   },
                 ),
