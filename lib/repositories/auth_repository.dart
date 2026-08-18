@@ -17,4 +17,20 @@ class AuthRepository {
     };
     return await _apiClient.post(AppApiEndPoint.login, body: body);
   }
+
+  Future<ApiResponseModel> resetPassword({
+    required String newPassword,
+    required String confirmPassword,
+    required String resetToken,
+  }) async {
+    Map<String, dynamic> body = {
+      "newPassword": newPassword,
+      "confirmPassword": confirmPassword,
+    };
+    return await _apiClient.post(
+      AppApiEndPoint.resetPassword,
+      body: body,
+      headers: {"Authorization": "Bearer $resetToken"},
+    );
+  }
 }

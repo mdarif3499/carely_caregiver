@@ -1,5 +1,5 @@
-- `[x]` Update app `build.gradle.kts` to SDK 36.
-- `[x]` Force SDK 36 in root `build.gradle.kts`.
-- `[x]` Run `fvm flutter clean`.
-- `[x]` Run `fvm flutter pub get`.
-- `[x]` Run `fvm flutter build apk --debug`.
+- `[x]` Add `resetPassword` endpoint to `AppApiEndPoint`.
+- `[x]` Implement `resetPassword` in `AuthRepository`.
+- `[x]` Update `ForgotScreenController` to store `resetToken` and handle password reset.
+- `[x]` Update `ForgotScreenCreatePasswordScreen` UI for loading state.
+- `[x]` Verify the full forgot password flow.

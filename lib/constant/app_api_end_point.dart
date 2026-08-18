@@ -5,26 +5,22 @@ class AppApiEndPoint {
   static final AppApiEndPoint _instance = AppApiEndPoint._privateConstructor();
   static AppApiEndPoint get instance => _instance;
 
-  //app use base
   final String domain = _getDomain();
   final String baseUrl = "${_getDomain()}/api/v1";
   final String liveServer = "https://test.com";
   final String refreshToken = "https://test.com";
 
-  // Auth
   static const String signUp = "/auth/register";
   static const String sendOtp = "/auth/send-otp";
   static const String verifyEmail = "/auth/verify-email";
   static const String login = "/auth/login";
+  static const String resetPassword = "/auth/reset-password";
 
-  // User
   static const String updateProfile = "/user/my-profile";
   static const String myProfile = "/user/my-profile";
 
-  // Care Recipient
   static const String createCareRecipient = "/care-recipient";
 
-  // Caregiver
   static const String uploadDocument = "/document/upload";
   static const String updateCaregiverProfile = "/caregiver-profiles/me";
 }

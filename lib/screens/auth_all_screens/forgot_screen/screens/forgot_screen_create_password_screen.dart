@@ -71,13 +71,17 @@ class ForgotScreenCreatePasswordScreen extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 40.h,),
           Column(
             children: [
-              CommonButton(
-                titleText: "Update Password",
-                onTap: () {
-                  controller.checkCreateFunction();
-                },
+              Obx(
+                () => CommonButton(
+                  isLoading: controller.isLoading.value,
+                  titleText: "Update Password",
+                  onTap: () {
+                    controller.checkCreateFunction();
+                  },
+                ),
               ),
               50.height,
             ],
