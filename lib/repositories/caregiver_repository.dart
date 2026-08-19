@@ -67,4 +67,8 @@ class CaregiverRepository {
       "${AppApiEndPoint.availability}/$availabilityId/shift/$shiftId",
     );
   }
+
+  Future<ApiResponseModel> getCategories() async {
+    return await _apiClient.get(AppApiEndPoint.categories);
+  }
 }

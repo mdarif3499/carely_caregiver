@@ -7,14 +7,12 @@ class ProfileAvatarHeader extends StatelessWidget {
   final String name;
   final String memberSince;
   final String avatarUrl;
-  final bool showCameraIcon;
 
   const ProfileAvatarHeader({
     super.key,
     required this.name,
     required this.memberSince,
     required this.avatarUrl,
-    this.showCameraIcon = false,
   });
 
   @override
@@ -24,37 +22,19 @@ class ProfileAvatarHeader extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Stack(
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: colors.border, width: 4),
-                ),
-                child: ClipOval(
-                  child: CommonImage(
-                    src: avatarUrl,
-                    fill: BoxFit.cover,
-                  ),
-                ),
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: colors.border, width: 4),
+            ),
+            child: ClipOval(
+              child: CommonImage(
+                src: avatarUrl,
+                fill: BoxFit.cover,
               ),
-              if (showCameraIcon)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colors.secondaryColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: colors.white, width: 2),
-                    ),
-                    child: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 20),
-                  ),
-                ),
-            ],
+            ),
           ),
           const SizedBox(height: 16),
           CommonText(

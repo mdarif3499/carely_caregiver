@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:intl/intl.dart';
 
 class UserModel {
@@ -28,7 +29,7 @@ class UserModel {
       role: json['role'] ?? "",
       email: json['email'] ?? "",
       phone: json['phone'] ?? "",
-      profileImage: json['profileImage'],
+      profileImage: AppApiEndPoint.imageUrl(json['profileImage']),
       intakeCompleted: json['intakeCompleted'] ?? false,
       createdAt: DateTime.tryParse(json['createdAt'] ?? "") ?? DateTime.now(),
     );

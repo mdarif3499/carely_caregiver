@@ -1,23 +1,30 @@
-# Walkthrough - Professional "Delete Shift" with Confirmation
+# Walkthrough - Professional Caregiver Profiles API Integration
 
-আমি সফলভাবে **Delete Shift** ফিচারটি ইমপ্লিমেন্ট করেছি। এখন শিফট ডিলিট করার আগে ইউজারকে একটি কনফার্মেশন পপআপ দেখানো হবে এবং এটি সরাসরি এপিআই-এর মাধ্যমে সার্ভার থেকে মুছে যাবে।
+আমি সফলভাবে `Find Caregivers` স্ক্রিনের জন্য প্রফেশনাল এপিআই ইন্টিগ্রেশন সম্পন্ন করেছি। এখন এই স্ক্রিনটি সরাসরি সার্ভার থেকে ডাটা ফেচ করবে এবং ফিল্টার ও সার্চ লজিক রিয়েল-টাইমে কাজ করবে।
 
-## কী কী পরিবর্তন করা হয়েছে?
+## প্রধান পরিবর্তনসমূহ
 
-### ১. এপিআই ইন্টিগ্রেশন (API Integration)
-- **[MODIFY] [caregiver_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/caregiver_repository.dart)**: আপনার দেওয়া রিকুয়েন্টমেন্ট অনুযায়ী `DELETE /availability/:availabilityId/shift/:shiftId` এন্ডপয়েন্টটি হ্যান্ডেল করার জন্য `deleteShift` মেথড যোগ করা হয়েছে।
+### ১. ডাইনামিক এপিআই ইন্টিগ্রেশন
+- **এন্ডপয়েন্ট**: `AppApiEndPoint`-এ `/caregiver-profiles` যোগ করা হয়েছে।
+- **রিপোজিটরি**: `ClientRepository`-তে `getCaregiverProfiles` মেথড তৈরি করা হয়েছে যা `searchTerm`, `specialty`, `skills`, এবং `language` প্যারামিটারগুলো হ্যান্ডেল করতে পারে।
 
-### ২. কনফার্মেশন ডায়ালগ (Confirmation Dialog)
-- **[MODIFY] [availability_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/availability_screen/availability_screen.dart)**: শিফট কার্ডের ডিলিট বাটনে ক্লিক করলে এখন সরাসরি ডিলিট না হয়ে একটি সুন্দর প্রফেশনাল ডায়ালগ আসবে। এতে ভুলবশত ডিলিট হওয়া থেকে ইউজার সুরক্ষিত থাকবে।
+### ২. স্মার্ট কন্ট্রোলার লজিক
+- **[MODIFY] [find_caregiver_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart)**:
+    - **Debounce Search**: ইউজার টাইপ করার সাথে সাথে এপিআই কল না হয়ে ৮০০ মিলি-সেকেন্ড বিরতিতে কল হবে, যা অ্যাপের পারফরম্যান্স বাড়াবে।
+    - **Filter Triggers**: ক্যাটাগরি চিপস বা অ্যাডভান্সড ফিল্টার চেঞ্জ করলে অটোমেটিক ডাটা রিফ্রেশ হবে।
+    - **Data Mapping**: সার্ভার থেকে আসা JSON ডাটাকে প্রফেশনাল মডেলে রূপান্তর করার লজিক যোগ করা হয়েছে।
 
-### ৩. স্মার্ট ডিলিট লজিক (Smart Delete Logic)
-- **[MODIFY] [availability_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/availability_screen/controller/availability_screen_controller.dart)**: `deleteShiftFromApi` মেথডটি তৈরি করা হয়েছে। এপিআই কল সফল হলে এটি লোকাল লিস্ট থেকেও শিফটটি সরিয়ে ফেলে ইউআই আপডেট করবে।
+### ৩. প্রিমিয়াম ইউআই এক্সপেরিয়েন্স
+- **[MODIFY] [find_caregiver_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/find_caregiver_screen/find_caregiver_screen.dart)**:
+    - ডাটা লোড হওয়ার সময় একটি ক্লিন `CircularProgressIndicator` যোগ করা হয়েছে।
+    - ডাটা না থাকলে একটি প্রফেশনাল `EmptySearchState` ডিজাইন করা হয়েছে।
 
 ## চেক করার নিয়ম
 
 > [!TIP]
-> ১. অ্যাপের **Availability** স্ক্রিনে যান।
-> ২. যেকোনো একটি শিফট কার্ডের **Delete (ট্রাশ আইকন)** এ ক্লিক করুন।
-> ৩. ডায়ালগে থাকা **Delete** বাটনে ক্লিক করলে এটি এপিআই কল করবে এবং লিস্ট থেকে মুছে যাবে।
+> ১. **Find Caregivers** স্ক্রিনে যান।
+> ২. সার্চ বারে কোনো নাম বা লোকেশন লিখে ৮০০ms অপেক্ষা করুন।
+> ৩. ক্যাটাগরি চিপস (যেমন: RN, Companion) পরিবর্তন করে দেখুন ডাটা রিফ্রেশ হচ্ছে কিনা।
+> ৪. কনসোলে `Caregiver Profiles API Response: ...` লগটি চেক করে ডাটা ভেরিফাই করতে পারেন।
 
-আপনার অ্যাপটি এখন আরও নিরাপদ এবং প্রফেশনাল। অন্য কোনো পরিবর্তন লাগবে?
+আপনার অ্যাপটি এখন ডাটা ফেচিং এবং ফিল্টারিং এর জন্য পুরোপুরি প্রস্তুত। অন্য কোনো স্ক্রিনে কাজ করতে হবে?

@@ -23,4 +23,31 @@ class ClientRepository {
 
     return await _apiClient.post(AppApiEndPoint.createCareRecipient, body: body);
   }
+
+  Future<ApiResponseModel> getCaregiverProfiles({
+    String? searchTerm,
+    String? specialty,
+    String? skills,
+    String? language,
+    String? sortBy,
+    String? sortOrder,
+  }) async {
+    final Map<String, dynamic> queryParams = {};
+    if (searchTerm != null && searchTerm.isNotEmpty) queryParams['searchTerm'] = searchTerm;
+    if (specialty != null && specialty.isNotEmpty) queryParams['specialty'] = specialty;
+    if (skills != null && skills.isNotEmpty) queryParams['skills'] = skills;
+    if (language != null && language.isNotEmpty) queryParams['language'] = language;
+    if (sortBy != null && sortBy.isNotEmpty) queryParams['sortBy'] = sortBy;
+    if (sortOrder != null && sortOrder.isNotEmpty) queryParams['sortOrder'] = sortOrder;
+
+    String endpoint = AppApiEndPoint.caregiverProfiles;
+    if (queryParams.isNotEmpty) {
+      final queryString = queryParams.entries
+          .map((e) => "${e.key}=${Uri.encodeComponent(e.value.toString())}")
+          .join('&');
+      endpoint = "$endpoint?$queryString";
+    }
+
+    return await _apiClient.get(endpoint);
+  }
 }

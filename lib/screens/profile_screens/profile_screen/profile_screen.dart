@@ -54,6 +54,13 @@ class ProfileScreen extends StatelessWidget {
         },
       ),
       ProfileMenuItem(
+        icon: Icons.work_outline_rounded,
+        title: 'Professional Profile',
+        onTap: () {
+          Get.toNamed(AppRoutes.instance.editProfessionalProfileScreen);
+        },
+      ),
+      ProfileMenuItem(
         icon: Icons.calendar_today_outlined,
         title: 'Availability & Schedule',
         onTap: () {
@@ -116,7 +123,6 @@ class ProfileScreen extends StatelessWidget {
                 memberSince: user.memberSince,
                 avatarUrl: user.profileImage ??
                     'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-                showCameraIcon: isClient,
               ),
               const SizedBox(height: 32),
 
@@ -143,3 +149,4 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+ ///

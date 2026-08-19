@@ -13,6 +13,7 @@ class AppNavigationScreenController extends GetxController {
   @override
   void onInit() {
     isClient = Get.arguments?['isClient'] ?? false;
+    selectedIndex = Get.arguments?['selectedIndex'] ?? 0;
     selectedAppUserType =
     isClient ? AppUserType.client : AppUserType.caregiver;
     fetchProfile();

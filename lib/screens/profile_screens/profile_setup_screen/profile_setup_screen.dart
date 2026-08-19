@@ -5,6 +5,7 @@ import 'package:carely_caregiver/widgets/certification_card.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/skill_chip.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
+import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,15 +30,89 @@ class ProfileSetupScreen extends StatelessWidget {
                 children: [
                   _buildHeader(),
                   const SizedBox(height: 28),
-                  _buildSectionTitle('Skills & Specializations'),
+                  _buildSectionTitle('Professional Bio'),
+                  const SizedBox(height: 14),
+                  AppMultilineTextField(
+                    controller: controller.bioController,
+                    hintText: 'Tell families about yourself, your experience and why you love caregiving...',
+                    validationType: ValidationType.notRequired,
+                    borderRadius: 12,
+                    backgroundColor: AppColors.instance.textFiledBg,
+                  ),
+                  const SizedBox(height: 28),
+                  _buildSectionTitle('Expertise & Specialties'),
+                  const SizedBox(height: 14),
+                  _buildSpecialtiesGrid(controller),
+                  const SizedBox(height: 28),
+                  _buildSectionTitle('Skills'),
                   const SizedBox(height: 14),
                   _buildSkillsGrid(controller),
                   const SizedBox(height: 28),
-                  _buildSectionTitle('Work Experience'),
-                  const SizedBox(height: 10),
-                  const AppContentHeader(text: 'Total Years in Caregiving'),
-                  const SizedBox(height: 10),
-                  _buildExperienceDropdown(controller),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle('Hourly Rate (\$)'),
+                            const SizedBox(height: 14),
+                            CommonTextField(
+                              controller: controller.hourlyRateController,
+                              validationType: ValidationType.validateNumber,
+                              hintText: 'e.g. 25',
+                              borderRadius: 12,
+                              backgroundColor: AppColors.instance.textFiledBg,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle('Experience'),
+                            const SizedBox(height: 14),
+                            _buildExperienceDropdown(controller),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  _buildSectionTitle('Location'),
+                  const SizedBox(height: 14),
+                  CommonTextField(
+                    controller: controller.cityController,
+                    validationType: ValidationType.notRequired,
+                    hintText: 'City',
+                    borderRadius: 12,
+                    backgroundColor: AppColors.instance.textFiledBg,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CommonTextField(
+                          controller: controller.stateController,
+                          validationType: ValidationType.notRequired,
+                          hintText: 'State',
+                          borderRadius: 12,
+                          backgroundColor: AppColors.instance.textFiledBg,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: CommonTextField(
+                          controller: controller.countryController,
+                          validationType: ValidationType.notRequired,
+                          hintText: 'Country',
+                          borderRadius: 12,
+                          backgroundColor: AppColors.instance.textFiledBg,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 28),
                   _buildSectionTitle('Certifications & Licenses'),
                   const SizedBox(height: 14),
@@ -88,6 +163,26 @@ class ProfileSetupScreen extends StatelessWidget {
       text: title,
       fontSize: 20,
       fontWeight: FontWeight.w700,
+    );
+  }
+
+  // ─────────────────────────────
+  //  Specialties grid
+  // ─────────────────────────────
+
+  Widget _buildSpecialtiesGrid(ProfileSetupScreenController controller) {
+    return Obx(
+      () => Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: controller.categories.map(
+          (category) => SkillChip(
+            label: category.name,
+            isSelected: controller.selectedSpecialties.contains(category.id),
+            onTap: () => controller.toggleSpecialty(category.id),
+          ),
+        ).toList(),
+      ),
     );
   }
 
