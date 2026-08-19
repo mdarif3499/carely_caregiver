@@ -1,7 +1,4 @@
-- [x] Remove `ValueKey` from `LoginScreen` TextFields
-- [x] Refactor `LoginScreenController` to use `late` initialization
-- [x] Refactor `SignUpController` to use `late` initialization
-- [x] Refactor `ForgotScreenController` to use `late` initialization
-- [x] Refactor `OtpVerificationController` to use `late` initialization
-- [x] Refactor `ChangePasswordScreenController` to use `late` initialization
-- [x] Final verification across all Auth screens
+- [x] Add `deleteShift` to `CaregiverRepository`
+- [x] Implement `deleteShiftFromApi` in `AvailabilityScreenController`
+- [x] Add professional Confirmation Dialog in `AvailabilityScreen`
+- [x] Final verification of delete flow

@@ -130,14 +130,19 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.newRecipientProfileScreen,
     binding: ClientHomeBinding(),
-    page: () =>  NewRecipientProfileScreen(),
+    page: () => const NewRecipientProfileScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
-  ///////////////////////  auth all end
-  /////////////////////  app base start
+
   GetPage(
     name: AppRoutes.instance.appNavigationScreen,
-    binding: NavigationScreenBinding(),
+    bindings: [
+      NavigationScreenBinding(),
+      ClientHomeBinding(),
+      CareGiverHomeBinding(),
+      ProfileBinding(),
+      MessageBinding(),
+    ],
     page: () => const AppNavigationScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),

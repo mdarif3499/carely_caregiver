@@ -1,3 +1,6 @@
+import 'package:carely_caregiver/repositories/caregiver_repository.dart';
+import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -8,16 +11,24 @@ import '../../../../widgets/app_calendar_controller.dart';
 // ─────────────────────────────────────────────
 class Shift {
   final String id;
+  final String availabilityId; // Parent ID for Edit/Delete API
   final String label;
-  final String startTime;
-  final String endTime;
+  final String startTime; // "08:00 AM" for UI
+  final String endTime;   // "12:00 PM" for UI
+  final String apiStartTime; // "08:00" for API
+  final String apiEndTime;   // "12:00" for API
+  final String shiftType; // "MORNING", "AFTERNOON", "EVENING"
   final String icon; // 'morning' | 'evening' | 'night'
 
   const Shift({
     required this.id,
+    required this.availabilityId,
     required this.label,
     required this.startTime,
     required this.endTime,
+    required this.apiStartTime,
+    required this.apiEndTime,
+    required this.shiftType,
     required this.icon,
   });
 
@@ -43,10 +54,16 @@ class AvailabilityScreenController extends GetxController
   );
   RxBool rebuild = false.obs;
 
+  RxBool isFetching = false.obs;
+  final RxBool isSaving = false.obs;
+
   void selectDay(DateTime day) {
     if (day.month != focusedMonth.value.month) return;
     rebuild.value = !rebuild.value;
     selectedDay.value = day;
+    
+    // Call API when date is selected as requested
+    fetchAvailabilityForMonth();
   }
 
   bool isSelected(DateTime d) =>
@@ -80,24 +97,178 @@ class AvailabilityScreenController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    // seed today with two sample shifts
-    final k = _key(DateTime.now());
-    _shifts[k] = [
-      const Shift(
-        id: '1',
-        label: 'Morning Shift',
-        startTime: '08:00 AM',
-        endTime: '12:00 PM',
-        icon: 'morning',
-      ),
-      const Shift(
-        id: '2',
-        label: 'Evening Shift',
-        startTime: '05:00 PM',
-        endTime: '09:00 PM',
-        icon: 'evening',
-      ),
-    ];
+    // Fetch initial data for the current month
+    fetchAvailabilityForMonth();
+    
+    // Watch for month changes to fetch new data
+    ever(focusedMonth, (_) => fetchAvailabilityForMonth());
+  }
+
+  Future<void> fetchAvailabilityForMonth() async {
+    try {
+      isFetching.value = true;
+      update();
+
+      final firstDay = DateTime(focusedMonth.value.year, focusedMonth.value.month, 1);
+      final lastDay = DateTime(focusedMonth.value.year, focusedMonth.value.month + 1, 0);
+
+      final startStr = _key(firstDay);
+      final endStr = _key(lastDay);
+
+      debugPrint("Fetching availability from $startStr to $endStr");
+      final response = await CaregiverRepository.instance.getAvailability(
+        startDate: startStr,
+        endDate: endStr,
+      );
+
+      debugPrint("Availability API Response: ${response.data}");
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data'] ?? [];
+        
+        // Clear existing shifts to map fresh data from API
+        _shifts.clear();
+
+        for (var dayData in dataList) {
+          final String availabilityId = dayData['_id'] ?? "";
+          final String rawDate = dayData['date'] ?? "";
+          if (rawDate.isEmpty) continue;
+
+          final dateObj = DateTime.parse(rawDate);
+          final String key = _key(dateObj);
+          
+          final List shiftList = dayData['shifts'] ?? [];
+          final List<Shift> mappedShifts = [];
+
+          for (var s in shiftList) {
+            final type = s['shiftType'] ?? "MORNING";
+            final start = s['startTime'] ?? "00:00";
+            final end = s['endTime'] ?? "00:00";
+
+            final label = '${type.toString().toLowerCase()} Shift';
+            
+            mappedShifts.add(
+              Shift(
+                id: s['_id'] ?? DateTime.now().toString(),
+                availabilityId: availabilityId,
+                label: label,
+                startTime: _formatToUiTime(start),
+                endTime: _formatToUiTime(end),
+                apiStartTime: start,
+                apiEndTime: end,
+                shiftType: type,
+                icon: type.toString().toLowerCase(),
+              ),
+            );
+          }
+          
+          _shifts[key] = mappedShifts;
+        }
+        _shifts.refresh();
+      }
+    } catch (e) {
+      debugPrint("Error fetching availability: $e");
+    } finally {
+      isFetching.value = false;
+      update();
+    }
+  }
+
+  String _formatToUiTime(String apiTime) {
+    try {
+      final parts = apiTime.split(':');
+      final hour = int.parse(parts[0]);
+      final min = int.parse(parts[1]);
+      final dt = DateTime(0, 1, 1, hour, min);
+      return DateFormat('hh:mm a').format(dt);
+    } catch (e) {
+      return apiTime;
+    }
+  }
+
+  Future<void> saveShiftToApi(Shift shift) async {
+    try {
+      isSaving.value = true;
+      update();
+
+      final body = {
+        "date": _key(selectedDay.value),
+        "shiftType": shift.shiftType,
+        "startTime": shift.apiStartTime,
+        "endTime": shift.apiEndTime,
+      };
+
+      final response = await CaregiverRepository.instance.addAvailability(data: body);
+
+      if (response.isSuccess) {
+        // After successful add, we refresh from API to get the correct IDs
+        await fetchAvailabilityForMonth();
+        showCustomSnackbar(message: "Shift added successfully", isError: false);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to add shift", isError: true);
+    } finally {
+      isSaving.value = false;
+      update();
+    }
+  }
+
+  Future<void> updateShiftInApi(Shift shift) async {
+    try {
+      isSaving.value = true;
+      update();
+
+      final body = {
+        "date": _key(selectedDay.value),
+        "shiftType": shift.shiftType,
+        "startTime": shift.apiStartTime,
+        "endTime": shift.apiEndTime,
+      };
+
+      final response = await CaregiverRepository.instance.updateShift(
+        availabilityId: shift.availabilityId,
+        shiftId: shift.id,
+        data: body,
+      );
+
+      if (response.isSuccess) {
+        await fetchAvailabilityForMonth();
+        showCustomSnackbar(message: "Shift updated successfully", isError: false);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to update shift", isError: true);
+    } finally {
+      isSaving.value = false;
+      update();
+    }
+  }
+
+  Future<void> deleteShiftFromApi(Shift shift) async {
+    try {
+      isSaving.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.deleteShift(
+        availabilityId: shift.availabilityId,
+        shiftId: shift.id,
+      );
+
+      if (response.isSuccess) {
+        _deleteLocalShift(shift.id);
+        showCustomSnackbar(message: "Shift deleted successfully", isError: false);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to delete shift", isError: true);
+    } finally {
+      isSaving.value = false;
+      update();
+    }
   }
 
   void addShift(Shift shift) {
@@ -106,19 +277,12 @@ class AvailabilityScreenController extends GetxController
     _shifts.refresh();
   }
 
-  void deleteShift(String id) {
+  void _deleteLocalShift(String id) {
     final k = _key(selectedDay.value);
     _shifts[k] = (_shifts[k] ?? []).where((s) => s.id != id).toList();
     _shifts.refresh();
   }
 
-  final RxBool isSaving = false.obs;
   final Rx<DateTime> lastSynced = DateTime.now().obs;
-
-  Future<void> confirmChanges() async {
-    isSaving.value = true;
-    await Future.delayed(const Duration(milliseconds: 800));
-    lastSynced.value = DateTime.now();
-    isSaving.value = false;
-  }
+  String get lastSyncedLabel => DateFormat('hh:mm a').format(lastSynced.value);
 }

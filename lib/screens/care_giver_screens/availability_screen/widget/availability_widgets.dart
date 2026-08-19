@@ -96,12 +96,12 @@ class ShiftCard extends StatelessWidget {
   }
 
   IconData _getIcon() {
-    switch (shift.icon) {
-      case 'morning':
+    switch (shift.shiftType.toUpperCase()) {
+      case 'MORNING':
         return Icons.wb_sunny_outlined;
-      case 'evening':
+      case 'AFTERNOON':
         return Icons.wb_twilight_rounded;
-      case 'night':
+      case 'EVENING':
         return Icons.nightlight_outlined;
       default:
         return Icons.access_time_rounded;

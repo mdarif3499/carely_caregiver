@@ -23,6 +23,8 @@ class AppApiEndPoint {
 
   static const String uploadDocument = "/document/upload";
   static const String updateCaregiverProfile = "/caregiver-profiles/me";
+  static const String availability = "/availability";
+  static const String getMyAvailability = "/availability/me";
 }
 
 String _getDomain() {
