@@ -1,4 +1,6 @@
 class AppRoutes {
+  final String editProfessionalProfileScreen = "/editProfessionalProfileScreen";
+
   AppRoutes._privateConstructor();
   static final AppRoutes _instance = AppRoutes._privateConstructor();
   static AppRoutes get instance => _instance;

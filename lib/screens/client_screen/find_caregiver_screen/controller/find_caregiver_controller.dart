@@ -1,8 +1,12 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/widgets/bottom_shit_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 // ── Data Model ──────────────────────────────────────────
 class CaregiverModel {
+  final String id;
   final String name;
   final String role;
   final String specialty;
@@ -12,6 +16,7 @@ class CaregiverModel {
   final String avatarUrl;
 
   const CaregiverModel({
+    required this.id,
     required this.name,
     required this.role,
     required this.specialty,
@@ -20,6 +25,22 @@ class CaregiverModel {
     required this.hourlyRate,
     this.avatarUrl = '',
   });
+
+  factory CaregiverModel.fromJson(Map<String, dynamic> json) {
+    final userData = json['user'] as Map<String, dynamic>? ?? {};
+    final specialties = json['specialties'] as List? ?? [];
+    
+    return CaregiverModel(
+      id: json['_id'] ?? '',
+      name: userData['name'] ?? 'Unknown',
+      role: 'Caregiver', // Default as it's not in this specific API response
+      specialty: specialties.isNotEmpty ? specialties.join(', ') : 'General Care',
+      description: json['description'] ?? '', // Not in response, keeping as empty
+      rating: (json['averageRating'] ?? 0.0).toDouble(),
+      hourlyRate: (json['hourlyRate'] ?? 0.0).toDouble(), // Not in response, using 0.0
+      avatarUrl: AppApiEndPoint.imageUrl(userData['profileImage']),
+    );
+  }
 }
 
 // ── Controller ───────────────────────────────────────────
@@ -37,7 +58,10 @@ class FindCaregiverController extends GetxController {
     'Therapist',
   ];
   final RxString selectedFilter = 'All'.obs;
-  void onFilterSelected(String filter) => selectedFilter.value = filter;
+  void onFilterSelected(String filter) {
+    selectedFilter.value = filter;
+    fetchCaregivers();
+  }
 
   // ── Advanced filter state ──
   final Rx<FilterState> filterState = FilterState().obs;
@@ -49,75 +73,62 @@ class FindCaregiverController extends GetxController {
       context,
       initial: filterState.value,
     );
-    if (result != null) filterState.value = result;
+    if (result != null) {
+      filterState.value = result;
+      fetchCaregivers();
+    }
   }
 
+  // ── API State ──
+  final RxList<CaregiverModel> caregivers = <CaregiverModel>[].obs;
+  final RxBool isLoading = false.obs;
 
-  // ── Dummy data ──
-  final List<CaregiverModel> _allCaregivers = const [
-    CaregiverModel(
-      avatarUrl:
-          'https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      specialty: 'Companion & Daily Living',
-      description:
-          'Dedicated companion providing emotional support and physical assistance for daily tasks.',
-      rating: 4.9,
-      hourlyRate: 25,
-    ),
-    CaregiverModel(
-      avatarUrl: 'https://market-resized.envatousercontent.com/photodune.net/EVA/TRX/2c/5e/35/e2/76/v1_E10/E109CG4V.jpg?auto=format&q=94&mark=https%3A%2F%2Fassets.market-storefront.envato-static.com%2Fwatermarks%2Fphoto-260724.png&opacity=0.2&cf_fit=contain&w=590&h=885&s=4b95f37d2220201e10c2b6791a9a3cf37f308f0315b4ba0ba8308067486aac91',
-      name: 'Marcus Lee',
-      role: 'Companion',
-      specialty: 'Elderly Care',
-      description:
-          'Compassionate caregiver specialising in senior companionship and mobility support.',
-      rating: 4.7,
-      hourlyRate: 20,
-    ),
-    CaregiverModel(
-      name: 'Priya Sharma',
-      role: 'Specialized',
-      specialty: 'Dementia & Memory Care',
-      description:
-          'Certified specialist in memory-care techniques and cognitive stimulation activities.',
-      rating: 4.8,
-      hourlyRate: 30,
-    ),
-    CaregiverModel(
-      name: 'Tom Rivera',
-      role: 'Therapist',
-      specialty: 'Physical & Occupational',
-      description:
-          'Licensed occupational therapist helping clients regain independence after injury.',
-      rating: 4.6,
-      hourlyRate: 35,
-    ),
-    CaregiverModel(
-      name: 'Aisha Nwosu',
-      role: 'RN',
-      specialty: 'Post-Surgical Care',
-      description:
-          'Registered nurse with 8 years of post-op recovery and wound-care experience.',
-      rating: 5.0,
-      hourlyRate: 28,
-    ),
-  ];
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCaregivers();
 
-  // Filtered + searched list
-  List<CaregiverModel> get filteredCaregivers {
-    final query = searchQuery.value.toLowerCase();
-    final filter = selectedFilter.value;
-
-    return _allCaregivers.where((c) {
-      final matchesFilter = filter == 'All' || c.role == filter;
-      final matchesSearch =
-          query.isEmpty ||
-          c.name.toLowerCase().contains(query) ||
-          c.role.toLowerCase().contains(query) ||
-          c.specialty.toLowerCase().contains(query);
-      return matchesFilter && matchesSearch;
-    }).toList();
+    // Debounce search query to avoid excessive API calls
+    debounce(searchQuery, (_) => fetchCaregivers(), time: const Duration(milliseconds: 800));
   }
+
+  Future<void> fetchCaregivers() async {
+    try {
+      isLoading.value = true;
+      update();
+
+      final specialty = selectedFilter.value == 'All' ? null : selectedFilter.value;
+      final skills = filterState.value.selectedSkills.isNotEmpty 
+          ? filterState.value.selectedSkills.join(', ') 
+          : null;
+      final language = filterState.value.selectedLanguage;
+
+      debugPrint("Fetching Caregivers: search=${searchQuery.value}, specialty=$specialty, skills=$skills, lang=$language");
+
+      final response = await ClientRepository.instance.getCaregiverProfiles(
+        searchTerm: searchQuery.value,
+        specialty: specialty,
+        skills: skills,
+        language: language,
+        // Passing null so parameters are only added if filters are active
+        sortBy: null, 
+        sortOrder: null,
+      );
+
+      debugPrint("Caregiver Profiles API Response: ${response.data}");
+
+      if (response.isSuccess) {
+        final List data = response.data['data'] ?? [];
+        caregivers.value = data.map((json) => CaregiverModel.fromJson(json)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching caregivers: $e");
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
+
+  // Legacy getter kept for UI compatibility if needed, but now uses API data
+  List<CaregiverModel> get filteredCaregivers => caregivers;
 }

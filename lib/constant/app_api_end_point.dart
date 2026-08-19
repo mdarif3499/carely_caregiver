@@ -25,6 +25,14 @@ class AppApiEndPoint {
   static const String updateCaregiverProfile = "/caregiver-profiles/me";
   static const String availability = "/availability";
   static const String getMyAvailability = "/availability/me";
+  static const String caregiverProfiles = "/caregiver-profiles";
+
+  static String imageUrl(String? path) {
+    if (path == null || path.isEmpty) return "";
+    if (path.startsWith("http")) return path;
+    String cleanPath = path.startsWith("/") ? path.substring(1) : path;
+    return "${AppApiEndPoint.instance.baseUrl}/uploads/$cleanPath";
+  }
 }
 
 String _getDomain() {

@@ -17,8 +17,6 @@ class BookingTabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.instance;
-
     return Row(
       children: [
         _TabItem(
