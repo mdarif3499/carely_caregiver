@@ -1,4 +1,6 @@
-- [x] Add `deleteShift` to `CaregiverRepository`
-- [x] Implement `deleteShiftFromApi` in `AvailabilityScreenController`
-- [x] Add professional Confirmation Dialog in `AvailabilityScreen`
-- [x] Final verification of delete flow
+- [x] Add `caregiverProfiles` endpoint to `AppApiEndPoint`
+- [x] Add `getCaregiverProfiles` to `ClientRepository`
+- [x] Refactor `FindCaregiverController` for API integration
+- [x] Update `FindCaregiverScreen` with loading states and real data
+- [x] Implement search debounce and filter triggers
+- [x] Final verification and styling

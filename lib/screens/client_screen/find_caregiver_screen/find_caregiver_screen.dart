@@ -23,7 +23,7 @@ class FindCaregiverScreen extends StatelessWidget {
         const SizedBox(width: 12),
       ],
       child: Obx(() {
-        final caregivers = controller.filteredCaregivers;
+        final caregivers = controller.caregivers;
 
         // ── Header (Search + Category Filters) ──
         final header = Padding(
@@ -40,7 +40,9 @@ class FindCaregiverScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               CommonText(
-                text: '${caregivers.length} caregivers nearby',
+                text: controller.isLoading.value 
+                    ? 'Finding caregivers...' 
+                    : '${caregivers.length} caregivers nearby',
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 textColor: colors.textPrimary,
@@ -48,6 +50,17 @@ class FindCaregiverScreen extends StatelessWidget {
             ],
           ),
         );
+
+        if (controller.isLoading.value && caregivers.isEmpty) {
+          return Column(
+            children: [
+              header,
+              const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          );
+        }
 
         if (caregivers.isEmpty) {
           return Column(

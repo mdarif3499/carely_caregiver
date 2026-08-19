@@ -15,6 +15,7 @@ import 'package:carely_caregiver/screens/profile_screens/personal_information_sc
 import 'package:carely_caregiver/screens/profile_screens/profile_setup_screen/profile_setup_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/booking_status_screen/booking_status_screen.dart';
 import 'package:get/get.dart';
+import 'package:carely_caregiver/screens/profile_screens/edit_professional_profile_screen/edit_professional_profile_screen.dart';
 import 'package:carely_caregiver/screens/on_boarding_screen/on_boarding_screen.dart';
 import '../screens/about_us_screen/about_us_screen.dart';
 import '../screens/app_navigation_screen/app_navigation_screen.dart';
@@ -224,6 +225,10 @@ List<GetPage> appRootRoutesFile = <GetPage>[
     binding: CareGiverHomeBinding(),
     page: () => const BookingStatusScreen(),
     middlewares: [InternetCheckMiddleWare()],
+  ),
+  GetPage(
+    name: AppRoutes.instance.editProfessionalProfileScreen,
+    page: () => const EditProfessionalProfileScreen(),
   ),
   /////////////////////  app base end
 ];

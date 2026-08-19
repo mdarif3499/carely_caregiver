@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:io';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
+import 'package:carely_caregiver/repositories/user_repository.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
-import 'package:file_picker/file_picker.dart';
-import '../../../../routes/app_routes.dart';
 
-class ProfileSetupScreenController extends GetxController {
+class EditProfessionalProfileController extends GetxController {
   // ── Text Controllers ──
   late final TextEditingController bioController;
   late final TextEditingController hourlyRateController;
   late final TextEditingController cityController;
   late final TextEditingController stateController;
   late final TextEditingController countryController;
+
+  final RxBool isLoading = false.obs;
+  final RxBool isSubmitting = false.obs;
 
   @override
   void onInit() {
@@ -22,6 +23,7 @@ class ProfileSetupScreenController extends GetxController {
     cityController = TextEditingController();
     stateController = TextEditingController();
     countryController = TextEditingController();
+    fetchProfileData();
   }
 
   @override
@@ -43,20 +45,7 @@ class ProfileSetupScreenController extends GetxController {
     'Medication Admin',
     'Meal Prep',
   ];
-
   final RxSet<String> selectedSkills = <String>{}.obs;
-  final RxBool showAllSkills = false.obs;
-  static const int collapsedCount = 4;
-
-  List<String> get visibleSkills {
-    if (showAllSkills.value || allSkills.length <= collapsedCount) {
-      return allSkills;
-    }
-    return allSkills.take(collapsedCount).toList();
-  }
-
-  bool get hasMoreSkills =>
-      !showAllSkills.value && allSkills.length > collapsedCount;
 
   void toggleSkill(String skill) {
     if (selectedSkills.contains(skill)) {
@@ -65,8 +54,6 @@ class ProfileSetupScreenController extends GetxController {
       selectedSkills.add(skill);
     }
   }
-
-  void expandSkills() => showAllSkills.value = true;
 
   // ── Specialties ──
   final List<String> allSpecialties = [
@@ -94,80 +81,59 @@ class ProfileSetupScreenController extends GetxController {
     '5 – 10 years',
     '10+ years',
   ];
-
   final Rxn<String> selectedExperience = Rxn<String>();
 
   void onExperienceChanged(String? val) => selectedExperience.value = val;
 
-  // ── Certifications ──
-  final RxList<Map<String, dynamic>> certifications = <Map<String, dynamic>>[].obs;
-  final RxBool isUploading = false.obs;
-  final RxBool isSubmitting = false.obs;
-
-  Future<void> pickAndUploadFile() async {
+  Future<void> fetchProfileData() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-      );
-
-      if (result != null && result.files.single.path != null) {
-        File file = File(result.files.single.path!);
-        String fileName = result.files.single.name;
-        
-        await uploadFile(file, fileName);
-      }
-    } catch (e) {
-      showCustomSnackbar(message: "Error picking file: $e", isError: true);
-    }
-  }
-
-  Future<void> uploadFile(File file, String fileName) async {
-    try {
-      isUploading.value = true;
+      isLoading.value = true;
       update();
 
-      final response = await CaregiverRepository.instance.uploadDocument(
-        documentType: "NURSING_CERT",
-        file: file,
-      );
-
+      final response = await UserRepository.instance.getMyProfile();
       if (response.isSuccess) {
-        final uploadedData = response.data['data'];
-        
-        certifications.add({
-          'title': fileName,
-          'subtitle': 'Uploaded successfully',
-          'data': uploadedData,
-        });
-        
-        showCustomSnackbar(message: "File uploaded successfully", isError: false);
-      } else {
-        showCustomSnackbar(message: response.message, isError: true);
+        final userData = response.data['data'] ?? {};
+        final caregiverProfile = userData['caregiverProfile'] ?? {};
+
+        bioController.text = caregiverProfile['bio'] ?? "";
+        hourlyRateController.text = (caregiverProfile['hourlyRate'] ?? "").toString();
+        cityController.text = caregiverProfile['city'] ?? "";
+        stateController.text = caregiverProfile['state'] ?? "";
+        countryController.text = caregiverProfile['country'] ?? "";
+
+        if (caregiverProfile['skills'] != null) {
+          selectedSkills.addAll(List<String>.from(caregiverProfile['skills']));
+        }
+        if (caregiverProfile['specialties'] != null) {
+          selectedSpecialties.addAll(List<String>.from(caregiverProfile['specialties']));
+        }
+
+        final exp = caregiverProfile['experience'];
+        if (exp != null) {
+           // Find matching option or set default
+           for (var option in experienceOptions) {
+             if (option.contains(exp.toString())) {
+               selectedExperience.value = option;
+               break;
+             }
+           }
+        }
       }
     } catch (e) {
-      showCustomSnackbar(message: "Upload failed: $e", isError: true);
+      debugPrint("Error fetching profile: $e");
     } finally {
-      isUploading.value = false;
+      isLoading.value = false;
       update();
     }
   }
-
-  void deleteCertification(int index) => certifications.removeAt(index);
 
   Future<void> updateProfile() async {
     if (isSubmitting.value) return;
-
-    if (selectedExperience.value == null) {
-      showCustomSnackbar(message: "Please select years of experience", isError: true);
-      return;
-    }
 
     try {
       isSubmitting.value = true;
       update();
 
-      // Mapping UI data to API fields
       int? expYears;
       if (selectedExperience.value != null) {
         final match = RegExp(r'(\d+)').firstMatch(selectedExperience.value!);
@@ -191,10 +157,7 @@ class ProfileSetupScreenController extends GetxController {
 
       if (response.isSuccess) {
         showCustomSnackbar(message: "Profile updated successfully", isError: false);
-        Get.offAllNamed(
-          AppRoutes.instance.appNavigationScreen,
-          arguments: {"isClient": false},
-        );
+        Get.back();
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }

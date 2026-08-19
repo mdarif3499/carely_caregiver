@@ -1,0 +1,7 @@
+- [x] Update `ProfileSetupScreenController` with new caregiver fields
+- [x] Update `ProfileSetupScreen` UI for onboarding
+- [x] Create `EditProfessionalProfileController` for profile updates
+- [x] Create `EditProfessionalProfileScreen` UI
+- [x] Add navigation to `ProfileScreen` for caregivers
+- [x] Register new routes in `app_routes.dart` and `app_routes_file.dart`
+- [x] Verify implementation with a walkthrough
