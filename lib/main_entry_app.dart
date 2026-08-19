@@ -6,6 +6,7 @@ import 'package:carely_caregiver/routes/app_routes_file.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/utils/app_theme.dart';
 import 'package:core_kit/core_kit.dart';
+import 'routes/bindings/initial_binding.dart';
 
 GlobalKey<NavigatorState>? appNavigatorStateKey = GlobalKey<NavigatorState>();
 // Initialize a ScaffoldMessenger key that will be used by core_kit (and the app)
@@ -20,6 +21,7 @@ class MainEntryApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       defaultTransition: Transition.zoom,
       initialRoute: AppRoutes.instance.initial,
+      initialBinding: InitialBinding(),
       getPages: appRootRoutesFile,
       theme: appThemeData,
       themeMode: ThemeMode.light,

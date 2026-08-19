@@ -20,8 +20,6 @@ Future<void> main() async {
     SystemUiOverlayStyle(systemNavigationBarColor: AppColors.instance.transparent, statusBarColor: AppColors.instance.transparent, systemNavigationBarDividerColor: Colors.transparent),
   );
 
-  ///////////// internet connectivity status check
-  Get.put(ConnectivityService());
   /////////  flutter main widget call
 
   runApp(const MainEntryApp());

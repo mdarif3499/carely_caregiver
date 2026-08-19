@@ -15,14 +15,22 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../utils/log/app_log.dart';
 
 class OtpVerificationController extends GetxController {
-  final otpController = TextEditingController();
+  late final TextEditingController otpController;
   late final PinInputController pinController;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  
+
+  @override
+  void onInit() {
+    super.onInit();
+    otpController = TextEditingController();
+    pinController = PinInputController(textController: otpController);
+    _loadInitialData();
+  }
+
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
-  
+
   RxString identity = "".obs;
   RxString type = "email".obs;
   Map<String, dynamic> userData = {};
@@ -30,13 +38,6 @@ class OtpVerificationController extends GetxController {
   RxInt timerSeconds = 180.obs;
   Timer? _timer;
   RxBool canResend = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    pinController = PinInputController(textController: otpController);
-    _loadInitialData();
-  }
 
 
     ///   PHASE_CLIENT_ON_CONTROLS_CHANGED
@@ -185,8 +186,7 @@ class OtpVerificationController extends GetxController {
     if (_isDisposed) return;
     try {
       _timer?.cancel();
-      otpController.dispose();
-      pinController.dispose();
+      // Manual disposal removed for lifecycle stability.
       _isDisposed = true;
     } catch (e) {
       errorLog("onClose", e);

@@ -6,9 +6,18 @@ import '../../../../utils/error_log.dart';
 
 class ChangePasswordScreenController extends GetxController {
   ///////////////////  object
-  TextEditingController oldPasswordTextEditingController = TextEditingController();
-  TextEditingController newPasswordTextEditingController = TextEditingController();
-  TextEditingController confirmPasswordTextEditingController = TextEditingController();
+  late final TextEditingController oldPasswordTextEditingController;
+  late final TextEditingController newPasswordTextEditingController;
+  late final TextEditingController confirmPasswordTextEditingController;
+
+  @override
+  void onInit() {
+    super.onInit();
+    oldPasswordTextEditingController = TextEditingController();
+    newPasswordTextEditingController = TextEditingController();
+    confirmPasswordTextEditingController = TextEditingController();
+  }
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void checkData() {
@@ -23,9 +32,7 @@ class ChangePasswordScreenController extends GetxController {
 
   void onAppClose() {
     try {
-      oldPasswordTextEditingController.dispose();
-      newPasswordTextEditingController.dispose();
-      confirmPasswordTextEditingController.dispose();
+      // Manual disposal removed for lifecycle stability during navigation.
     } catch (e) {
       errorLog('onAppClose', e);
     }

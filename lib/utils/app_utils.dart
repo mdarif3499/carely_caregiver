@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'error_log.dart';
 
 class AppUtils {
@@ -26,6 +27,10 @@ class AppUtils {
       errorLog("maskEmail", e);
     }
     return email;
+  }
+
+  static void closeKeyboard() {
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   static String getGreeting() {

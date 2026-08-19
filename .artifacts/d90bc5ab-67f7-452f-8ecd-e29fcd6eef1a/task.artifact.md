@@ -1,0 +1,7 @@
+- [x] Remove `ValueKey` from `LoginScreen` TextFields
+- [x] Refactor `LoginScreenController` to use `late` initialization
+- [x] Refactor `SignUpController` to use `late` initialization
+- [x] Refactor `ForgotScreenController` to use `late` initialization
+- [x] Refactor `OtpVerificationController` to use `late` initialization
+- [x] Refactor `ChangePasswordScreenController` to use `late` initialization
+- [x] Final verification across all Auth screens

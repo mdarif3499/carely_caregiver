@@ -29,7 +29,11 @@ import '../screens/splash_screen/splash_screen.dart';
 import '../screens/terms_and_conditions_screen/terms_and_conditions_screen.dart';
 import 'app_routes.dart';
 import 'bindings/auth_binding.dart';
+import 'bindings/care_giver_home_binding.dart';
+import 'bindings/client_home_binding.dart';
+import 'bindings/message_binding.dart';
 import 'bindings/navigation_screen_binding.dart';
+import 'bindings/profile_binding.dart';
 import 'bindings/splash_screen_binding.dart';
 import 'internet_check_middle_ware.dart';
 
@@ -95,37 +99,37 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   ),
   GetPage(
     name: AppRoutes.instance.basicInfoScreen,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const BasicInfoScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.profileSetUpScreen,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const ProfileSetupScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.personalInfoScreen,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const PersonalInfoScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.notificationSettingsScreen,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const NotificationSettingsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.careRecipientsScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () => const CareRecipientsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.newRecipientProfileScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () =>  NewRecipientProfileScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
@@ -139,59 +143,59 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   ),
   GetPage(
     name: AppRoutes.instance.termsAndConditions,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const TermsAndConditionsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.privacyPolicy,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const PrivacyPolicyScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.aboutUs,
-    binding: NavigationScreenBinding(),
+    binding: ProfileBinding(),
     page: () => const AboutUsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.clientHomeScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () => const ClientHomeScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.careGiverDetailsScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () => const CareGiverDetailsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
   GetPage(
     name: AppRoutes.instance.reviewBookingScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () => const ReviewBookingScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
   GetPage(
     name: AppRoutes.instance.bookCareGiverScreen,
-    binding: NavigationScreenBinding(),
+    binding: ClientHomeBinding(),
     page: () => const BookCaregiverScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
   GetPage(
     name: AppRoutes.instance.messageScreen,
-    binding: NavigationScreenBinding(),
+    binding: MessageBinding(),
     page: () => const MessageScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
   GetPage(
     name: AppRoutes.instance.bookingDetailsScreen,
-    binding: NavigationScreenBinding(),
+    binding: CareGiverHomeBinding(),
     page: () => const BookingDetailsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
@@ -205,14 +209,14 @@ List<GetPage> appRootRoutesFile = <GetPage>[
 
   GetPage(
     name: AppRoutes.instance.availabilityScreen,
-    binding: NavigationScreenBinding(),
+    binding: CareGiverHomeBinding(),
     page: () => const AvailabilityScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
   GetPage(
     name: AppRoutes.instance.bookingStatusScreen,
-    binding: NavigationScreenBinding(),
+    binding: CareGiverHomeBinding(),
     page: () => const BookingStatusScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
