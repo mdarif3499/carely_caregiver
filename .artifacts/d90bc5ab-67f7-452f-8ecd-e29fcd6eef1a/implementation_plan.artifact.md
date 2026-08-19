@@ -1,42 +1,48 @@
-# Implementation Plan - Final Fix for TextEditingController Disposal Error
+# Implementation Plan - Professional "Add Shift" UI and API Integration
 
-This plan addresses the persistent "TextEditingController was used after being disposed" error by removing state-preserving keys and refining the controller lifecycle.
+Revamp the "Add Shift" functionality in the `AvailabilityScreen` to provide a premium, professional user experience and integrate with the backend API.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> - I will remove `ValueKey` from `LoginScreen` and `SignUpScreen`. These keys were inadvertently causing Flutter to try and reuse disposed state.
-> - I will switch to `late` initialization in `GetxController`'s `onInit` for all authentication controllers. This ensures fresh `TextEditingController` instances are created every time the screen is mounted.
+> - I will be adding a new `availability` endpoint to `AppApiEndPoint`.
+> - The "Add Shift" UI will be implemented as a modern bottom sheet with custom shift type selection and time pickers.
+> - `shiftType` will be restricted to `MORNING`, `AFTERNOON`, and `EVENING` as per the API requirements.
 
 ## Proposed Changes
 
-### [UI Layer]
+### [Constants & API]
 
-#### [MODIFY] [login_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/login_screen.dart)
-- Remove `key: const ValueKey(...)` from all `CommonTextField` and `PhoneTextField` widgets.
+#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
+- Add `static const String availability = "/availability";`.
 
-#### [MODIFY] [sign_up_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/sign_up_screen/sign_up_screen.dart)
-- Ensure no `ValueKey` is used in TextFields.
+#### [MODIFY] [caregiver_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/caregiver_repository.dart)
+- Add `addAvailability` method to handle the POST request to `/availability`.
 
 ### [Controller Layer]
 
-#### [MODIFY] [login_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/login_screen/controller/login_screen_controller.dart)
-- Refactor `TextEditingController` fields to be `late`.
-- Initialize them in `onInit()`.
-- Simplify `onClose()`.
+#### [MODIFY] [availability_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/availability_screen/controller/availability_screen_controller.dart)
+- Update `Shift` model (if needed) or create a mapper to API format.
+- Add `saveShift` method that calls the repository.
+- Implement loading states during API calls.
 
-#### [MODIFY] [sign_up_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/sign_up_screen/controller/sign_up_controller.dart)
-- Refactor `TextEditingController` fields to be `late`.
-- Initialize them in `onInit()`.
+### [UI Layer]
 
-#### [MODIFY] [forgot_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/auth_all_screens/forgot_screen/controller/forgot_screen_controller.dart)
-- Apply the same `late` initialization pattern.
-- **Remove** manual `Get.delete` logic added in previous attempts.
+#### [MODIFY] [availability_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/availability_screen/availability_screen.dart)
+- Completely redesign `_showAddShiftSheet` to be a professional, premium bottom sheet.
+- Implement custom shift type selector with icons and modern styling.
+- Use a professional time picker UI for selecting start and end times.
+- Add validation to ensure `endTime` is after `startTime`.
+
+#### [MODIFY] [availability_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/availability_screen/widget/availability_widgets.dart)
+- Add or update widgets needed for the premium "Add Shift" experience.
 
 ## Verification Plan
 
 ### Manual Verification
-1. Perform a **Hot Restart** of the app.
-2. Navigate to the **Login Screen**.
-3. Go through the **Forgot Password** ceremony.
-4. After returning to the **Login Screen**, verify that typing into fields works without crashing.
+1. Open the **Availability** screen.
+2. Tap **+ Add Shift**.
+3. Verify the new premium UI for selecting shift type and times.
+4. Try saving a shift and verify it calls the API (mocked or real) with the correct JSON body format.
+5. Verify that `startTime` and `endTime` are formatted as `HH:mm`.
+6. Verify that `date` is formatted as `YYYY-MM-DD`.

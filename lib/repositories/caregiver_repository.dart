@@ -32,4 +32,39 @@ class CaregiverRepository {
   }) async {
     return await _apiClient.patch(AppApiEndPoint.updateCaregiverProfile, body: profileData);
   }
+
+  Future<ApiResponseModel> addAvailability({
+    required Map<String, dynamic> data,
+  }) async {
+    return await _apiClient.post(AppApiEndPoint.availability, body: data);
+  }
+
+  Future<ApiResponseModel> getAvailability({
+    required String startDate,
+    required String endDate,
+  }) async {
+    return await _apiClient.get(
+      "${AppApiEndPoint.getMyAvailability}?startDate=$startDate&endDate=$endDate",
+    );
+  }
+
+  Future<ApiResponseModel> updateShift({
+    required String availabilityId,
+    required String shiftId,
+    required Map<String, dynamic> data,
+  }) async {
+    return await _apiClient.patch(
+      "${AppApiEndPoint.availability}/$availabilityId/shift/$shiftId",
+      body: data,
+    );
+  }
+
+  Future<ApiResponseModel> deleteShift({
+    required String availabilityId,
+    required String shiftId,
+  }) async {
+    return await _apiClient.delete(
+      "${AppApiEndPoint.availability}/$availabilityId/shift/$shiftId",
+    );
+  }
 }

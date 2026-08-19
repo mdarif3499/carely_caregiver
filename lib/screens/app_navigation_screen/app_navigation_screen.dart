@@ -60,11 +60,7 @@ class AppNavigationScreen extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Animated Indexed Stack
-//  • Keeps all screens alive (Offstage + TickerMode, same as IndexedStack)
-//  • Fades + slides the incoming screen upward on index change
-// ─────────────────────────────────────────────────────────────────────────────
+
 class _AnimatedIndexedStack extends StatefulWidget {
   final int index;
   final List<Widget> children;
@@ -92,7 +88,7 @@ class _AnimatedIndexedStackState extends State<_AnimatedIndexedStack>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350), // slightly slower = smoother
+      duration: const Duration(milliseconds: 350),
     );
 
     _fade = CurvedAnimation(
@@ -101,7 +97,7 @@ class _AnimatedIndexedStackState extends State<_AnimatedIndexedStack>
     );
 
     _slide = Tween<Offset>(
-      begin: const Offset(0, 0.08), // slightly more slide
+      begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
