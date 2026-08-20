@@ -67,7 +67,7 @@ class ForgotOtpInputScreen extends StatelessWidget {
                         () => RichText(
                           text: TextSpan(
                             text: "Resend code in ${AppUtils.formatSecondFunction(controller.secondsRemaining.value)} ",
-                            style: TextStyle(color: Color(0xFF333333).withOpacity(0.6), fontSize: 14),
+                            style: TextStyle(color: const Color(0xFF333333).withValues(alpha: 0.6), fontSize: 14),
                             children: [
                               TextSpan(
                                 text: "Resend",

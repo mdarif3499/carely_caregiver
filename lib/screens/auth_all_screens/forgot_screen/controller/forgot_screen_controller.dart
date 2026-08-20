@@ -11,6 +11,10 @@ import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
 
+   ///  Md Arif Bhuiyan
+  ///    mdarif3499
+
+
 class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
@@ -65,7 +69,7 @@ class ForgotScreenController extends GetxController {
         if (!isClosed) {
           showCustomSnackbar(message: response.message, isError: false);
           
-          // Unfocus to prevent keyboard glitches during page transition
+
           FocusManager.instance.primaryFocus?.unfocus();
           
           pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
