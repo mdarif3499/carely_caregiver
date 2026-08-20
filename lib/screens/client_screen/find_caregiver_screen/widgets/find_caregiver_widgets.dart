@@ -190,7 +190,8 @@ class CaregiverCard extends StatelessWidget {
                   buttonWidth: 120,
                   titleText: 'Book Now',
                   onTap: () {
-                    Get.toNamed(AppRoutes.instance.careGiverDetailsScreen);
+                    Get.toNamed(AppRoutes.instance.bookCareGiverScreen,
+                        arguments: caregiver);
                   },
                 ),
               ],

@@ -26,7 +26,9 @@ class BookCaregiverScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CaregiverInfoCard(),
+                  Obx(() => CaregiverInfoCard(
+                        caregiver: controller.caregiver.value,
+                      )),
                   const SizedBox(height: 24),
                   AppCalendar(controller: controller),
                   const SizedBox(height: 32),

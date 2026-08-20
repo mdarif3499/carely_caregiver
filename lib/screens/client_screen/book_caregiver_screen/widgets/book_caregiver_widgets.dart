@@ -1,17 +1,31 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/gen/assets.gen.dart';
 import 'package:carely_caregiver/screens/client_screen/book_caregiver_screen/controller/book_caregiver_controller.dart';
+import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart';
 import 'package:carely_caregiver/widgets/profile_avatar/profile_avatar.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
 class CaregiverInfoCard extends StatelessWidget {
   final bool isHoursShow;
-  const CaregiverInfoCard({super.key, this.isHoursShow = true});
+  final CaregiverModel? caregiver;
+
+  const CaregiverInfoCard({
+    super.key,
+    this.isHoursShow = true,
+    this.caregiver,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
+    
+    final name = caregiver?.name ?? 'Sarah Jenkins, RN';
+    final specialty = caregiver?.specialty ?? 'Certified Pediatric Caregiver';
+    final rating = caregiver?.rating ?? 4.9;
+    final rate = caregiver?.hourlyRate ?? 25.0;
+    final imageUrl = caregiver?.avatarUrl ?? '';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -29,7 +43,7 @@ class CaregiverInfoCard extends StatelessWidget {
         children: [
           ProfileAvatar(
             size: 68,
-            imageUrl: 'https://thumbs.dreamstime.com/b/young-male-doctor-close-up-happy-looking-camera-56751540.jpg',
+            imageUrl: imageUrl.isNotEmpty ? imageUrl : 'https://thumbs.dreamstime.com/b/young-male-doctor-close-up-happy-looking-camera-56751540.jpg',
             borderColor: colors.secondaryColor,
             badgeIcon: Assets.icons.verify,
           ),
@@ -39,14 +53,14 @@ class CaregiverInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CommonText(
-                  text: 'Sarah Jenkins, RN',
+                  text: name,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   textColor: colors.textPrimary,
                 ),
                 const SizedBox(height: 4),
                 CommonText(
-                  text: 'Certified Pediatric Caregiver',
+                  text: specialty,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   textColor: colors.secondaryColor,
@@ -57,7 +71,7 @@ class CaregiverInfoCard extends StatelessWidget {
                     const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
                     const SizedBox(width: 4),
                     CommonText(
-                      text: '4.9 (120 reviews)',
+                      text: rating.toStringAsFixed(1),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       textColor: colors.textPrimary,
@@ -72,7 +86,7 @@ class CaregiverInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 CommonText(
-                  text: '\$25/hr',
+                  text: '\$${rate.toStringAsFixed(0)}/hr',
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   textColor: colors.primary,
