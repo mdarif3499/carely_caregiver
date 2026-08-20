@@ -31,11 +31,14 @@ class FindCaregiverScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HomeSearchBar(onChanged: controller.onSearchChanged),
+              HomeSearchBar(
+                controller: controller.searchController,
+                onChanged: controller.onSearchChanged,
+              ),
               const SizedBox(height: 20),
               CaregiverFilterRow(
-                categories: controller.filterCategories,
-                selected: controller.selectedFilter.value,
+                categories: controller.filterCategoryNames,
+                selected: controller.selectedFilterName.value,
                 onSelected: controller.onFilterSelected,
               ),
               const SizedBox(height: 24),
@@ -78,8 +81,8 @@ class FindCaregiverScreen extends StatelessWidget {
             color: colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             child: CaregiverFilterRow(
-              categories: controller.filterCategories,
-              selected: controller.selectedFilter.value,
+              categories: controller.filterCategoryNames,
+              selected: controller.selectedFilterName.value,
               onSelected: controller.onFilterSelected,
             ),
           ),
