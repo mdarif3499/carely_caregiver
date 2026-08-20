@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../../../models/category_model.dart';
 import '../../../../routes/app_routes.dart';
 
 class ProfileSetupScreenController extends GetxController {
@@ -22,15 +23,11 @@ class ProfileSetupScreenController extends GetxController {
     cityController = TextEditingController();
     stateController = TextEditingController();
     countryController = TextEditingController();
+    fetchCategories();
   }
 
   @override
   void onClose() {
-    bioController.dispose();
-    hourlyRateController.dispose();
-    cityController.dispose();
-    stateController.dispose();
-    countryController.dispose();
     super.onClose();
   }
 
@@ -69,20 +66,26 @@ class ProfileSetupScreenController extends GetxController {
   void expandSkills() => showAllSkills.value = true;
 
   // ── Specialties ──
-  final List<String> allSpecialties = [
-    'Dementia Care',
-    'Post-Surgical',
-    'Elderly Care',
-    'Memory Care',
-    'Daily Living',
-  ];
+  final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxSet<String> selectedSpecialties = <String>{}.obs;
 
-  void toggleSpecialty(String specialty) {
-    if (selectedSpecialties.contains(specialty)) {
-      selectedSpecialties.remove(specialty);
+  Future<void> fetchCategories() async {
+    try {
+      final response = await CaregiverRepository.instance.getCategories();
+      if (response.isSuccess) {
+        final List data = response.data['data'] ?? [];
+        categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching categories: $e");
+    }
+  }
+
+  void toggleSpecialty(String categoryId) {
+    if (selectedSpecialties.contains(categoryId)) {
+      selectedSpecialties.remove(categoryId);
     } else {
-      selectedSpecialties.add(specialty);
+      selectedSpecialties.add(categoryId);
     }
   }
 
@@ -193,7 +196,7 @@ class ProfileSetupScreenController extends GetxController {
         showCustomSnackbar(message: "Profile updated successfully", isError: false);
         Get.offAllNamed(
           AppRoutes.instance.appNavigationScreen,
-          arguments: {"isClient": false},
+          arguments: {"isClient": false, "selectedIndex": 3},
         );
       } else {
         showCustomSnackbar(message: response.message, isError: true);

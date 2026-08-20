@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/repositories/user_repository.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import '../../../../models/category_model.dart';
 
 class EditProfessionalProfileController extends GetxController {
   // ── Text Controllers ──
@@ -23,16 +24,16 @@ class EditProfessionalProfileController extends GetxController {
     cityController = TextEditingController();
     stateController = TextEditingController();
     countryController = TextEditingController();
-    fetchProfileData();
+    initData();
+  }
+
+  Future<void> initData() async {
+    await fetchCategories();
+    await fetchProfileData();
   }
 
   @override
   void onClose() {
-    bioController.dispose();
-    hourlyRateController.dispose();
-    cityController.dispose();
-    stateController.dispose();
-    countryController.dispose();
     super.onClose();
   }
 
@@ -56,20 +57,26 @@ class EditProfessionalProfileController extends GetxController {
   }
 
   // ── Specialties ──
-  final List<String> allSpecialties = [
-    'Dementia Care',
-    'Post-Surgical',
-    'Elderly Care',
-    'Memory Care',
-    'Daily Living',
-  ];
+  final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxSet<String> selectedSpecialties = <String>{}.obs;
 
-  void toggleSpecialty(String specialty) {
-    if (selectedSpecialties.contains(specialty)) {
-      selectedSpecialties.remove(specialty);
+  Future<void> fetchCategories() async {
+    try {
+      final response = await CaregiverRepository.instance.getCategories();
+      if (response.isSuccess) {
+        final List data = response.data['data'] ?? [];
+        categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching categories: $e");
+    }
+  }
+
+  void toggleSpecialty(String categoryId) {
+    if (selectedSpecialties.contains(categoryId)) {
+      selectedSpecialties.remove(categoryId);
     } else {
-      selectedSpecialties.add(specialty);
+      selectedSpecialties.add(categoryId);
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:carely_caregiver/widgets/certification_card.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/skill_chip.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
+import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,7 +32,7 @@ class ProfileSetupScreen extends StatelessWidget {
                   const SizedBox(height: 28),
                   _buildSectionTitle('Professional Bio'),
                   const SizedBox(height: 14),
-                  CommonMultilineTextField(
+                  AppMultilineTextField(
                     controller: controller.bioController,
                     hintText: 'Tell families about yourself, your experience and why you love caregiving...',
                     validationType: ValidationType.notRequired,
@@ -174,11 +175,11 @@ class ProfileSetupScreen extends StatelessWidget {
       () => Wrap(
         spacing: 10,
         runSpacing: 10,
-        children: controller.allSpecialties.map(
-          (specialty) => SkillChip(
-            label: specialty,
-            isSelected: controller.selectedSpecialties.contains(specialty),
-            onTap: () => controller.toggleSpecialty(specialty),
+        children: controller.categories.map(
+          (category) => SkillChip(
+            label: category.name,
+            isSelected: controller.selectedSpecialties.contains(category.id),
+            onTap: () => controller.toggleSpecialty(category.id),
           ),
         ).toList(),
       ),

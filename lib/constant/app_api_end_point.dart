@@ -26,6 +26,7 @@ class AppApiEndPoint {
   static const String availability = "/availability";
   static const String getMyAvailability = "/availability/me";
   static const String caregiverProfiles = "/caregiver-profiles";
+  static const String categories = "/categories";
 
   static String imageUrl(String? path) {
     if (path == null || path.isEmpty) return "";

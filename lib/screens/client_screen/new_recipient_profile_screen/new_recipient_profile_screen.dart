@@ -2,6 +2,7 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/controller/health_profile_controller.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
+import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -67,7 +68,7 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                       const AppContentHeader(
                           text: 'Health Considerations & Care Needs'),
                       const SizedBox(height: 12),
-                      CommonMultilineTextField(
+                      AppMultilineTextField(
                         controller: controller.healthNeedsController,
                         hintText:
                             'List any allergies, mobility issues, or specific conditions (e.g., Diabetes, Dementia) ...',

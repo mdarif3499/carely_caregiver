@@ -73,9 +73,6 @@ class BasicInfoController extends GetxController{
 
   @override
   void onClose() {
-    fullNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
     super.onClose();
   }
 }

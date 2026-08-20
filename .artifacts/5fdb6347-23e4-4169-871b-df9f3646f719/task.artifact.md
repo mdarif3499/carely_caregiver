@@ -1,7 +1,8 @@
-- [x] Update `ProfileSetupScreenController` with new caregiver fields
-- [x] Update `ProfileSetupScreen` UI for onboarding
-- [x] Create `EditProfessionalProfileController` for profile updates
-- [x] Create `EditProfessionalProfileScreen` UI
-- [x] Add navigation to `ProfileScreen` for caregivers
-- [x] Register new routes in `app_routes.dart` and `app_routes_file.dart`
-- [x] Verify implementation with a walkthrough
+- [x] Add `/categories` endpoint to `AppApiEndPoint`
+- [x] Create `CategoryModel` data class
+- [x] Add `getCategories()` to `CaregiverRepository`
+- [x] Update `ProfileSetupScreenController` with dynamic categories
+- [x] Update `ProfileSetupScreen` UI
+- [x] Update `EditProfessionalProfileController` with dynamic categories
+- [x] Update `EditProfessionalProfileScreen` UI
+- [x] Verify selection by ID and display by name
