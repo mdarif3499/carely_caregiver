@@ -111,7 +111,6 @@ class ForgotScreenController extends GetxController {
         final payload = response.data['data'] ?? {};
         resetToken = payload['resetToken'] ?? "";
         
-        // Unfocus to prevent keyboard glitches during page transition
         FocusManager.instance.primaryFocus?.unfocus();
         
         pageController.nextPage(duration: 180.milliseconds, curve: Curves.easeInOut);
@@ -146,11 +145,10 @@ class ForgotScreenController extends GetxController {
         if (response.isSuccess) {
           showCustomSnackbar(message: response.message, title: '', isError: false);
           
-          // 1. Force keyboard to close and clear focus
           FocusManager.instance.primaryFocus?.unfocus();
-          
-          // 2. Wait for the keyboard animation to finish and for the framework 
-          // to unlock the widget tree before wiping the stack.
+
+    ///     3,737 86 64
+
           Future.delayed(const Duration(milliseconds: 500), () {
              Get.offAllNamed(AppRoutes.instance.loginScreen);
           });
