@@ -1,4 +1,5 @@
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart';
 import 'package:carely_caregiver/widgets/app_calendar_controller.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:get/get.dart';
@@ -13,10 +14,22 @@ class TimeSlot {
 // ── Controller ───────────────────────────────────────────
 class BookCaregiverController extends GetxController
     with AppCalendarController {
+  
+  final Rxn<CaregiverModel> caregiver = Rxn<CaregiverModel>();
+  
   RxBool rebuild = false.obs;
   // ── Calendar ──
   final Rx<DateTime> focusedMonth = DateTime.now().obs;
   final Rx<DateTime> selectedDay = DateTime.now().obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    final args = Get.arguments;
+    if (args is CaregiverModel) {
+      caregiver.value = args;
+    }
+  }
 
   void previousMonth() {
     focusedMonth.value = DateTime(

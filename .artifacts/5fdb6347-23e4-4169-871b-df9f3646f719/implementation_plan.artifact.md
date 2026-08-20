@@ -1,47 +1,30 @@
-# Implementation Plan - Dynamic Specialties from API
+# Implementation Plan - Navigation to Booking Screen
 
-This plan outlines the steps to fetch "Expertise & Specialties" categories from the backend and use them in the caregiver professional profile sections.
+The goal is to navigate to the "Book Caregiver" screen when the "Book Now" button is clicked in the `FindCaregiverScreen`, passing the selected caregiver's information.
 
 ## Proposed Changes
 
-### 1. API Configuration
-#### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
-- Add `static const String categories = "/categories";` to the `AppApiEndPoint` class.
+### 1. Data Sharing & Logic
+#### [MODIFY] [book_caregiver_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/book_caregiver_screen/controller/book_caregiver_controller.dart)
+- Import `FindCaregiverController` to access `CaregiverModel`.
+- Add `Rxn<CaregiverModel> caregiver = Rxn<CaregiverModel>()`.
+- In `onInit`, initialize the `caregiver` field from `Get.arguments`.
 
-### 2. Data Model
-#### [NEW] [category_model.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/models/category_model.dart)
-- Create a `CategoryModel` class to parse the category response containing `_id` and `name`.
+### 2. UI Components
+#### [MODIFY] [book_caregiver_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/book_caregiver_screen/widgets/book_caregiver_widgets.dart)
+- Update `CaregiverInfoCard` to accept a `CaregiverModel` and display its data (name, specialty, rating, hourly rate, avatar).
 
-### 3. Repository Layer
-#### [MODIFY] [caregiver_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/caregiver_repository.dart)
-- Add a `getCategories()` method to fetch the list of categories from the `/categories` endpoint.
+#### [MODIFY] [book_caregiver_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/book_caregiver_screen/book_caregiver_screen.dart)
+- Wrap the `CaregiverInfoCard` with `Obx` and pass the caregiver data from the controller.
 
-### 4. Controller Layer
-#### [MODIFY] [profle_setup_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_setup_screen/controller/profle_setup_screen_controller.dart)
-- Remove the hardcoded `allSpecialties` list.
-- Add `RxList<CategoryModel> categories = <CategoryModel>[].obs`.
-- Implement `fetchCategories()` to load data on `onInit`.
-- Update `toggleSpecialty(String id)` and `selectedSpecialties` to work with category IDs.
-- Ensure `updateProfile()` sends the selected IDs.
-
-#### [MODIFY] [edit_professional_profile_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/edit_professional_profile_screen/controller/edit_professional_profile_controller.dart)
-- Similar changes as above: fetch dynamic categories and handle selection by ID.
-- Ensure `fetchProfileData()` correctly maps the saved specialties (IDs) from the user profile.
-
-### 5. UI Layer
-#### [MODIFY] [profile_setup_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_setup_screen/profile_setup_screen.dart)
-- Update `_buildSpecialtiesGrid` to iterate over `controller.categories`.
-- Pass `category.name` to `SkillChip`'s `label` and `category.id` to the toggle method.
-
-#### [MODIFY] [edit_professional_profile_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/edit_professional_profile_screen/edit_professional_profile_screen.dart)
-- Update `_buildSpecialtiesGrid` to use the dynamic categories from the controller.
+### 3. Navigation Implementation
+#### [MODIFY] [find_caregiver_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/find_caregiver_screen/widgets/find_caregiver_widgets.dart)
+- In `CaregiverCard`, update the "Book Now" button's `onTap` to navigate to `AppRoutes.instance.bookCareGiverScreen` and pass the `caregiver` object as an argument.
 
 ## Verification Plan
 
-### Automated Tests
-- I will verify that the request body for `updateProfile` contains a list of IDs for the `specialties` field.
-
 ### Manual Verification
-1.  **Onboarding**: Open the `ProfileSetupScreen`, verify that "Expertise & Specialties" are loaded from the API. Select some and proceed.
-2.  **Profile Edit**: Open the `EditProfessionalProfileScreen`, verify that specialties are loaded and previously selected ones are highlighted.
-3.  **Data Persistence**: Change specialties, save, and reopen the screen to verify they are persisted correctly (fetched as IDs from the backend).
+1.  Open the "Find Caregiver" screen.
+2.  Click the "Book Now" button on any caregiver card.
+3.  Verify that you are taken to the "Book Caregiver" screen.
+4.  Verify that the top card displays the correct information for the selected caregiver.

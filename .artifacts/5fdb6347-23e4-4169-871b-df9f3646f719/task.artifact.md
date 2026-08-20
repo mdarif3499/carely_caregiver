@@ -1,8 +1,4 @@
-- [x] Add `/categories` endpoint to `AppApiEndPoint`
-- [x] Create `CategoryModel` data class
-- [x] Add `getCategories()` to `CaregiverRepository`
-- [x] Update `ProfileSetupScreenController` with dynamic categories
-- [x] Update `ProfileSetupScreen` UI
-- [x] Update `EditProfessionalProfileController` with dynamic categories
-- [x] Update `EditProfessionalProfileScreen` UI
-- [x] Verify selection by ID and display by name
+- [ ] Update `BookCaregiverController` to receive caregiver data
+- [ ] Update `CaregiverInfoCard` to display dynamic caregiver data
+- [ ] Update `BookCaregiverScreen` to pass data to the card
+- [ ] Implement navigation from `FindCaregiverScreen` to `BookCaregiverScreen`

@@ -3,6 +3,7 @@ import 'package:carely_caregiver/models/category_model.dart';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/widgets/bottom_shit_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
@@ -61,7 +62,6 @@ class FindCaregiverController extends GetxController {
     selectedFilterName.value = name;
     if (name == 'All') {
       selectedFilterId.value = 'All';
-      // Clear all other filters as requested
       searchQuery.value = '';
       searchController.clear();
       filterState.value = FilterState(); // Reset advanced filters
@@ -88,7 +88,6 @@ class FindCaregiverController extends GetxController {
     }
   }
 
-  // ── API State ──
   final RxList<CaregiverModel> caregivers = <CaregiverModel>[].obs;
   final RxBool isLoading = false.obs;
 
@@ -98,7 +97,7 @@ class FindCaregiverController extends GetxController {
     searchController = TextEditingController();
     initData();
 
-    // Debounce search query to avoid excessive API calls
+
     debounce(searchQuery, (_) {
       debugPrint("Search query triggered: ${searchQuery.value}");
       fetchCaregivers();
@@ -128,6 +127,11 @@ class FindCaregiverController extends GetxController {
     super.onClose();
   }
 
+
+///  BookCaregiverController
+
+
+
   List<String> get filterCategoryNames => ['All', ...categories.map((e) => e.name)];
 
   Future<void> fetchCaregivers() async {
@@ -148,8 +152,7 @@ class FindCaregiverController extends GetxController {
         specialty: specialty,
         skills: skills,
         language: language,
-        // Passing null so parameters are only added if filters are active
-        sortBy: null, 
+        sortBy: null,
         sortOrder: null,
       );
 
@@ -167,6 +170,12 @@ class FindCaregiverController extends GetxController {
     }
   }
 
-  // Legacy getter kept for UI compatibility if needed, but now uses API data
+   ///   🌐 N 📡
+  ///
+
+
+
+
+
   List<CaregiverModel> get filteredCaregivers => caregivers;
 }
