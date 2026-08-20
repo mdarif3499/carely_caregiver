@@ -60,7 +60,6 @@ class LoginScreenController extends GetxController {
 
           showCustomSnackbar(message: response.message, isError: false);
 
-          // Force unfocus before navigating to prevent disposal race conditions
           FocusManager.instance.primaryFocus?.unfocus();
 
           if (user['intakeCompleted'] == true) {
@@ -108,14 +107,10 @@ class LoginScreenController extends GetxController {
 
   bool _isDisposed = false;
 
-  ///////////. app. close
   void appOnClose() {
     if (_isDisposed) return;
     try {
-      // We stop explicit disposal of TextEditingControllers here to prevent the 
-      // "used after being disposed" race condition during rapid Get.offAllNamed transitions.
-      // Since these are only a few objects in an auth flow, letting the Garbage Collector 
-      // handle them is a safe and reliable way to ensure 100% stability.
+
       _isDisposed = true;
     } catch (e) {
       errorLog("appOnClose", e);
