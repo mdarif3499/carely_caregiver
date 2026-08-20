@@ -36,9 +36,9 @@ class CaregiverModel {
     return CaregiverModel(
       id: json['_id'] ?? '',
       name: userData['name'] ?? 'Unknown',
-      role: 'Caregiver', // Default as it's not in this specific API response
+      role: 'Caregiver',
       specialty: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['name'] ?? 'General Care') : specialties.join(', ')) : 'General Care',
-      description: json['bio'] ?? '', // Using 'bio' as description
+      description: json['bio'] ?? '',
       rating: (json['averageRating'] ?? 0.0).toDouble(),
       hourlyRate: (json['hourlyRate'] ?? 0.0).toDouble(),
       avatarUrl: AppApiEndPoint.imageUrl(userData['profileImage']),
@@ -46,14 +46,13 @@ class CaregiverModel {
   }
 }
 
-// ── Controller ───────────────────────────────────────────
+// ── Controller ───────────
 class FindCaregiverController extends GetxController {
   // ── Search ──
   late final TextEditingController searchController;
   final RxString searchQuery = ''.obs;
   void onSearchChanged(String val) => searchQuery.value = val;
 
-  // ── Filter chips (Dynamic) ──
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxString selectedFilterId = 'All'.obs;
   final RxString selectedFilterName = 'All'.obs;
@@ -64,7 +63,7 @@ class FindCaregiverController extends GetxController {
       selectedFilterId.value = 'All';
       searchQuery.value = '';
       searchController.clear();
-      filterState.value = FilterState(); // Reset advanced filters
+      filterState.value = FilterState();
     } else {
       final category = categories.firstWhere((element) => element.name == name);
       selectedFilterId.value = category.id;
@@ -72,7 +71,6 @@ class FindCaregiverController extends GetxController {
     fetchCaregivers();
   }
 
-  // ── Advanced filter state ──
   final Rx<FilterState> filterState = FilterState().obs;
 
   void onFilterTap() async {
