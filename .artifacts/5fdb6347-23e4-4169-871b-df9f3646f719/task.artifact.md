@@ -1,4 +1,4 @@
-- [ ] Update `BookCaregiverController` to receive caregiver data
-- [ ] Update `CaregiverInfoCard` to display dynamic caregiver data
-- [ ] Update `BookCaregiverScreen` to pass data to the card
-- [ ] Implement navigation from `FindCaregiverScreen` to `BookCaregiverScreen`
+- [x] Implement 24-hour time formatting helper in `AvailabilityScreen`
+- [x] Update `Shift` object creation to use 24-hour format for API fields
+- [x] Verify API payload in `AvailabilityScreenController`
+- [x] Fix `AlertDialog` rendering error in `AvailabilityScreen`

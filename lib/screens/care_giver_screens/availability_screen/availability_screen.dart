@@ -7,6 +7,7 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class AvailabilityScreen extends StatelessWidget {
   const AvailabilityScreen({super.key});
@@ -137,25 +138,35 @@ class AvailabilityScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-        title: const CommonText(
-          text: 'Delete Shift?',
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
+        title: Text(
+          'Delete Shift?',
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+            color: AppColors.instance.textPrimary,
+          ),
         ),
-        content: CommonText(
-          text: 'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
-          fontSize: 14,
-          textColor: AppColors.instance.secondaryText,
+        content: Text(
+          'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.instance.secondaryText,
+          ),
         ),
         actionsPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: CommonText(
-              text: 'Cancel',
-              fontWeight: FontWeight.w600,
-              textColor: AppColors.instance.textGrey,
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.instance.textGrey,
+              ),
             ),
           ),
           SizedBox(
@@ -315,10 +326,18 @@ class AvailabilityScreen extends StatelessWidget {
               child: CommonButton(
                 titleText: existing != null ? 'Update Shift' : 'Add Shift',
                 onTap: () {
-                  final startStr = startTime.value.format(context);
-                  final endStr = endTime.value.format(context);
-                  final apiStart = '${startTime.value.hour.toString().padLeft(2, '0')}:${startTime.value.minute.toString().padLeft(2, '0')}';
-                  final apiEnd = '${endTime.value.hour.toString().padLeft(2, '0')}:${endTime.value.minute.toString().padLeft(2, '0')}';
+                  final start = startTime.value;
+                  final end = endTime.value;
+
+                  // Robust 24-hour formatting for Backend
+                  final apiStart = '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
+                  final apiEnd = '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
+
+                  // Robust AM/PM formatting for UI (ignoring system locale to keep it professional)
+                  final dtStart = DateTime(0, 1, 1, start.hour, start.minute);
+                  final dtEnd = DateTime(0, 1, 1, end.hour, end.minute);
+                  final uiStart = DateFormat('hh:mm a').format(dtStart);
+                  final uiEnd = DateFormat('hh:mm a').format(dtEnd);
                   
                   if (existing != null) {
                     c.updateShiftInApi(
@@ -326,8 +345,8 @@ class AvailabilityScreen extends StatelessWidget {
                         id: existing.id,
                         availabilityId: existing.availabilityId,
                         label: '${selectedType.value} Shift',
-                        startTime: startStr,
-                        endTime: endStr,
+                        startTime: uiStart,
+                        endTime: uiEnd,
                         apiStartTime: apiStart,
                         apiEndTime: apiEnd,
                         shiftType: selectedType.value,
@@ -338,10 +357,10 @@ class AvailabilityScreen extends StatelessWidget {
                     c.saveShiftToApi(
                       Shift(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        availabilityId: "", // Will be assigned by API on refresh
+                        availabilityId: "",
                         label: '${selectedType.value} Shift',
-                        startTime: startStr,
-                        endTime: endStr,
+                        startTime: uiStart,
+                        endTime: uiEnd,
                         apiStartTime: apiStart,
                         apiEndTime: apiEnd,
                         shiftType: selectedType.value,

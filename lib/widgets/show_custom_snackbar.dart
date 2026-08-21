@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 
 void showCustomSnackbar({
   required String message,
-  bool isError = true, // ✅ default true
+  bool isError = true,
   String? title,
   Duration duration = const Duration(seconds: 3),
   SnackPosition position = SnackPosition.BOTTOM,
@@ -23,7 +23,7 @@ void showCustomSnackbar({
   final Color bgColor = isError ? Colors.red : Colors.green;
 
   Get.snackbar(
-    title ?? (isError?'Error': 'Success'), // Fallback title based on isError
+    title ?? (isError?'Error': 'Success'),
     message,
     backgroundColor: bgColor,
     titleText: title != null
