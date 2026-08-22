@@ -1,4 +1,10 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/repositories/caregiver_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../widgets/show_custom_snackbar.dart';
 
 // ─────────────────────────────────────────────
 //  Model
@@ -6,29 +12,75 @@ import 'package:get/get.dart';
 class BookingRequest {
   final String id;
   final String clientName;
-  final String clientRole;
-  final String avatarUrl;
-  final double rating;
-  final int previousJobs;
-  final String serviceType;
-  final String dateTime;
-  final String duration;
-  final String location;
-  final double distanceMiles;
+  final String clientAvatar;
+  final String recipientName;
+  final String relationship;
+  final String serviceName;
+  final String date;
+  final String shift;
+  final String startTime;
+  final String endTime;
+  final double totalAmount;
+  final String status;
+  final String instructions;
 
   const BookingRequest({
     required this.id,
     required this.clientName,
-    required this.clientRole,
-    required this.avatarUrl,
-    required this.rating,
-    required this.previousJobs,
-    required this.serviceType,
-    required this.dateTime,
-    required this.duration,
-    required this.location,
-    required this.distanceMiles,
+    required this.clientAvatar,
+    required this.recipientName,
+    required this.relationship,
+    required this.serviceName,
+    required this.date,
+    required this.shift,
+    required this.startTime,
+    required this.endTime,
+    required this.totalAmount,
+    required this.status,
+    this.instructions = '',
   });
+
+  factory BookingRequest.fromJson(Map<String, dynamic> json) {
+    final client = json['client'] ?? {};
+    final recipient = json['careRecipient'] ?? {};
+    final service = json['serviceCategory'] ?? {};
+
+    return BookingRequest(
+      id: json['_id'] ?? '',
+      clientName: client['name'] ?? 'Unknown Client',
+      clientAvatar: AppApiEndPoint.imageUrl(client['profileImage']),
+      recipientName: recipient['fullName'] ?? 'Unknown Recipient',
+      relationship: recipient['relationship'] ?? 'Family',
+      serviceName: service['name'] ?? 'General Care',
+      date: json['date'] ?? '',
+      shift: json['shift'] ?? 'MORNING',
+      startTime: json['slotStartTime'] ?? '00:00',
+      endTime: json['slotEndTime'] ?? '00:00',
+      totalAmount: (json['totalAmount'] ?? 0.0).toDouble(),
+      status: json['status'] ?? 'PENDING',
+      instructions: json['instructions'] ?? '',
+    );
+  }
+
+  String get formattedDateTime {
+    try {
+      final dt = DateTime.parse(date);
+      final dateStr = DateFormat('MMM d').format(dt);
+      return '$dateStr, ${_formatTime(startTime)} - ${_formatTime(endTime)}';
+    } catch (_) {
+      return '$date, $startTime - $endTime';
+    }
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      final dt = DateTime(0, 1, 1, int.parse(parts[0]), int.parse(parts[1]));
+      return DateFormat('hh:mm a').format(dt);
+    } catch (_) {
+      return time;
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -36,88 +88,86 @@ class BookingRequest {
 // ─────────────────────────────────────────────
 class BookingRequestController extends GetxController {
   final RxInt selectedTab = 0.obs; // 0 = New, 1 = History
+  final RxBool isLoading = false.obs;
 
-  final List<BookingRequest> newRequests = const [
-    BookingRequest(
-      id: '1',
-      clientName: 'Sarah Jenkins',
-      clientRole: 'RN',
-      avatarUrl: '',
-      rating: 4.9,
-      previousJobs: 12,
-      serviceType: 'Elderly Care - Post-Op Support',
-      dateTime: 'Monday, Oct 12 . 09:00 AM - 02:00 PM',
-      duration: '5h',
-      location: 'West Village',
-      distanceMiles: 1.2,
-    ),
-    BookingRequest(
-      id: '2',
-      clientName: 'Mark Thompson',
-      clientRole: 'LPN',
-      avatarUrl: '',
-      rating: 4.7,
-      previousJobs: 8,
-      serviceType: 'Dementia Care - Daily Routine',
-      dateTime: 'Tuesday, Oct 13 . 10:00 AM - 03:00 PM',
-      duration: '5h',
-      location: 'Brooklyn Heights',
-      distanceMiles: 2.4,
-    ),
-    BookingRequest(
-      id: '3',
-      clientName: 'Linda Moore',
-      clientRole: 'CNA',
-      avatarUrl: '',
-      rating: 4.8,
-      previousJobs: 15,
-      serviceType: 'Post-Surgery Recovery Support',
-      dateTime: 'Wednesday, Oct 14 . 08:00 AM - 01:00 PM',
-      duration: '5h',
-      location: 'Upper East Side',
-      distanceMiles: 0.9,
-    ),
-  ];
+  final RxList<BookingRequest> newRequests = <BookingRequest>[].obs;
+  final RxList<BookingRequest> historyRequests = <BookingRequest>[].obs;
 
-  final List<BookingRequest> historyRequests = const [
-    BookingRequest(
-      id: '4',
-      clientName: 'James Wilson',
-      clientRole: 'RN',
-      avatarUrl: '',
-      rating: 4.6,
-      previousJobs: 5,
-      serviceType: 'Medication Management',
-      dateTime: 'Friday, Oct 10 . 07:00 AM - 12:00 PM',
-      duration: '5h',
-      location: 'Chelsea',
-      distanceMiles: 3.1,
-    ),
-    BookingRequest(
-      id: '5',
-      clientName: 'Anna Roberts',
-      clientRole: 'LPN',
-      avatarUrl: '',
-      rating: 4.5,
-      previousJobs: 3,
-      serviceType: 'Companion Care',
-      dateTime: 'Thursday, Oct 9 . 11:00 AM - 04:00 PM',
-      duration: '5h',
-      location: 'Midtown',
-      distanceMiles: 1.7,
-    ),
-  ];
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCaregiverBookings();
+  }
+
+  Future<void> fetchCaregiverBookings() async {
+    try {
+      isLoading.value = true;
+      update();
+
+      debugPrint("Fetching Caregiver Bookings...");
+      final response = await CaregiverRepository.instance.getCaregiverBookings();
+
+      debugPrint("Caregiver Booking API Response Body: ${response.data}");
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data']?['data'] ?? [];
+        final List<BookingRequest> all = dataList.map((e) => BookingRequest.fromJson(e)).toList();
+
+        newRequests.value = all.where((e) => e.status == 'PENDING').toList();
+        historyRequests.value = all.where((e) => e.status != 'PENDING').toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching caregiver bookings: $e");
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
 
   List<BookingRequest> get activeList =>
       selectedTab.value == 0 ? newRequests : historyRequests;
 
   void selectTab(int index) => selectedTab.value = index;
 
-  void acceptRequest(String id) {
-    Get.snackbar('Accepted', 'Booking #$id accepted!');
+  Future<void> acceptRequest(String id) async {
+    try {
+      isLoading.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.acceptBooking(id);
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: "Booking request accepted!", isError: false);
+        await fetchCaregiverBookings();
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to accept booking", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
+    }
   }
 
-  void declineRequest(String id) {
-    Get.snackbar('Declined', 'Booking #$id declined.');
+  Future<void> declineRequest(String id) async {
+    try {
+      isLoading.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.declineBooking(id);
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: "Booking request declined.", isError: false);
+        await fetchCaregiverBookings();
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to decline booking", isError: true);
+    } finally {
+      isLoading.value = false;
+      update();
+    }
   }
 }

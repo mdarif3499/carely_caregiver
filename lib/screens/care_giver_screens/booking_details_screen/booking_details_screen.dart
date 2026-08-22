@@ -14,37 +14,47 @@ class BookingDetailsScreen extends StatelessWidget {
 
     return DefaultBackgroundTemplate(
       appBarTitle: 'Booking Details',
-      child: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClientProfileHeader(booking: ctrl.booking),
-                  20.height,
-                  ScheduleEarningsCard(booking: ctrl.booking),
-                  20.height,
-                  AdditionalInstructionsCard(
-                    instructions: ctrl.booking.additionalInstructions,
-                  ),
-                ],
+      child: Obx(() {
+        if (ctrl.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final BookingDetails? b = ctrl.booking.value;
+        if (b == null) {
+          return const Center(child: CommonText(text: 'Booking not found'));
+        }
+
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClientProfileHeader(booking: b),
+                    20.height,
+                    ScheduleEarningsCard(booking: b),
+                    20.height,
+                    AdditionalInstructionsCard(
+                      instructions: b.instructions,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Obx(
-            () => Padding(
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: BookingDetailActions(
-                isLoading: ctrl.isLoading.value,
+                isLoading: ctrl.isActionLoading.value,
+                status: b.status,
                 onAccept: ctrl.accept,
                 onDecline: ctrl.decline,
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }
