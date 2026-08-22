@@ -30,6 +30,7 @@ class AppRoutes {
   final String bookCareGiverScreen = "/bookCareGiverScreen";
   final String messageScreen = "/messageScreen";
   final String bookingDetailsScreen = "/bookingDetailsScreen";
+  final String stripePaymentWebView = "/stripePaymentWebView";
   final String notificationScreen = "/notificationScreen";
   final String availabilityScreen = "/availabilityScreen";
   final String bookingStatusScreen = "/bookingStatusScreen";

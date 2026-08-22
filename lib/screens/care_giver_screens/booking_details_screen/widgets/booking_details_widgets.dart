@@ -48,7 +48,6 @@ class ClientProfileHeader extends StatelessWidget {
               ),
             ),
 
-
           ],
         ),
         const SizedBox(width: 16),

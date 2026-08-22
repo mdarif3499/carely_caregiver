@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
@@ -307,8 +308,16 @@ class BookCaregiverController extends GetxController
       final response = await ClientRepository.instance.createBooking(data: bookingData);
 
       if (response.isSuccess) {
-        showCustomSnackbar(message: "Booking confirmed successfully!", isError: false);
-        Get.toNamed(AppRoutes.instance.appNavigationScreen);
+        log("BOOKING SUCCESS DATA: ${response.data}");
+
+        final String? checkoutUrl = response.data['data']?['checkoutUrl'];
+        
+        if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
+          Get.toNamed(AppRoutes.instance.stripePaymentWebView, arguments: checkoutUrl);
+        } else {
+          showCustomSnackbar(message: "Booking confirmed, but payment link not found.", isError: true);
+          Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
+        }
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }
