@@ -23,12 +23,17 @@ class ClientProfileHeader extends StatelessWidget {
                 border: Border.all(color: colors.primary.withAlpha(50), width: 2),
               ),
               child: ClipOval(
+
+
                 child: CommonImage(
                   src: booking.avatarUrl,
                   fill: BoxFit.cover,
                 ),
+
+
               ),
             ),
+
             Positioned(
               right: 0,
               bottom: 0,
@@ -42,10 +47,13 @@ class ClientProfileHeader extends StatelessWidget {
                 child: const Icon(Icons.check, size: 12, color: Colors.white),
               ),
             ),
+
+
           ],
         ),
         const SizedBox(width: 16),
         Expanded(
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -77,6 +85,8 @@ class ClientProfileHeader extends StatelessWidget {
               ),
             ],
           ),
+
+
         ),
       ],
     );
