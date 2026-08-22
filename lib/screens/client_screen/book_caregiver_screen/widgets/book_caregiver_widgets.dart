@@ -6,6 +6,8 @@ import 'package:carely_caregiver/widgets/profile_avatar/profile_avatar.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 
+import '../../care_recipients_screen/controller/care_recipients_controller.dart';
+
 class CaregiverInfoCard extends StatelessWidget {
   final bool isHoursShow;
   final CaregiverModel? caregiver;
@@ -106,7 +108,7 @@ class CaregiverInfoCard extends StatelessWidget {
 }
 
 class TimeGroupLabel extends StatelessWidget {
-  final String icon;
+  final Widget icon;
   final String label;
 
   const TimeGroupLabel({
@@ -120,11 +122,11 @@ class TimeGroupLabel extends StatelessWidget {
     final colors = AppColors.instance;
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 20)),
+        icon,
         const SizedBox(width: 8),
         CommonText(
           text: label,
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.w600,
           textColor: colors.secondaryText,
         ),
@@ -151,21 +153,109 @@ class TimeChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? colors.primary.withAlpha(15) : colors.boxBg.withAlpha(50),
+          color: isSelected ? colors.primary : const Color(0xFFF5F6FA),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? colors.primary : colors.transparent,
-            width: 1.5,
-          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: colors.primary.withAlpha(50),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: CommonText(
           text: slot.label,
           fontSize: 14,
-          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-          textColor: isSelected ? colors.primary : colors.textPrimary,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+          textColor: isSelected ? Colors.white : colors.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
+class RecipientSelectionCard extends StatelessWidget {
+  final RecipientModel recipient;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const RecipientSelectionCard({
+    super.key,
+    required this.recipient,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.instance;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? colors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? colors.primary : colors.boxBg,
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: colors.primary.withAlpha(40),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.white.withAlpha(40) : colors.boxBg,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: CommonText(
+                  text: recipient.name.isNotEmpty ? recipient.name.substring(0, 1) : "?",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  textColor: isSelected ? Colors.white : colors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CommonText(
+                  text: recipient.name,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  textColor: isSelected ? Colors.white : colors.textPrimary,
+                ),
+                CommonText(
+                  text: recipient.relationship,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                  textColor: isSelected ? Colors.white.withAlpha(180) : colors.secondaryText,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

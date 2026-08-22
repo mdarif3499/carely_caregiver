@@ -17,6 +17,10 @@ class BookingRequestScreen extends StatelessWidget {
       appBarTitle: 'Booking Requests',
       hideBackButton: true,
       child: Obx(() {
+        if (c.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         final requests = c.activeList;
 
         // ── Tab bar header ──────────────────────────────
@@ -66,7 +70,7 @@ class BookingRequestScreen extends StatelessWidget {
             final req = requests[index];
             return BookingRequestCard(
               onTap: () {
-                Get.toNamed(AppRoutes.instance.bookingDetailsScreen);
+                Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: req.id);
               },
               request: req,
               isNew: c.selectedTab.value == 0,

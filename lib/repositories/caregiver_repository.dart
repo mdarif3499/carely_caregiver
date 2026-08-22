@@ -71,4 +71,20 @@ class CaregiverRepository {
   Future<ApiResponseModel> getCategories() async {
     return await _apiClient.get(AppApiEndPoint.categories);
   }
+
+  Future<ApiResponseModel> getCaregiverBookings() async {
+    return await _apiClient.get(AppApiEndPoint.caregiverBooking);
+  }
+
+  Future<ApiResponseModel> getBookingDetails(String id) async {
+    return await _apiClient.get("${AppApiEndPoint.booking}/$id");
+  }
+
+  Future<ApiResponseModel> acceptBooking(String id) async {
+    return await _apiClient.patch("${AppApiEndPoint.booking}/$id/accept");
+  }
+
+  Future<ApiResponseModel> declineBooking(String id) async {
+    return await _apiClient.patch("${AppApiEndPoint.booking}/$id/decline");
+  }
 }

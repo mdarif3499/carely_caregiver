@@ -1,0 +1,12 @@
+- `[x]` Professional Booking Requests Integration
+    - `[x]` Update `BookingRequest` model with full API fields (Client, Recipient, Service, Amount)
+    - `[x]` Implement JSON parsing and categorization (New vs History) in `BookingRequestController`
+    - `[x]` Redesign `BookingRequestCard` UI for professional data display
+    - `[x]` Update `BookingRequestScreen` for dynamic tab counts
+    - `[x]` Verify UI with the provided API data
+- `[x]` Booking Details Professional Integration
+    - `[x]` Add `getBookingDetails` to `CaregiverRepository`
+    - `[x]` Update `BookingDetailsController` to fetch and handle real data
+    - `[x]` Implement status-based button visibility logic
+    - `[x]` Redesign `BookingDetailsScreen` UI with real data mapping
+    - `[x]` Update navigation to pass correct booking ID
