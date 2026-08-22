@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+
+import '../../../../repositories/client_repository.dart';
 
 class RecipientModel {
   final String id;
@@ -14,23 +17,42 @@ class RecipientModel {
     required this.tags,
     this.imageUrl = '',
   });
+
+  factory RecipientModel.fromJson(Map<String, dynamic> json) {
+    return RecipientModel(
+      id: json['_id'] ?? '',
+      name: json['fullName'] ?? 'Unknown',
+      relationship: json['relationship'] ?? 'Family',
+      tags: (json['medicalConditions'] as String? ?? '').split(',').where((e) => e.isNotEmpty).toList(),
+      imageUrl: '',
+    );
+  }
 }
 
 class CareRecipientsController extends GetxController {
-  final RxList<RecipientModel> recipients = <RecipientModel>[
-    const RecipientModel(
-      id: '1',
-      name: 'Sarah Henderson',
-      relationship: 'Mother',
-      tags: ['ELDERLY CARE', 'MOBILITY ASSISTANCE'],
-    ),
-    const RecipientModel(
-      id: '2',
-      name: 'James Henderson',
-      relationship: 'Father',
-      tags: ['ELDERLY CARE', 'DEMENTIA CARE'],
-    ),
-  ].obs;
+  final RxList<RecipientModel> recipients = <RecipientModel>[].obs;
+  final RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchRecipients();
+  }
+
+  Future<void> fetchRecipients() async {
+    try {
+      isLoading.value = true;
+      final response = await ClientRepository.instance.getCareRecipients();
+      if (response.isSuccess) {
+        final List data = response.data['data'] ?? [];
+        recipients.value = data.map((e) => RecipientModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching recipients: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void addRecipient() {
     // Navigate to new recipient screen

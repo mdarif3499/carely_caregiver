@@ -24,6 +24,10 @@ class ClientRepository {
     return await _apiClient.post(AppApiEndPoint.createCareRecipient, body: body);
   }
 
+  Future<ApiResponseModel> getCareRecipients() async {
+    return await _apiClient.get(AppApiEndPoint.createCareRecipient);
+  }
+
   Future<ApiResponseModel> getCaregiverProfiles({
     String? searchTerm,
     String? specialty,
@@ -58,5 +62,9 @@ class ClientRepository {
   }) async {
     final endpoint = "${AppApiEndPoint.availability}/$caregiverId?startDate=$startDate&endDate=$endDate";
     return await _apiClient.get(endpoint);
+  }
+
+  Future<ApiResponseModel> createBooking({required Map<String, dynamic> data}) async {
+    return await _apiClient.post(AppApiEndPoint.booking, body: data);
   }
 }

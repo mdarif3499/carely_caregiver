@@ -1,24 +1,39 @@
+import 'dart:convert';
+
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart';
 import 'package:carely_caregiver/utils/log/app_log.dart';
 import 'package:carely_caregiver/widgets/app_calendar_controller.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../care_recipients_screen/controller/care_recipients_controller.dart';
+import '../../select_service_type_screen/controller/selected_service_type_controller.dart';
+
 // ── Time Slot Model ──────────────────────────────────────
 class TimeSlot {
   final String startTime;
+  final String endTime;
   final String status;
+  final String shiftType;
 
-  const TimeSlot({required this.startTime, required this.status});
+  const TimeSlot({
+    required this.startTime,
+    required this.endTime,
+    required this.status,
+    required this.shiftType,
+  });
 
-  factory TimeSlot.fromJson(Map<String, dynamic> json) {
+  factory TimeSlot.fromJson(Map<String, dynamic> json, String shiftType, String defaultEndTime) {
     return TimeSlot(
       startTime: json['startTime'] ?? "",
+      endTime: json['endTime'] ?? defaultEndTime,
       status: json['status'] ?? "",
+      shiftType: shiftType,
     );
   }
 
@@ -43,14 +58,6 @@ class CaregiverShift {
   final List<TimeSlot> slots;
 
   const CaregiverShift({required this.shiftType, required this.slots});
-
-  factory CaregiverShift.fromJson(Map<String, dynamic> json) {
-    final List slotList = json['slots'] ?? [];
-    return CaregiverShift(
-      shiftType: json['shiftType'] ?? "MORNING",
-      slots: slotList.map((s) => TimeSlot.fromJson(s)).toList(),
-    );
-  }
 }
 
 // ── Controller ───────────────────────────────────────────
@@ -59,6 +66,7 @@ class BookCaregiverController extends GetxController
   
   final Rxn<CaregiverModel> caregiver = Rxn<CaregiverModel>();
   final RxBool isLoading = false.obs;
+  final RxBool isBooking = false.obs;
   
   RxBool rebuild = false.obs;
   // ── Calendar ──
@@ -68,16 +76,48 @@ class BookCaregiverController extends GetxController
   // ── API Data ──
   final RxList<CaregiverShift> availableShifts = <CaregiverShift>[].obs;
 
+  // ── Selection State ──
+  final Rxn<RecipientModel> selectedRecipient = Rxn<RecipientModel>();
+
+  // ── Booking Inputs ──
+  late final TextEditingController instructionsController;
+
   @override
   void onInit() {
     super.onInit();
+    instructionsController = TextEditingController();
     final args = Get.arguments;
     if (args is CaregiverModel) {
       caregiver.value = args;
     }
     
+    // Auto-select first recipient if available
+    _initRecipient();
+
     // Initial fetch
     fetchCaregiverAvailability();
+  }
+
+  void _initRecipient() {
+    try {
+      final recipientController = Get.find<CareRecipientsController>();
+      if (recipientController.recipients.isNotEmpty) {
+        selectedRecipient.value = recipientController.recipients.first;
+      }
+      
+      // Watch for changes in recipients list (e.g. if loaded after onInit)
+      ever(recipientController.recipients, (list) {
+        if (selectedRecipient.value == null && list.isNotEmpty) {
+          selectedRecipient.value = list.first;
+        }
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void onClose() {
+    instructionsController.dispose();
+    super.onClose();
   }
 
   Future<void> fetchCaregiverAvailability() async {
@@ -102,9 +142,6 @@ class BookCaregiverController extends GetxController
         endDate: dateStr,
       );
 
-      appLog("Caregiver Availability Response Status: ${response.statusCode}", source: "AVAILABILITY_API");
-      appLog("Caregiver Availability Response Body: ${response.data}", source: "AVAILABILITY_API");
-
       if (response.isSuccess) {
         final List dataList = response.data['data'] ?? [];
         availableShifts.clear();
@@ -113,39 +150,43 @@ class BookCaregiverController extends GetxController
           final dayData = dataList[0];
           final List shiftList = dayData['shifts'] ?? [];
           
-          // 1. Collect all slots into a single list
-          List<TimeSlot> allSlots = [];
           for (var s in shiftList) {
+            final String type = s['shiftType'] ?? "MORNING";
+            final String shiftEnd = s['endTime'] ?? "00:00";
             final List slotList = s['slots'] ?? [];
-            allSlots.addAll(slotList.map((slotJson) => TimeSlot.fromJson(slotJson)));
-          }
+            
+            final List<TimeSlot> availableSlots = [];
+            
+            for (int i = 0; i < slotList.length; i++) {
+              final slotJson = slotList[i];
+              if ((slotJson['status'] ?? "").toString().toUpperCase() == 'AVAILABLE') {
+                // Determine end time: next slot's start time or shift end time
+                String nextStartTime = shiftEnd;
+                if (i + 1 < slotList.length) {
+                  nextStartTime = slotList[i + 1]['startTime'] ?? shiftEnd;
+                }
+                
+                availableSlots.add(TimeSlot.fromJson(slotJson, type, nextStartTime));
+              }
+            }
 
-          // 2. Group slots by their actual time (International Standard)
-          Map<String, List<TimeSlot>> grouped = {
-            'MORNING': [],
-            'AFTERNOON': [],
-            'EVENING': [],
-          };
-
-          for (var slot in allSlots) {
-            final hour = int.tryParse(slot.startTime.split(':')[0]) ?? 0;
-            if (hour < 12) {
-              grouped['MORNING']!.add(slot);
-            } else if (hour < 17) {
-              grouped['AFTERNOON']!.add(slot);
-            } else {
-              grouped['EVENING']!.add(slot);
+            if (availableSlots.isNotEmpty) {
+              availableSlots.sort((a, b) => a.startTime.compareTo(b.startTime));
+              
+              String displayType = type;
+              if (type.toUpperCase() == 'AFTERNOON') {
+                final firstSlotHour = int.tryParse(availableSlots.first.startTime.split(':')[0]) ?? 0;
+                if (firstSlotHour >= 17) {
+                  displayType = 'EVENING';
+                }
+              }
+              
+              availableShifts.add(CaregiverShift(
+                shiftType: displayType,
+                slots: availableSlots,
+              ));
             }
           }
-
-          // 3. Convert grouped map back to availableShifts list (only non-empty groups)
-          grouped.forEach((type, slots) {
-            if (slots.isNotEmpty) {
-              // Sort slots by time within the group
-              slots.sort((a, b) => a.startTime.compareTo(b.startTime));
-              availableShifts.add(CaregiverShift(shiftType: type, slots: slots));
-            }
-          });
         }
       } else {
         showCustomSnackbar(message: response.message, isError: true);
@@ -177,11 +218,9 @@ class BookCaregiverController extends GetxController
     selectedDay.value = day;
     rebuild.value = !rebuild.value;
     
-    // Clear selected slot when changing date
     selectedSlot.value = null;
     availableShifts.clear();
     
-    // Trigger API call
     fetchCaregiverAvailability();
   }
 
@@ -223,14 +262,62 @@ class BookCaregiverController extends GetxController
     return '$formatted, ${slot.label}';
   }
 
-  void confirmSchedule() {
-    if (selectedSlot.value == null) {
-      showCustomSnackbar(
-        message: 'Please select a date and time.',
-        isError: true,
-      );
+  Future<void> confirmSchedule() async {
+    final slot = selectedSlot.value;
+    if (slot == null) {
+      showCustomSnackbar(message: 'Please select a date and time.', isError: true);
       return;
     }
-    Get.toNamed(AppRoutes.instance.reviewBookingScreen);
+    if (selectedRecipient.value == null) {
+      showCustomSnackbar(message: 'Please select a care recipient.', isError: true);
+      return;
+    }
+
+    try {
+      isBooking.value = true;
+      update();
+
+      // Gather external IDs
+      String? caregiverId = caregiver.value?.id;
+      String? careRecipientId = selectedRecipient.value?.id;
+      
+      // Get Service Category ID from SelectedServiceTypeController
+      String serviceCategoryId = "";
+      try {
+        final serviceController = Get.find<SelectedServiceTypeController>();
+        if (serviceController.serviceTypes.isNotEmpty && 
+            serviceController.selectedIndex.value < serviceController.serviceTypes.length) {
+          serviceCategoryId = serviceController.serviceTypes[serviceController.selectedIndex.value].id;
+        }
+      } catch (_) {}
+
+      final bookingData = {
+        "caregiver": caregiverId,
+        "careRecipient": careRecipientId,
+        "serviceCategory": serviceCategoryId,
+        "date": DateFormat('yyyy-MM-dd').format(selectedDay.value),
+        "shift": slot.shiftType,
+        "slotStartTime": slot.startTime,
+        "slotEndTime": slot.endTime,
+        "instructions": instructionsController.text,
+      };
+
+      appLog("BOOKING REQUEST BODY: ${const JsonEncoder.withIndent('  ').convert(bookingData)}", source: "BOOKING_API");
+
+      final response = await ClientRepository.instance.createBooking(data: bookingData);
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: "Booking confirmed successfully!", isError: false);
+        Get.toNamed(AppRoutes.instance.appNavigationScreen);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      appLog("Error creating booking: $e", source: "BOOKING_API");
+      showCustomSnackbar(message: "Failed to confirm booking", isError: true);
+    } finally {
+      isBooking.value = false;
+      update();
+    }
   }
 }

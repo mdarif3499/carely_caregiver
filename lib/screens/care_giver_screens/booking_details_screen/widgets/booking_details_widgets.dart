@@ -23,12 +23,17 @@ class ClientProfileHeader extends StatelessWidget {
                 border: Border.all(color: colors.primary.withAlpha(50), width: 2),
               ),
               child: ClipOval(
+
+
                 child: CommonImage(
                   src: booking.avatarUrl,
                   fill: BoxFit.cover,
                 ),
+
+
               ),
             ),
+
             Positioned(
               right: 0,
               bottom: 0,
@@ -42,10 +47,13 @@ class ClientProfileHeader extends StatelessWidget {
                 child: const Icon(Icons.check, size: 12, color: Colors.white),
               ),
             ),
+
+
           ],
         ),
         const SizedBox(width: 16),
         Expanded(
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -57,7 +65,7 @@ class ClientProfileHeader extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               CommonText(
-                text: '${booking.clientAge} years old . ${booking.careType}',
+                text: '${booking.recipientName} (${booking.relationship})',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 textColor: colors.primary,
@@ -65,10 +73,10 @@ class ClientProfileHeader extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 18),
+                  const Icon(Icons.info_outline, color: Colors.amber, size: 18),
                   const SizedBox(width: 4),
                   CommonText(
-                    text: '${booking.rating} (${booking.reviewCount} reviews)',
+                    text: 'Status: ${booking.status}',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     textColor: colors.secondaryText,
@@ -77,6 +85,8 @@ class ClientProfileHeader extends StatelessWidget {
               ),
             ],
           ),
+
+
         ),
       ],
     );
@@ -114,7 +124,7 @@ class ScheduleEarningsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   CommonText(
-                    text: booking.date,
+                    text: booking.formattedDate,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     textColor: colors.textPrimary,
@@ -145,7 +155,7 @@ class ScheduleEarningsCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: CommonText(
-              text: '${booking.timeRange} (${booking.duration})',
+              text: booking.timeRange,
               fontSize: 14,
               fontWeight: FontWeight.w400,
               textColor: colors.secondaryText,
@@ -170,13 +180,13 @@ class ScheduleEarningsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CommonText(
-                      text: booking.serviceType,
+                      text: booking.serviceName,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       textColor: colors.textPrimary,
                     ),
                     CommonText(
-                      text: 'Service ID: ${booking.serviceId}',
+                      text: 'Service ID: #${booking.id.substring(booking.id.length - 6).toUpperCase()}',
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       textColor: colors.secondaryText,
@@ -203,11 +213,10 @@ class AdditionalInstructionsCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CommonText(
+        const CommonText(
           text: 'Additional Instructions',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          textColor: colors.textPrimary,
         ),
         const SizedBox(height: 12),
         Container(
@@ -221,7 +230,7 @@ class AdditionalInstructionsCard extends StatelessWidget {
           child: Stack(
             children: [
               CommonText(
-                text: instructions,
+                text: instructions.isEmpty ? 'No instructions provided.' : instructions,
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 textColor: colors.textPrimary,
@@ -242,18 +251,22 @@ class AdditionalInstructionsCard extends StatelessWidget {
 
 class BookingDetailActions extends StatelessWidget {
   final bool isLoading;
+  final String status;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
 
   const BookingDetailActions({
     super.key,
     required this.isLoading,
+    required this.status,
     required this.onAccept,
     required this.onDecline,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (status != 'PENDING') return const SizedBox.shrink();
+
     final colors = AppColors.instance;
 
     return Column(

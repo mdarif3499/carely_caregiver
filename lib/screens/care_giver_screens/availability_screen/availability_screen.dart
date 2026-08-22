@@ -135,52 +135,58 @@ class AvailabilityScreen extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, AvailabilityScreenController c, Shift shift) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      Dialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-        title: Text(
-          'Delete Shift?',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-            color: AppColors.instance.textPrimary,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: AppColors.instance.secondaryText,
-          ),
-        ),
-        actionsPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.instance.textGrey,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CommonText(
+                text: 'Delete Shift?',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
-            ),
+              16.height,
+              CommonText(
+                text: 'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
+                fontSize: 14,
+                textColor: AppColors.instance.secondaryText,
+              ),
+              24.height,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: CommonText(
+                      text: 'Cancel',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      textColor: AppColors.instance.textGrey,
+                    ),
+                  ),
+                  12.width,
+                  SizedBox(
+                    width: 100,
+                    child: CommonButton(
+                      titleText: 'Delete',
+                      buttonColor: AppColors.instance.error,
+                      onTap: () {
+                        Get.back();
+                        c.deleteShiftFromApi(shift);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          SizedBox(
-            width: 100.w,
-            child: CommonButton(
-              titleText: 'Delete',
-              buttonColor: AppColors.instance.error,
-              onTap: () {
-                Get.back();
-                c.deleteShiftFromApi(shift);
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
