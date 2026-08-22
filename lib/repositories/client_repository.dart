@@ -50,4 +50,13 @@ class ClientRepository {
 
     return await _apiClient.get(endpoint);
   }
+
+  Future<ApiResponseModel> getCaregiverAvailability({
+    required String caregiverId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final endpoint = "${AppApiEndPoint.availability}/$caregiverId?startDate=$startDate&endDate=$endDate";
+    return await _apiClient.get(endpoint);
+  }
 }

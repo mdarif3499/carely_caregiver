@@ -34,7 +34,7 @@ class CaregiverModel {
     final specialties = json['specialties'] as List? ?? [];
     
     return CaregiverModel(
-      id: json['_id'] ?? '',
+      id: userData['_id'] ?? json['_id'] ?? '',
       name: userData['name'] ?? 'Unknown',
       role: 'Caregiver',
       specialty: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['name'] ?? 'General Care') : specialties.join(', ')) : 'General Care',
