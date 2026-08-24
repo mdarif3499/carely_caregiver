@@ -42,7 +42,7 @@ class WeeklyEarningsChartCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CommonText(
-                    text: 'Weekly Earnings',
+                    text: 'Total Paid Earnings',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     textColor: Colors.white,

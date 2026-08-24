@@ -275,9 +275,7 @@ class HomeBannerCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  4. Section Header Row (title + See All)
-// ═══════════════════════════════════════════════════════
+
 
 class HomeSectionHeader extends StatelessWidget {
   final String title;
@@ -290,7 +288,7 @@ class HomeSectionHeader extends StatelessWidget {
     this.actionLabel = 'See All',
     this.onActionTap,
   });
-
+///     6a79a98330d3731b65ee9609user6a857fddd8963a180f28eb79/6a82e64f00c0207c32bf6ad7profile6a8580a2d8963a180f28eb7cImage-1786963559858.jpg
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -308,7 +306,7 @@ class HomeSectionHeader extends StatelessWidget {
         if (actionLabel != null)
           GestureDetector(
             onTap: onActionTap,
-            child: CommonText(
+            child :CommonText(
               text: actionLabel!,
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -322,9 +320,9 @@ class HomeSectionHeader extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  5. Upcoming Booking Card
-// ═══════════════════════════════════════════════════════
+
+///    I/FlutterActivityAndFragmentDelegate( 6077): If you are attempting to set --start-paused via Intent extras to launch a Flutter component outside of using the Flutter CLI, note that support for setting engine flags on Android via Intent will soon be dropped; see https://github.com/flutter/flutter/issues/180686 for more information on this breaking change. To migrate, set --start-paused or any other flags specified via Intent extras on the command line instead or see https://github.com/flutter/flutter/blob/main/docs/engine/Flutter-Android-Engine-Flags.md for alternative methods.
+
 
 class UpcomingBookingCard extends StatelessWidget {
   final BookingModel booking;
@@ -349,10 +347,8 @@ class UpcomingBookingCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Top row — avatar, name + badge, datetime
           Row(
             children: [
-              // Avatar
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppColors.instance.boxBg,
@@ -369,7 +365,6 @@ class UpcomingBookingCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
 
-              // Name + status + datetime
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +408,6 @@ class UpcomingBookingCard extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Bottom row — View Details + chat
           Row(
             children: [
               Expanded(
@@ -472,9 +466,7 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  6. Activity Item
-// ═══════════════════════════════════════════════════════
+
 
 class ActivityItemWidget extends StatelessWidget {
   final ActivityModel activity;
@@ -490,7 +482,7 @@ class ActivityItemWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon
+    ///       \-...-/
           Container(
             width: 38,
             height: 38,
@@ -512,7 +504,7 @@ class ActivityItemWidget extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          // Text
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
