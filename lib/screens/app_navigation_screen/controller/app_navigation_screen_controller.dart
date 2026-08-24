@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:get/get.dart';
 import '../../../app_all_enum/app_login_status.dart';
 import '../../../models/user_model.dart';
@@ -12,19 +13,33 @@ class AppNavigationScreenController extends GetxController {
 
   @override
   void onInit() {
-    isClient = Get.arguments?['isClient'] ?? false;
-    selectedIndex = Get.arguments?['selectedIndex'] ?? 0;
-    selectedAppUserType =
-    isClient ? AppUserType.client : AppUserType.caregiver;
-    fetchProfile();
+    _initializeRoleAndData();
     super.onInit();
+  }
+
+  Future<void> _initializeRoleAndData() async {
+    // 1. Try to get role from arguments (fastest)
+    if (Get.arguments != null) {
+      isClient = Get.arguments?['isClient'] ?? false;
+      selectedIndex = Get.arguments?['selectedIndex'] ?? 0;
+    } 
+    // 2. Fallback to SharedPreferences (robust)
+    else {
+      String role = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+      isClient = role == "CLIENT";
+    }
+
+    selectedAppUserType = isClient ? AppUserType.client : AppUserType.caregiver;
+    
+    update(); 
+    await fetchProfile();
   }
 
   Future<void> fetchProfile() async {
     try {
       isProfileLoading.value = true;
-      update();
-
+      // Removed immediate update() to prevent redundant rebuilds during initialization
+      
       final response = await UserRepository.instance.getMyProfile();
 
       if (response.isSuccess) {

@@ -66,11 +66,51 @@ class ClientHomeScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
             Obx(
-              () => ClientUpcomingBookingCard(
-                booking: controller.upcomingBooking.value,
-                onViewDetails: controller.onViewDetails,
-                onChat: () {},
-              ),
+              () {
+                if (controller.isBookingsLoading.value && controller.upcomingBookings.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                
+                if (controller.upcomingBookings.isEmpty) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    decoration: BoxDecoration(
+                      color: colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colors.boxBg),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.calendar_today_outlined, size: 40, color: Colors.grey.shade300),
+                        const SizedBox(height: 12),
+                        const CommonText(
+                          text: 'No bookings for today.',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          textColor: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: controller.upcomingBookings.map((booking) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: ClientUpcomingBookingCard(
+                          booking: booking,
+                          onViewDetails: controller.onViewDetails,
+                          onChat: () {},
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 32),
 

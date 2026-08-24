@@ -6,6 +6,8 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../care_giver_screens/all_schedule_screen/model/care_giver_schedule_model.dart';
+
 class ClientHomeHeader extends StatelessWidget {
   final String userName;
   final String avatarUrl;
@@ -202,7 +204,7 @@ class ProfessionalCareBanner extends StatelessWidget {
 }
 
 class ClientUpcomingBookingCard extends StatelessWidget {
-  final BookingModel booking;
+  final CareGiverScheduleModel booking;
   final VoidCallback onViewDetails;
   final VoidCallback onChat;
 
@@ -217,6 +219,7 @@ class ClientUpcomingBookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
     return Container(
+      width: 320, // Fixed width for horizontal scrolling
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colors.white,
@@ -225,14 +228,15 @@ class ClientUpcomingBookingCard extends StatelessWidget {
         boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
               CircleAvatar(
                 radius: 25,
                 backgroundColor: colors.boxBg,
-                backgroundImage: booking.avatarUrl.isNotEmpty ? NetworkImage(booking.avatarUrl) : null,
-                child: booking.avatarUrl.isEmpty ? Icon(Icons.person, color: colors.primary, size: 26) : null,
+                backgroundImage: booking.caregiverAvatar.isNotEmpty ? NetworkImage(booking.caregiverAvatar) : null,
+                child: booking.caregiverAvatar.isEmpty ? Icon(Icons.person, color: colors.primary, size: 26) : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -241,8 +245,18 @@ class ClientUpcomingBookingCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        CommonText(text: '${booking.name}, ${booking.role}', fontSize: 16, fontWeight: FontWeight.w700, textColor: colors.textPrimary),
-                        const SizedBox(width: 8),
+                        Expanded(
+                          child: CommonText(
+                            text: booking.caregiverName,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            textColor: colors.textPrimary,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
                         _StatusBadge(label: booking.status),
                       ],
                     ),
@@ -251,7 +265,12 @@ class ClientUpcomingBookingCard extends StatelessWidget {
                       children: [
                         Icon(Icons.calendar_today_outlined, size: 14, color: colors.secondaryText),
                         const SizedBox(width: 6),
-                        CommonText(text: booking.dateTime, fontSize: 13, fontWeight: FontWeight.w400, textColor: colors.secondaryText),
+                        CommonText(
+                          text: booking.formattedTimeRange,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          textColor: colors.secondaryText,
+                        ),
                       ],
                     ),
                   ],

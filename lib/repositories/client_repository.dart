@@ -67,4 +67,12 @@ class ClientRepository {
   Future<ApiResponseModel> createBooking({required Map<String, dynamic> data}) async {
     return await _apiClient.post(AppApiEndPoint.booking, body: data);
   }
+
+  Future<ApiResponseModel> getClientBookings({String? date}) async {
+    String endpoint = AppApiEndPoint.myBookings;
+    if (date != null) {
+      endpoint = "$endpoint?date=$date";
+    }
+    return await _apiClient.get(endpoint);
+  }
 }

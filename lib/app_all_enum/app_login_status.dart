@@ -1,3 +1,3 @@
 enum AppUserType { client, caregiver, unKnow }
 
-AppUserType selectedAppUserType = AppUserType.caregiver;
+AppUserType selectedAppUserType = AppUserType.unKnow;
