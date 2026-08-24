@@ -1,4 +1,5 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
+import 'package:carely_caregiver/gen/assets.gen.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/profile_screen.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class ProfileAvatarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
+    final displayName = name.isEmpty ? 'User' : name;
+    final displayMemberSince = memberSince.isEmpty ? 'Loading account details...' : memberSince;
 
     return Center(
       child: Column(
@@ -31,21 +34,21 @@ class ProfileAvatarHeader extends StatelessWidget {
             ),
             child: ClipOval(
               child: CommonImage(
-                src: avatarUrl,
+                src: avatarUrl.isEmpty ? Assets.icons.profile : avatarUrl,
                 fill: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 16),
           CommonText(
-            text: name,
+            text: displayName,
             fontSize: 22,
             fontWeight: FontWeight.w700,
             textColor: colors.textPrimary,
           ),
           const SizedBox(height: 4),
           CommonText(
-            text: memberSince,
+            text: displayMemberSince,
             fontSize: 14,
             fontWeight: FontWeight.w400,
             textColor: colors.secondaryText,

@@ -20,6 +20,12 @@ class AppNavigationScreen extends StatelessWidget {
     return GetBuilder<AppNavigationScreenController>(
       init: AppNavigationScreenController(),
       builder: (controller) {
+        if (selectedAppUserType == AppUserType.unKnow) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         final screens = selectedAppUserType == AppUserType.client
             ? _getClientScreens()
             : _getCareGiverScreens();

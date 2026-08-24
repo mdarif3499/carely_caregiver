@@ -9,6 +9,7 @@ import 'package:carely_caregiver/screens/message_screen/message_screen.dart';
 import 'package:carely_caregiver/screens/notification_screen/notification_screen.dart';
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/basic_info_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/care_recipients_screen.dart';
+import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/all_schedule_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/payment/stripe_webview_screen.dart';
 import 'package:carely_caregiver/screens/profile_screens/notification_settings_screen/notification_settings_screen.dart';
@@ -196,6 +197,11 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.stripePaymentWebView,
     page: () => const StripeWebViewScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+  GetPage(
+    name: AppRoutes.instance.allScheduleScreen,
+    page: () => const AllScheduleScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 

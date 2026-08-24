@@ -22,76 +22,61 @@ class FindCaregiverScreen extends StatelessWidget {
         AppIconButton(icon: Icons.tune_rounded, onTap: controller.onFilterTap),
         const SizedBox(width: 12),
       ],
-      child: Obx(() {
-        final caregivers = controller.caregivers;
-
-        // ── Header (Search + Category Filters) ──
-        final header = Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HomeSearchBar(
-                controller: controller.searchController,
-                onChanged: controller.onSearchChanged,
-              ),
-              const SizedBox(height: 20),
-              CaregiverFilterRow(
-                categories: controller.filterCategoryNames,
-                selected: controller.selectedFilterName.value,
-                onSelected: controller.onFilterSelected,
-              ),
-              const SizedBox(height: 24),
-              CommonText(
-                text: controller.isLoading.value 
-                    ? 'Finding caregivers...' 
-                    : '${caregivers.length} caregivers nearby',
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                textColor: colors.textPrimary,
-              ),
-            ],
-          ),
-        );
-
-        if (controller.isLoading.value && caregivers.isEmpty) {
-          return Column(
-            children: [
-              header,
-              const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ],
-          );
-        }
-
-        if (caregivers.isEmpty) {
-          return Column(
-            children: [
-              header,
-              const EmptySearchState(),
-            ],
-          );
-        }
-
-        return SmartListLoader(
-          itemCount: caregivers.length,
-          appbar: header,
-          onColapsAppbar: Container(
-            color: colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            child: CaregiverFilterRow(
-              categories: controller.filterCategoryNames,
-              selected: controller.selectedFilterName.value,
-              onSelected: controller.onFilterSelected,
+      child: Column(
+        children: [
+          // ── Header (Search + Category Filters) ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HomeSearchBar(
+                  controller: controller.searchController,
+                  onChanged: controller.onSearchChanged,
+                ),
+                const SizedBox(height: 20),
+                Obx(() => CaregiverFilterRow(
+                  categories: controller.filterCategoryNames,
+                  selected: controller.selectedFilterName.value,
+                  onSelected: controller.onFilterSelected,
+                )),
+                const SizedBox(height: 24),
+                Obx(() => CommonText(
+                  text: controller.isLoading.value && controller.caregivers.isEmpty
+                      ? 'Finding caregivers...' 
+                      : '${controller.caregivers.length} caregivers nearby',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  textColor: colors.textPrimary,
+                )),
+              ],
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          itemBuilder: (_, index) {
-            return CaregiverCard(caregiver: caregivers[index]);
-          },
-        );
-      }),
+
+          // ── Caregiver List ──
+          Expanded(
+            child: Obx(() {
+              final caregivers = controller.caregivers;
+
+              if (controller.isLoading.value && caregivers.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (caregivers.isEmpty) {
+                return const EmptySearchState();
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                itemCount: caregivers.length,
+                itemBuilder: (_, index) {
+                  return CaregiverCard(caregiver: caregivers[index]);
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 }

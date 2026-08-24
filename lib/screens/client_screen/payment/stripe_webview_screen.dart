@@ -40,8 +40,12 @@ class _StripeWebViewScreenState extends State<StripeWebViewScreen> {
 
             // Detect success/cancel from Stripe redirect URL
             if (url.contains("success")) {
-              Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
-              showCustomSnackbar(message: "Payment successful! Your booking is confirmed.", isError: false);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
+                  showCustomSnackbar(message: "Payment successful! Your booking is confirmed.", isError: false);
+                });
+              });
             }
             else if (url.contains("cancel") || url.contains("failure")) {
               Get.back();

@@ -1,5 +1,9 @@
+import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/model/care_giver_schedule_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ── Data Models ─────────────────────────
 class BookingModel {
@@ -40,16 +44,38 @@ class ClientHomeController extends GetxController {
   final RxString searchQuery = ''.obs;
   void onSearchChanged(String val) => searchQuery.value = val;
 
-  // Upcoming booking
-  final Rx<BookingModel> upcomingBooking = Rx<BookingModel>(
-    const BookingModel(
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      status: 'Confirmed',
-      dateTime: 'Today, 2:00 PM – 4:00 PM',
-      avatarUrl: '',
-    ),
-  );
+  // Upcoming bookings
+  final RxList<CareGiverScheduleModel> upcomingBookings = <CareGiverScheduleModel>[].obs;
+  final RxBool isBookingsLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUpcomingBookings();
+  }
+
+  Future<void> fetchUpcomingBookings() async {
+    try {
+      isBookingsLoading.value = true;
+      update();
+
+      // Fetch all bookings for the client. The API /booking/my already filters by user.
+      // We don't filter by date here to show any upcoming booking, 
+      // or we can pass the current date to get today's.
+      final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final response = await ClientRepository.instance.getClientBookings(date: today);
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data']?['data'] ?? [];
+        upcomingBookings.value = dataList.map((e) => CareGiverScheduleModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching upcoming bookings: $e");
+    } finally {
+      isBookingsLoading.value = false;
+      update();
+    }
+  }
 
   // Recent activities
   final RxList<ActivityModel> recentActivities = <ActivityModel>[
@@ -78,7 +104,7 @@ class ClientHomeController extends GetxController {
   }
 
   void onSeeAllBookings() {
-    // TODO: navigate to all bookings
+    Get.toNamed(AppRoutes.instance.allScheduleScreen);
   }
 
   void onLearnMore() {

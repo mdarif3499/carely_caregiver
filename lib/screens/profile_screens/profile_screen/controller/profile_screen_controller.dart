@@ -1,11 +1,11 @@
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../../../../models/user_model.dart';
 import '../../../../repositories/user_repository.dart';
 import '../../../../utils/error_log.dart';
 
-// ── Controller ───────────────────────────────────────────
 class ProfileScreenController extends GetxController {
   final Rxn<UserModel> userModel = Rxn<UserModel>();
   final RxBool isLoading = false.obs;
@@ -19,7 +19,6 @@ class ProfileScreenController extends GetxController {
   Future<void> fetchProfile() async {
     try {
       isLoading.value = true;
-      update();
 
       final response = await UserRepository.instance.getMyProfile();
 
@@ -28,12 +27,13 @@ class ProfileScreenController extends GetxController {
         if (data != null) {
           userModel.value = UserModel.fromJson(data);
         }
+      } else {
+        debugPrint("Profile fetch failed: ${response.message}");
       }
     } catch (e) {
       errorLog("ProfileScreen fetchProfile", e);
     } finally {
       isLoading.value = false;
-      update();
     }
   }
 

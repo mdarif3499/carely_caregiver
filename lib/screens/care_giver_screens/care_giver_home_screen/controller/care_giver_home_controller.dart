@@ -63,7 +63,9 @@ class CareGiverHomeController extends GetxController {
   void onNotificationTap() {
     Get.toNamed(AppRoutes.instance.notificationScreen);
   }
-  void onSeeAllSchedule() {}
+  void onSeeAllSchedule() {
+    Get.toNamed(AppRoutes.instance.allScheduleScreen);
+  }
   void onFilterTap() {}
 
   // Weekly earnings

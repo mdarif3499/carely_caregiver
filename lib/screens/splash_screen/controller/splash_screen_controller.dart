@@ -23,10 +23,10 @@ class SplashScreenController extends GetxController {
 
       Future.delayed(const Duration(seconds: 3), () {
         if (token.isNotEmpty) {
-          // Auto-login: Navigate to dashboard
-          Get.offAllNamed(AppRoutes.instance.appNavigationScreen, arguments: {"isClient": role == "CLIENT"});
+          // Auto-login: Navigate to dashboard. AppNavigationScreenController will handle the role from storage.
+          Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
         } else {
-          // No token: Navigate to onboarding or login
+          // No token: Navigate to login
           Get.offAllNamed(AppRoutes.instance.loginScreen);
         }
       });

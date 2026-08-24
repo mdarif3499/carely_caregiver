@@ -21,40 +21,43 @@ class CareGiverHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: colors.boxBg,
-          backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-          child: avatarUrl.isEmpty
-              ? Icon(Icons.person, color: colors.primary, size: 26)
-              : null,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CommonText(
-                text: AppUtils.getGreeting(),
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                textColor: colors.secondaryText,
-                textAlign: TextAlign.start,
-              ),
-              CommonText(
-                text: userName,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                textColor: colors.textPrimary,
-                textAlign: TextAlign.start,
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(right: 30),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: colors.boxBg,
+            backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+            child: avatarUrl.isEmpty
+                ? Icon(Icons.person, color: colors.primary, size: 26)
+                : null,
           ),
-        ),
-        _IconButton(icon: Icons.notifications_none_rounded, onTap: onNotificationTap, hasBadge: true),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonText(
+                  text: AppUtils.getGreeting(),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  textColor: colors.secondaryText,
+                  textAlign: TextAlign.start,
+                ),
+                CommonText(
+                  text: userName,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  textColor: colors.textPrimary,
+                  textAlign: TextAlign.start,
+                ),
+              ],
+            ),
+          ),
+          _IconButton(icon: Icons.notifications_none_rounded, onTap: onNotificationTap, hasBadge: true),
+        ],
+      ),
     );
   }
 }
@@ -84,16 +87,7 @@ class _IconButton extends StatelessWidget {
             ),
             child: Icon(icon, size: 22, color: colors.textPrimary),
           ),
-          if (hasBadge)
-            Positioned(
-              right: 2,
-              top: 2,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: colors.error, shape: BoxShape.circle, border: Border.all(color: colors.white, width: 1.5)),
-              ),
-            ),
+
         ],
       ),
     );
