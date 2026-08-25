@@ -83,7 +83,7 @@ class CaregiverCard extends StatelessWidget {
     final colors = AppColors.instance;
     return GestureDetector(
       onTap: () {
-        Get.toNamed(AppRoutes.instance.careGiverDetailsScreen);
+        Get.toNamed(AppRoutes.instance.careGiverDetailsScreen, arguments: caregiver.id);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

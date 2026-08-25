@@ -12,14 +12,12 @@ class ClientHomeHeader extends StatelessWidget {
   final String userName;
   final String avatarUrl;
   final VoidCallback? onNotificationTap;
-  final VoidCallback? onFilterTap;
 
   const ClientHomeHeader({
     super.key,
     required this.userName,
     required this.avatarUrl,
     this.onNotificationTap,
-    this.onFilterTap,
   });
 
   @override
@@ -59,8 +57,6 @@ class ClientHomeHeader extends StatelessWidget {
               ],
             ),
           ),
-          _IconButton(icon: Icons.tune_rounded, onTap: onFilterTap),
-          const SizedBox(width: 10),
           _IconButton(icon: Icons.notifications_none_rounded, onTap: onNotificationTap, hasBadge: true),
         ],
       ),

@@ -22,7 +22,6 @@ class ClientHomeScreen extends StatelessWidget {
         () => ClientHomeHeader(
           userName: navC.userModel.value?.name ?? "...",
           avatarUrl: navC.userModel.value?.profileImage ?? "",
-          onFilterTap: controller.onFilterTap,
           onNotificationTap: controller.onNotificationTap,
         ),
       ),

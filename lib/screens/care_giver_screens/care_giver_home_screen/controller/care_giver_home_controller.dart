@@ -1,6 +1,9 @@
+import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/screens/care_giver_screens/earning_screen/model/caregiver_earnings_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ── Models ─────────────────────────────────────────────
 class WeeklyBarData {
@@ -69,8 +72,9 @@ class CareGiverHomeController extends GetxController {
   void onFilterTap() {}
 
   // Weekly earnings
-  final RxDouble totalWeeklyEarnings = 1248.50.obs;
+  final RxDouble totalWeeklyEarnings = 0.0.obs;
   final RxList<WeeklyBarData> weeklyBars = <WeeklyBarData>[].obs;
+  final RxBool isEarningsLoading = false.obs;
 
   // Today's schedule (Upcoming Booking)
   final RxList<TodayScheduleItem> todaySchedule = <TodayScheduleItem>[].obs;
@@ -81,21 +85,49 @@ class CareGiverHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadWeeklyData();
+    fetchEarningsSummary();
     _loadSchedule();
     _loadRecentActivities();
   }
 
-  void _loadWeeklyData() {
-    weeklyBars.assignAll([
-      const WeeklyBarData(day: 'Mon', value: 0.45),
-      const WeeklyBarData(day: 'Tue', value: 0.55),
-      const WeeklyBarData(day: 'Wed', value: 0.35),
-      const WeeklyBarData(day: 'Thu', value: 0.60),
-      const WeeklyBarData(day: 'Fri', value: 0.50),
-      const WeeklyBarData(day: 'Sat', value: 0.65),
-      const WeeklyBarData(day: 'Sun', value: 0.90, isToday: true),
-    ]);
+  Future<void> fetchEarningsSummary() async {
+    try {
+      isEarningsLoading.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.getEarningsSummary();
+
+      if (response.isSuccess) {
+        final model = CaregiverEarningsModel.fromJson(response.data['data'] ?? {});
+        
+        // Use paidTotal as requested
+        totalWeeklyEarnings.value = model.paidTotal;
+
+        // Map breakdown to bars
+        final List<WeeklyBarData> bars = [];
+        final String currentDay = DateFormat('EEE').format(DateTime.now());
+
+        double maxAmount = 0;
+        for (var e in model.weeklyBreakdown) {
+          if (e.amount > maxAmount) maxAmount = e.amount;
+        }
+
+        for (var e in model.weeklyBreakdown) {
+          bars.add(WeeklyBarData(
+            day: e.day,
+            // Normalize height (min 0.1 for visibility if 0)
+            value: maxAmount > 0 ? (e.amount / maxAmount).clamp(0.1, 1.0) : 0.1,
+            isToday: e.day.toLowerCase() == currentDay.toLowerCase(),
+          ));
+        }
+        weeklyBars.assignAll(bars);
+      }
+    } catch (e) {
+      debugPrint("Error fetching earnings summary: $e");
+    } finally {
+      isEarningsLoading.value = false;
+      update();
+    }
   }
 
   void _loadSchedule() {

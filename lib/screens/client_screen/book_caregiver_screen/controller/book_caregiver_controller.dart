@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/model/care_giver_profile_model.dart';
 import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart';
 import 'package:carely_caregiver/utils/log/app_log.dart';
 import 'package:carely_caregiver/widgets/app_calendar_controller.dart';
@@ -71,7 +72,9 @@ class BookCaregiverController extends GetxController
   
   RxBool rebuild = false.obs;
   // ── Calendar ──
+  @override
   final Rx<DateTime> focusedMonth = DateTime.now().obs;
+  @override
   final Rx<DateTime> selectedDay = DateTime.now().obs;
 
   // ── API Data ──
@@ -88,7 +91,29 @@ class BookCaregiverController extends GetxController
     super.onInit();
     instructionsController = TextEditingController();
     final args = Get.arguments;
-    if (args is CaregiverModel) {
+    
+    if (args is Map) {
+      final profile = args['profile'];
+      final DateTime? date = args['selectedDate'];
+
+      if (profile is CareGiverProfileModel) {
+        caregiver.value = CaregiverModel(
+          id: profile.id,
+          name: profile.name,
+          role: 'Caregiver',
+          specialty: profile.specialties.isNotEmpty ? profile.specialties.first : 'General Care',
+          description: profile.bio,
+          rating: profile.averageRating,
+          hourlyRate: profile.hourlyRate,
+          avatarUrl: profile.profileImage,
+        );
+      }
+
+      if (date != null) {
+        selectedDay.value = date;
+        focusedMonth.value = DateTime(date.year, date.month, 1);
+      }
+    } else if (args is CaregiverModel) {
       caregiver.value = args;
     }
     
@@ -200,6 +225,7 @@ class BookCaregiverController extends GetxController
     }
   }
 
+  @override
   void previousMonth() {
     focusedMonth.value = DateTime(
       focusedMonth.value.year,
@@ -207,6 +233,7 @@ class BookCaregiverController extends GetxController
     );
   }
 
+  @override
   void nextMonth() {
     focusedMonth.value = DateTime(
       focusedMonth.value.year,
@@ -214,6 +241,7 @@ class BookCaregiverController extends GetxController
     );
   }
 
+  @override
   void selectDay(DateTime day) {
     if (day.month != focusedMonth.value.month) return;
     selectedDay.value = day;
@@ -225,16 +253,19 @@ class BookCaregiverController extends GetxController
     fetchCaregiverAvailability();
   }
 
+  @override
   bool isSelected(DateTime day) {
     final s = selectedDay.value;
     return s.year == day.year && s.month == day.month && s.day == day.day;
   }
 
+  @override
   bool isToday(DateTime day) {
     final now = DateTime.now();
     return day.year == now.year && day.month == now.month && day.day == now.day;
   }
 
+  @override
   List<DateTime> get calendarDays {
     final first = DateTime(
       focusedMonth.value.year,

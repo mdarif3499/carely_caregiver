@@ -1,9 +1,8 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
-import 'package:carely_caregiver/constant/app_constant.dart';
+import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/controller/care_giver_details_controller.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/profile_avatar/profile_avatar.dart';
-import 'package:carely_caregiver/widgets/text/primary_text.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,268 +16,279 @@ class CareGiverDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     CareGiverDetailsController controller =
         Get.find<CareGiverDetailsController>();
+    final colors = AppColors.instance;
 
     return DefaultBackgroundTemplate(
       appBarTitle: 'Caregiver Profile',
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment:CrossAxisAlignment .center,
-            children: [
-              ProfileAvatar(
-                size: 160.w,
-                imageUrl:
-                    "https://media.istockphoto.com/id/1468678624/photo/nurse-hospital-employee-and-portrait-of-black-man-in-a-healthcare-wellness-and-clinic-feeling.jpg?s=612x612&w=0&k=20&c=AGQPyeEitUPVm3ud_h5_yVX4NKY9mVyXbFf50ZIEtQI=",
-                borderColor: AppColors.instance.secondaryColor,
-                badgeIcon: Assets.icons.verify,
-                badgeSize: 40.w,
-              ),
-              12.height,
-              CommonText(
-                text: 'Sarah Jenkins, RN',
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-              ),
-              8.height,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CommonImage(
-                    src: Assets.icons.starIcon,
-                    height: 20,
-                    width: 20,
-                  ),
-                  4.width,
-                  RichText(
-                    text: TextSpan(
-                      text: '4.9 ',
-                      style: TextStyle(
-                        fontSize: 18.h,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.instance.primaryTextColor,
-                        fontFamily: AppConstant.instance.font,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: '(120 reviews)',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.instance.subTextColor,
-                          ),
-                        ),
-                      ],
+      child: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final profile = controller.caregiverProfile.value;
+        if (profile == null) {
+          return const Center(child: CommonText(text: "Failed to load profile"));
+        }
+
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ProfileAvatar(
+                  size: 160,
+                  imageUrl: profile.profileImage,
+                  borderColor: colors.secondaryColor,
+                  badgeIcon: profile.verifiedBadge ? Assets.icons.verify : null,
+                  badgeSize: 40,
+                ),
+                12.height,
+                CommonText(
+                  text: profile.name,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  textColor: colors.textPrimary,
+                ),
+                8.height,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 22),
+                    4.width,
+                    CommonText(
+                      text: '${profile.averageRating.toStringAsFixed(1)} ',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      textColor: colors.textPrimary,
                     ),
-                  ),
-                ],
-              ),
-              8.height,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CommonImage(
-                    src: Assets.icons.location,
-                    height: 20,
-                    width: 20,
-                  ),
-                  4.width,
-                  CommonText(
-                    text: 'New York, NY',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    textColor: AppColors.instance.subTextColor,
-                  ),
-                ],
-              ),
-              24.height,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _caregiverCard(title: 'Jobs', value: '150+'),
-                  _caregiverCard(title: 'EXP.', value: '8 Yrs'),
-                  _caregiverCard(title: 'RESPONSE', value: '<10m'),
-                ],
-              ),
-              24.height,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AppContentHeader(
-                  text: 'Bio',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
+                    CommonText(
+                      text: '(${profile.totalReviews} reviews)',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      textColor: colors.secondaryText,
+                    ),
+                  ],
                 ),
-              ),
-              8.height,
-              AppSecondaryText(
-                fontWeight: FontWeight.w200,
-                fontSize: 18,
-                text:
-                    'Compassionate Registered Nurse with over 8 years of experience in geriatric care and post-operative recovery. I specialize in providing high-quality, personalized support for your loved ones, ensuring they maintain their dignity and independence at home.',
-              ),
-              24.height,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AppContentHeader(
-                  text: 'Specialties',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
+                8.height,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 20, color: colors.secondaryText),
+                    4.width,
+                    CommonText(
+                      text: profile.location,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      textColor: colors.secondaryText,
+                    ),
+                  ],
                 ),
-              ),
-              8.height,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Obx(
-                  () => Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 0,
-                    runSpacing: 0,
-                    children: controller.specialties
-                        .map((s) => _specialtiesCard(title: s))
+                32.height,
+
+                // ── Stats Cards ──
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _statCard(title: 'Jobs', value: '${profile.totalReviews}+'),
+                    _statCard(title: 'EXP.', value: '${profile.experience} Yrs'),
+                    _statCard(title: 'RESPONSE', value: '<10m'),
+                  ],
+                ),
+                32.height,
+
+                // ── Bio ──
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CommonText(
+                    text: 'Bio',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    textColor: colors.textPrimary,
+                  ),
+                ),
+                12.height,
+                CommonText(
+                  text: controller.bioDisplay,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  textColor: colors.textPrimary,
+                  textAlign: TextAlign.start,
+                  height: 1.5,
+                  isDescription: true,
+                  maxLines: 10,
+                ),
+                32.height,
+
+                // ── Specialties ──
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CommonText(
+                    text: 'Specialties',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    textColor: colors.textPrimary,
+                  ),
+                ),
+                12.height,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: profile.specialties
+                        .map((s) => _specialtyChip(title: s))
                         .toList(),
                   ),
                 ),
-              ),
-              24.height,
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AppContentHeader(
-                  text: 'UpComing Availability',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+                32.height,
 
-              8.height,
-              Obx(
-                () => SingleChildScrollView(
-                  scrollDirection: Axis
-                      .horizontal,
+                // ── Availability ──
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CommonText(
+                    text: 'Upcoming Availability',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    textColor: colors.textPrimary,
+                  ),
+                ),
+                12.height,
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: controller.availability
-                        .map(
-                          (a) => _availabilityCard(
-                            day: a.day,
-                            date: a.date,
-                            availableStatus: a.status,
-                          ),
-                        )
+                    children: controller.weekAvailability
+                        .map((a) => _availabilityCard(
+                              model: a,
+                              isSelected: controller.selectedDate.value == a.date,
+                              onTap: a.isAvailable ? () => controller.selectDate(a.date) : null,
+                            ))
                         .toList(),
                   ),
                 ),
-              ),
-              48.height,
-              CommonButton(
-                titleText: 'Book Appointment',
-                onTap: () {},
-                buttonWidth: double.infinity,
-              ),
-              20.height,
-            ],
+                48.height,
+
+                // ── Action ──
+                CommonButton(
+                  titleText: 'Book Appointment',
+                  onTap: controller.selectedDate.value != null ? () {
+                    Get.toNamed(AppRoutes.instance.bookCareGiverScreen, arguments: {
+                      "profile": profile,
+                      "selectedDate": controller.selectedDate.value,
+                    });
+                  } : null,
+                  buttonWidth: double.infinity,
+                  buttonHeight: 54,
+                  buttonRadius: 14,
+                ),
+                20.height,
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
-  Widget _specialtiesCard({required String title}) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.instance.secondaryColor.withAlpha(50),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-          child: CommonText(text: title, fontSize: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _caregiverCard({required String title, required String value}) {
+  Widget _statCard({required String title, required String value}) {
+    final colors = AppColors.instance;
     return Container(
-      height: 100.h,
-      width: 112.w,
+      width: 100,
+      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: AppColors.instance.boxBg,
-        border: Border.all(color: AppColors.instance.secondaryColor, width: 2),
+        color: colors.boxBg.withAlpha(50),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.secondaryColor.withAlpha(80), width: 1.5),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 26),
-        child: Column(
-          children: [
-            CommonText(
-              text: title,
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              textColor: AppColors.instance.secondaryText,
-            ),
-            6.height,
-            CommonText(
-              text: value,
-              fontWeight: FontWeight.w700,
-              fontSize: 24,
-              textColor: AppColors.instance.primaryTextColor,
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          CommonText(
+            text: title,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+            textColor: colors.secondaryText,
+          ),
+          6.height,
+          CommonText(
+            text: value,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+            textColor: colors.textPrimary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _specialtyChip({required String title}) {
+    final colors = AppColors.instance;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: colors.primary.withAlpha(15),
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: CommonText(
+        text: title,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        textColor: colors.primary,
       ),
     );
   }
 
   Widget _availabilityCard({
-    required String day,
-    required String date,
-    required String availableStatus,
+    required AvailabilityModel model,
+    required bool isSelected,
+    VoidCallback? onTap,
   }) {
-    bool isAvailable = availableStatus == 'Available';
-    final borderColor = isAvailable
-        ? AppColors.instance.primary
-        : AppColors.instance.secondaryText;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    final colors = AppColors.instance;
+    final isAvailable = model.isAvailable;
+    
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        height: 96.h,
-        width: 108.w,
+        width: 100,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isAvailable
-              ? AppColors.instance.primary.withAlpha(15)
-              : AppColors.instance.boxBg,
-          border: Border.all(color: borderColor, width: 1.5),
+          color: isSelected 
+              ? colors.primary 
+              : (isAvailable ? colors.white : colors.boxBg.withAlpha(50)),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? colors.primary : colors.boxBg,
+            width: 1.5,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: colors.primary.withAlpha(40),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ] : null,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CommonText(
-              text: day,
-              fontWeight: FontWeight.w500,
+              text: model.day,
               fontSize: 12,
-              textColor: AppColors.instance.secondaryText,
+              fontWeight: FontWeight.w500,
+              textColor: isSelected ? Colors.white.withAlpha(180) : colors.secondaryText,
             ),
             4.height,
             CommonText(
-              text: date,
+              text: model.dateLabel,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
-              fontSize: 16,
-              textColor: borderColor,
+              textColor: isSelected ? Colors.white : (isAvailable ? colors.textPrimary : colors.textGrey),
             ),
-            6.height,
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: borderColor.withAlpha(30),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: CommonText(
-                text: availableStatus,
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
-                textColor: borderColor,
-              ),
+            8.height,
+            CommonText(
+              text: model.status,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              textColor: isSelected ? Colors.white : (isAvailable ? colors.primary : colors.textGrey),
             ),
           ],
         ),
