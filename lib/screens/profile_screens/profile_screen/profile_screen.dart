@@ -4,7 +4,6 @@ import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/widgets/profile_widgets.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

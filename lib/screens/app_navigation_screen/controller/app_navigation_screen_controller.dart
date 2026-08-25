@@ -1,5 +1,6 @@
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:get/get.dart';
+import 'package:carely_caregiver/services/socket/socket_service.dart';
 import '../../../app_all_enum/app_login_status.dart';
 import '../../../models/user_model.dart';
 import '../../../repositories/user_repository.dart';
@@ -31,6 +32,9 @@ class AppNavigationScreenController extends GetxController {
 
     selectedAppUserType = isClient ? AppUserType.client : AppUserType.caregiver;
     
+    // Connect to WebSocket
+    SocketService.connect();
+
     update(); 
     await fetchProfile();
   }

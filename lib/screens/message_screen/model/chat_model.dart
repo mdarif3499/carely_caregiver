@@ -1,3 +1,5 @@
+import '../../../constant/app_api_end_point.dart';
+
 class ChatMessage {
   final String messageId;
   final String content;
@@ -22,6 +24,39 @@ class ChatMessage {
     required this.isSendingFailed,
     required this.files,
   });
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    final sender = json['sender'] ?? {};
+    return ChatMessage(
+      messageId: json['_id'] ?? '',
+      content: json['content'] ?? '',
+      userId: sender['_id'] ?? sender['id'] ?? '',
+      userName: sender['name'] ?? '',
+      userImage: AppApiEndPoint.imageUrl(sender['profileImage']),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      isSending: false,
+      isSendingFailed: false,
+      files: _parseAttachments(json),
+    );
+  }
+
+  static List<String> _parseAttachments(Map<String, dynamic> json) {
+    final List<String> files = [];
+    
+    // Check singular 'attachment' field (String)
+    if (json['attachment'] != null && json['attachment'].toString().isNotEmpty) {
+      files.add(AppApiEndPoint.imageUrl(json['attachment'].toString()));
+    }
+    
+    // Check plural 'attachments' field (List)
+    if (json['attachments'] is List) {
+      files.addAll((json['attachments'] as List)
+          .map((e) => AppApiEndPoint.imageUrl(e.toString())));
+    }
+    
+    return files;
+  }
 
   ChatMessage copyWith({
     String? messageId,

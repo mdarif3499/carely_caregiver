@@ -86,4 +86,8 @@ class ClientRepository {
   Future<ApiResponseModel> getCaregiverProfile(String id) async {
     return await _apiClient.get("${AppApiEndPoint.caregiverProfiles}/$id");
   }
+
+  Future<ApiResponseModel> getBookingDetails(String id) async {
+    return await _apiClient.get("${AppApiEndPoint.booking}/$id");
+  }
 }

@@ -6,6 +6,8 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../routes/app_routes.dart';
+
 class MyBookingScreen extends StatelessWidget {
   const MyBookingScreen({super.key});
 
@@ -85,10 +87,11 @@ class MyBookingScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: c.bookings.length,
                   itemBuilder: (context, index) {
+                    final booking = c.bookings[index];
                     return ClientBookingCard(
-                      booking: c.bookings[index],
+                      booking: booking,
                       onTap: () {
-                        // Navigate to details if needed
+                        Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: booking.id);
                       },
                     );
                   },

@@ -44,7 +44,7 @@ class AvailabilityScreenController extends GetxController
   final Rx<DateTime> focusedMonth = DateTime.now().obs;
   final Rx<DateTime> selectedDay = DateTime.now().obs;
 
-  void previousMonth() => focusedMonth.value = DateTime(
+   void  previousMonth() => focusedMonth.value = DateTime(
     focusedMonth.value.year,
     focusedMonth.value.month - 1,
   );
@@ -62,7 +62,6 @@ class AvailabilityScreenController extends GetxController
     rebuild.value = !rebuild.value;
     selectedDay.value = day;
     
-    // Call API when date is selected as requested
     fetchAvailabilityForMonth();
   }
 

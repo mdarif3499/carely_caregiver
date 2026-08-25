@@ -1,5 +1,6 @@
 import 'package:carely_caregiver/repositories/auth_repository.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
+import 'package:carely_caregiver/services/socket/socket_service.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,6 +58,9 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
+
+          // Connect to WebSocket
+          SocketService.connect();
 
           showCustomSnackbar(message: response.message, isError: false);
 

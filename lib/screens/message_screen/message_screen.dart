@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/profile_avatar/profile_avatar.dart';
 import 'package:core_kit/core_kit.dart';
@@ -7,8 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/message_screen/controller/message_screen_controller.dart';
 import 'package:carely_caregiver/screens/message_screen/model/chat_model.dart';
-
-import '../../gen/assets.gen.dart';
+import 'package:carely_caregiver/screens/message_screen/widgets/expandable_chat_text.dart';
 
 class MessageScreen extends StatelessWidget {
   const MessageScreen({super.key});
@@ -32,12 +33,32 @@ class MessageScreen extends StatelessWidget {
               borderColor: AppColors.instance.transparent,
             ),
             2.width,
-            CommonText(
-              text: conversation != null
-                  ? '${conversation.name}, ${conversation.role}'
-                  : 'Chat',
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CommonText(
+                  text: conversation != null ? conversation.name : 'Chat',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                Obx(() {
+                  if (controller.isPartnerTyping.value) {
+                    return CommonText(
+                      text: 'typing...',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      textColor: AppColors.instance.primary,
+                    );
+                  }
+                  return CommonText(
+                    text: conversation != null ? conversation.role : '',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    textColor: AppColors.instance.textGrey,
+                  );
+                }),
+              ],
             )
           ],
         );
@@ -101,6 +122,18 @@ class MessageScreen extends StatelessWidget {
                   ),
                 ),
               ] else ...[
+                // Partner Avatar
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: AppColors.instance.boxBg,
+                  backgroundImage: chat.userImage.isNotEmpty
+                      ? NetworkImage(chat.userImage)
+                      : null,
+                  child: chat.userImage.isEmpty
+                      ? Icon(Icons.person, size: 18, color: AppColors.instance.primary)
+                      : null,
+                ),
+                const SizedBox(width: 8),
                 Flexible(
                   child: _messageBubble(
                     chat: chat,
@@ -168,8 +201,11 @@ class MessageScreen extends StatelessWidget {
     required bool isMe,
     required MessageScreenController controller,
   }) {
+    final hasImage = chat.files.isNotEmpty;
+    final hasText = chat.content.isNotEmpty;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: isMe
             ? AppColors.instance.secondaryColor
@@ -187,57 +223,64 @@ class MessageScreen extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          CommonText(
-            text: chat.content,
-            fontSize: 14,
-            textColor: isMe ? Colors.white : AppColors.instance.textPrimary,
-            fontWeight: FontWeight.w500,
-          ),
-          if (chat.isSending) ...[
-            4.height,
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 10,
-                  height: 10,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      isMe ? Colors.white70 : AppColors.instance.textGrey,
+          if (hasImage)
+            CommonImage(
+              src: chat.files.first,
+              width: 240,
+              height: 240,
+              fill: BoxFit.cover,
+            ),
+          if (hasText)
+            Padding(
+              padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, 12, 10),
+              child: ExpandableChatText(
+                text: chat.content,
+                isMe: isMe,
+              ),
+            ),
+          if (chat.isSending || chat.isSendingFailed)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (chat.isSending) ...[
+                    SizedBox(
+                      width: 10,
+                      height: 10,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          isMe ? Colors.white70 : AppColors.instance.textGrey,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                4.width,
-                CommonText(
-                  text: 'Sending...',
-                  fontSize: 10,
-                  textColor: isMe
-                      ? Colors.white70
-                      : AppColors.instance.textGrey,
-                ),
-              ],
+                    4.width,
+                    CommonText(
+                      text: 'Sending...',
+                      fontSize: 10,
+                      textColor: isMe
+                          ? Colors.white70
+                          : AppColors.instance.textGrey,
+                    ),
+                  ] else if (chat.isSendingFailed) ...[
+                    Icon(
+                      Icons.error_outline,
+                      size: 12,
+                      color: AppColors.instance.error,
+                    ),
+                    4.width,
+                    CommonText(
+                      text: 'Failed',
+                      fontSize: 10,
+                      textColor: AppColors.instance.error,
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ] else if (chat.isSendingFailed) ...[
-            4.height,
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 12,
-                  color: AppColors.instance.error,
-                ),
-                4.width,
-                CommonText(
-                  text: 'Failed',
-                  fontSize: 10,
-                  textColor: AppColors.instance.error,
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -245,51 +288,137 @@ class MessageScreen extends StatelessWidget {
 
   Widget _messageInputWidget(MessageScreenController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      color: Colors.transparent,
       child: SafeArea(
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-             child: Row(
-                children: [
-                  Expanded(
-                    child: CommonTextField(
-                      controller: controller.messageTextController,
-                      backgroundColor: AppColors.instance.secondaryColor
-                          .withAlpha(30),
-                      validationType: ValidationType.notRequired,
-                      hintText: 'Type a message',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            12.width,
+            // Image Preview Area (Keep this as is)
             Obx(() {
-              return GestureDetector(
-                onTap: controller.message.value.trim().isEmpty
-                    ? null
-                    : () => controller.send(),
-                child: CommonImage(
-                  src: Assets.icons.messageSend,
-                  height: 48,
-                  width: 48,
+              final xfile = controller.selectedImage.value;
+              if (xfile == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16, left: 40),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        height: 90,
+                        width: 90,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200, width: 2),
+                          image: DecorationImage(
+                            image: FileImage(File(xfile.path)),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: -10,
+                        right: -10,
+                        child: GestureDetector(
+                          onTap: controller.clearSelectedImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: Colors.red.withAlpha(50), blurRadius: 5)],
+                            ),
+                            child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
+            // Single Pill Bubble containing everything
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+              ),
+              padding: const EdgeInsets.only(left: 6, right: 4),
+              child: Row(
+                children: [
+                  // 1. Plus Icon (Inside, no splash circle)
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: controller.pickImage,
+                      customBorder: const CircleBorder(),
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(Icons.add, size: 24, color: Colors.black87),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // TextField
+                  Expanded(
+                    child: TextField(
+                      controller: controller.messageTextController,
+                      style: const TextStyle(fontSize: 15, color: Colors.black87),
+                      cursorColor: Colors.black87,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message',
+                        hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        isDense: true,
+                        filled: false,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  // 3. Green Send Button
+                  Obx(() {
+                    final canSend = controller.message.value.trim().isNotEmpty ||
+                        controller.selectedImage.value != null;
+                    return GestureDetector(
+                      onTap: canSend ? () => controller.send() : null,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: canSend
+                              ? const Color(0xFF22C55E)
+                              : Colors.grey.shade300,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
+
+
+
+
 }
