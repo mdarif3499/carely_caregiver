@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 
 class CareGiverScheduleModel {
   final String id;
+  final String clientId;
   final String clientName;
   final String clientAvatar;
+  final String caregiverId;
   final String caregiverName;
   final String caregiverAvatar;
   final String recipientName;
@@ -20,8 +22,10 @@ class CareGiverScheduleModel {
 
   CareGiverScheduleModel({
     required this.id,
+    required this.clientId,
     required this.clientName,
     required this.clientAvatar,
+    required this.caregiverId,
     required this.caregiverName,
     required this.caregiverAvatar,
     required this.recipientName,
@@ -44,8 +48,10 @@ class CareGiverScheduleModel {
 
     return CareGiverScheduleModel(
       id: json['_id'] ?? '',
+      clientId: (client is Map) ? (client['_id'] ?? client['id'] ?? '') : (client?.toString() ?? ''),
       clientName: (client is Map) ? (client['name'] ?? 'Unknown Client') : 'Unknown Client',
       clientAvatar: (client is Map) ? AppApiEndPoint.imageUrl(client['profileImage']) : "",
+      caregiverId: (caregiver is Map) ? (caregiver['_id'] ?? caregiver['id'] ?? '') : (caregiver?.toString() ?? ''),
       caregiverName: (caregiver is Map) ? (caregiver['name'] ?? 'Unknown Caregiver') : 'Unknown Caregiver',
       caregiverAvatar: (caregiver is Map) ? AppApiEndPoint.imageUrl(caregiver['profileImage']) : "",
       recipientName: (recipient is Map) ? (recipient['fullName'] ?? 'Unknown Recipient') : 'Unknown Recipient',

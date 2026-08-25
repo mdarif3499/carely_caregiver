@@ -1,12 +1,20 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/repositories/chat_repository.dart';
 import 'package:carely_caregiver/screens/chat_list_screen/controller/chat_list_controller.dart';
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
+import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../services/socket/socket_service.dart';
 import '../model/chat_model.dart';
 
 class MessageScreenController extends GetxController{
   final RxList<ChatMessage> chats = <ChatMessage>[].obs;
   final RxBool isLoading = false.obs;
+  final RxBool isMetadataLoading = false.obs;
   final RxList<String> filePaths = <String>[].obs;
   final RxInt currentPage = 1.obs;
   final RxBool hasMore = true.obs;
@@ -15,6 +23,8 @@ class MessageScreenController extends GetxController{
   String userId='';
   final RxString message = ''.obs;
   TextEditingController? messageTextController;
+  
+  final Rxn<XFile> selectedImage = Rxn<XFile>();
 
   @override
   void onInit() {
@@ -27,88 +37,130 @@ class MessageScreenController extends GetxController{
     if (Get.arguments is ChatConversation) {
       selectedConversation.value = Get.arguments as ChatConversation;
       chatId = selectedConversation.value?.id ?? '';
-      // For now, let's keep userId as empty or set a dummy one if needed
-      // but ideally it should come from an auth service.
-      // In the mock, it was commented out: userId = Get.arguments['userId'] ?? '';
+      _initUserIdAndData();
     }
-    
-    init();
+  }
+
+  Future<void> _initUserIdAndData() async {
+    userId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    await fetchConversationDetails();
+    await fetchMessages();
+    _setupSocketListener();
+  }
+
+  void _setupSocketListener() {
+    SocketService.on('message', (data) {
+      if (data != null && data['conversation'] == chatId) {
+        final incomingMsg = ChatMessage.fromJson(data);
+        if (incomingMsg.userId != userId) {
+          chats.insert(0, incomingMsg);
+        }
+      }
+    });
   }
 
   @override
   void onClose() {
+    SocketService.off('message', (data) {});
     messageTextController = null;
     super.onClose();
   }
 
+  Future<void> fetchConversationDetails() async {
+    if (chatId.isEmpty) return;
+    try {
+      isMetadataLoading.value = true;
+      update();
 
+      final response = await ChatRepository.instance.getConversationDetails(chatId);
 
-  Future<void> init() async {
-    await fetchMessages();
-  }
-  List<ChatMessage> _generateMockMessages(int page) {
-    return List.generate(20, (index) {
-      final id = (page - 1) * 20 + index;
-      final isMe = id % 2 == 0;
-      return ChatMessage(
-        messageId: 'msg_$id',
-        content: 'This is message number $id',
-        userId: isMe ? userId : 'other_user',
-        userName: isMe ? 'Me' : 'Other User',
-        userImage: '',
-        createdAt: DateTime.now().subtract(Duration(minutes: id)),
-        updatedAt: DateTime.now().subtract(Duration(minutes: id)),
-        isSending: false,
-        isSendingFailed: false,
-        files: [],
-      );
-    });
+      if (response.isSuccess) {
+        final data = response.data['data'] ?? {};
+        final List participants = data['participants'] ?? [];
+        
+        // Find the other participant
+        final partner = participants.firstWhere(
+          (p) => p['_id'] != userId, 
+          orElse: () => participants.isNotEmpty ? participants.first : {}
+        );
+
+        selectedConversation.value = ChatConversation(
+          id: data['_id'] ?? chatId,
+          name: partner['name'] ?? 'Chat',
+          role: partner['role'] ?? '',
+          avatarUrl: AppApiEndPoint.imageUrl(partner['profileImage']),
+          lastMessage: data['lastMessage'] ?? '',
+          time: '',
+        );
+      }
+    } catch (e) {
+      debugPrint("Error fetching conversation details: $e");
+    } finally {
+      isMetadataLoading.value = false;
+      update();
+    }
   }
 
   Future<void> fetchMessages({bool isLoadMore = false}) async {
-    if (isLoading.value) return;
+    if (chatId.isEmpty || isLoading.value) return;
 
-    isLoading.value = true;
     try {
-      // TODO: Replace with actual API call
-      // Example: final response = await chatRepository.getMessages(chatId, currentPage.value);
+      isLoading.value = true;
+      update();
 
-      await Future.delayed(const Duration(seconds: 1)); // Simulating API call
+      final response = await ChatRepository.instance.getMessages(chatId, currentPage.value);
 
-      if (isClosed) return;
+      if (response.isSuccess) {
+        final List dataList = response.data['data']?['messages'] ?? [];
+        final List<ChatMessage> newMessages = dataList.map((e) => ChatMessage.fromJson(e)).toList();
 
-      // Mock data - replace with actual API response
-      final newMessages = _generateMockMessages(currentPage.value);
+        if (isLoadMore) {
+          chats.addAll(newMessages);
+        } else {
+          chats.assignAll(newMessages);
+        }
 
-      if (isLoadMore) {
-        chats.addAll(newMessages);
-      } else {
-        chats.value = newMessages;
+        hasMore.value = dataList.length >= 20;
       }
-
-      hasMore.value = newMessages.length >= 20;
-
     } catch (e) {
-      // AppSnackBar.error('Failed to load messages: $e');
+      debugPrint("Error fetching messages: $e");
     } finally {
-      if (!isClosed) isLoading.value = false;
+      isLoading.value = false;
+      update();
     }
   }
+
   Future<void> loadMore() async {
     if (!hasMore.value || isLoading.value) return;
     currentPage.value++;
     await fetchMessages(isLoadMore: true);
   }
 
+  Future<void> pickImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+      if (image != null) {
+        selectedImage.value = image;
+      }
+    } catch (e) {
+      debugPrint("Error picking image: $e");
+    }
+  }
 
-
+  void clearSelectedImage() {
+    selectedImage.value = null;
+  }
 
   Future<void> send() async {
-    if (message.value.trim().isEmpty && filePaths.isEmpty) return;
+    if (message.value.trim().isEmpty && selectedImage.value == null) return;
+
+    final content = message.value.trim();
+    final pickedFile = selectedImage.value;
 
     final newMessage = ChatMessage(
       messageId: DateTime.now().millisecondsSinceEpoch.toString(),
-      content: message.value,
+      content: content,
       userId: userId,
       userName: 'Me',
       userImage: '',
@@ -116,37 +168,47 @@ class MessageScreenController extends GetxController{
       updatedAt: DateTime.now(),
       isSending: true,
       isSendingFailed: false,
-      files: filePaths.toList(),
-      // chatType: ChatType.text,
+      files: pickedFile != null ? [pickedFile.path] : [],
     );
 
     chats.insert(0, newMessage);
-    filePaths.clear();
     message.value = '';
     messageTextController?.clear();
+    selectedImage.value = null;
 
     try {
-      // TODO: Replace with actual API call
-      // await chatRepository.sendMessage(chatId, newMessage);
+      dynamic attachment;
+      if (pickedFile != null) {
+        attachment = await dio.MultipartFile.fromFile(
+          pickedFile.path,
+          filename: pickedFile.name,
+        );
+      }
 
-      await Future.delayed(const Duration(seconds: 1)); // Simulating API call
+      final response = await ChatRepository.instance.sendMessage(
+        conversationId: chatId,
+        content: content,
+        contentType: pickedFile != null ? "IMAGE" : "TEXT",
+        attachment: attachment,
+      );
 
-      if (isClosed) return;
-
-      // Update message status
-      final index = chats.indexWhere((m) => m.messageId == newMessage.messageId);
-      if (index != -1) {
-        chats[index] = newMessage.copyWith(isSending: false);
-        chats.refresh();
+      if (response.isSuccess) {
+        final index = chats.indexWhere((m) => m.messageId == newMessage.messageId);
+        if (index != -1) {
+          final serverMsg = ChatMessage.fromJson(response.data['data']);
+          chats[index] = serverMsg;
+          chats.refresh();
+        }
+      } else {
+        throw Exception(response.message);
       }
     } catch (e) {
-      if (isClosed) return;
       final index = chats.indexWhere((m) => m.messageId == newMessage.messageId);
       if (index != -1) {
         chats[index] = newMessage.copyWith(isSending: false, isSendingFailed: true);
         chats.refresh();
       }
-      // AppSnackBar.error('Failed to send message: $e');
+      showCustomSnackbar(message: "Failed to send message", isError: true);
     }
   }
 }

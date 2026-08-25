@@ -36,15 +36,24 @@ class ChatListScreen extends StatelessWidget {
                   Icons.search,
                   color: colors.secondaryText,
                 ),
-                // onChanged: controller.onSearchChanged,
+                onChanged: controller.onSearchChanged,
               ),
               const SizedBox(height: 12),
               // Encryption banner
-              EncryptedBanner(),
+              const EncryptedBanner(),
               const SizedBox(height: 4),
             ],
           ),
         );
+
+        if (controller.isLoading.value && chats.isEmpty) {
+          return Column(
+            children: [
+              header,
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
+          );
+        }
 
         if (chats.isEmpty) {
           return Column(

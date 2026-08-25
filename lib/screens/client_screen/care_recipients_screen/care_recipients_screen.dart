@@ -3,7 +3,6 @@ import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/controller/care_recipients_controller.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/widgets/care_recipients_widgets.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

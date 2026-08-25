@@ -1,5 +1,10 @@
+import 'package:carely_caregiver/constant/app_api_end_point.dart';
+import 'package:carely_caregiver/repositories/chat_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ── Model ─────────────────────────────────────────────
 class ChatConversation {
@@ -22,88 +27,74 @@ class ChatConversation {
     this.unreadCount = 0,
     this.isOnline = false,
   });
+
+  factory ChatConversation.fromJson(Map<String, dynamic> json, String currentUserId) {
+    final List participants = json['participants'] ?? [];
+    
+    // Find the partner (the user who isn't the logged-in user)
+    final partner = participants.firstWhere(
+      (p) => p['_id'] != currentUserId,
+      orElse: () => participants.isNotEmpty ? participants.first : {},
+    );
+
+    String lastTime = "";
+    try {
+      if (json['lastMessageAt'] != null) {
+        final dt = DateTime.parse(json['lastMessageAt']);
+        lastTime = DateFormat('hh:mm a').format(dt);
+      }
+    } catch (_) {}
+
+    return ChatConversation(
+      id: json['_id'] ?? '',
+      name: partner['name'] ?? 'Chat',
+      role: partner['role'] ?? '',
+      avatarUrl: AppApiEndPoint.imageUrl(partner['profileImage']),
+      lastMessage: json['lastMessage']?['content'] ?? 'No messages yet',
+      time: lastTime,
+      unreadCount: 0, // Logic for unread count can be added later
+      isOnline: json['isActive'] ?? false,
+    );
+  }
 }
 
 // ── Controller ────────────────────────────────────────
 class ChatListController extends GetxController {
-  // Search query
   final RxString searchQuery = ''.obs;
+  final RxList<ChatConversation> conversations = <ChatConversation>[].obs;
+  final RxBool isLoading = false.obs;
 
-  // Full dummy list
-  final List<ChatConversation> _allConversations = const [
-    ChatConversation(
-      id: '1',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage:
-          "I'll be there at 9:00 AM for the medication review. Please have...",
-      time: '10:45 AM',
-      unreadCount: 1,
-      isOnline: true,
-    ),
-    ChatConversation(
-      id: '2',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage: 'The lab results came back normal...',
-      time: 'Yesterday',
-      isOnline: false,
-    ),
-    ChatConversation(
-      id: '3',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage: 'How is the knee feeling after ...',
-      time: '10:45 AM',
-      unreadCount: 1,
-      isOnline: true,
-    ),
-    ChatConversation(
-      id: '4',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage: 'Thank you so much for the help today...',
-      time: 'Yesterday',
-      unreadCount: 2,
-      isOnline: false,
-    ),
-    ChatConversation(
-      id: '5',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage:
-          "I'll be there at 9:00 AM for the medication review. Please have...",
-      time: 'Mon',
-      isOnline: false,
-    ),
-    ChatConversation(
-      id: '6',
-      name: 'Sarah Jenkins',
-      role: 'RN',
-      avatarUrl:
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200',
-      lastMessage:
-          "I'll be there at 9:00 AM for the medication review. Please have...",
-      time: 'Oct 12',
-      isOnline: false,
-    ),
-  ];
+  @override
+  void onInit() {
+    super.onInit();
+    fetchConversations();
+  }
+
+  Future<void> fetchConversations() async {
+    try {
+      isLoading.value = true;
+      update();
+
+      final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+      final response = await ChatRepository.instance.getConversations();
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data']?['data'] ?? [];
+        conversations.value = dataList.map((e) => ChatConversation.fromJson(e, currentUserId)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching conversations: $e");
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
 
   // Filtered list (reactive)
   List<ChatConversation> get filteredConversations {
     final q = searchQuery.value.trim().toLowerCase();
-    if (q.isEmpty) return _allConversations;
-    return _allConversations.where((c) {
+    if (q.isEmpty) return conversations;
+    return conversations.where((c) {
       return c.name.toLowerCase().contains(q) ||
           c.lastMessage.toLowerCase().contains(q);
     }).toList();

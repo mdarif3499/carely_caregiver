@@ -81,7 +81,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       width: isSelected ? 50 : 0,
                       decoration: BoxDecoration(
                         color: AppColors.instance.primary, // Purple indicator
-                        borderRadius: BorderRadius.only(
+                        borderRadius:const BorderRadius.only(
                           bottomLeft: Radius.circular(6),
                           bottomRight: Radius.circular(6),
                         ),

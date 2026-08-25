@@ -1,5 +1,4 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
-import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_setup_screen/controller/profle_setup_screen_controller.dart';
 import 'package:carely_caregiver/widgets/certification_card.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';

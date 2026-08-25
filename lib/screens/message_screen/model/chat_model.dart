@@ -23,6 +23,22 @@ class ChatMessage {
     required this.files,
   });
 
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    final sender = json['sender'] ?? {};
+    return ChatMessage(
+      messageId: json['_id'] ?? '',
+      content: json['content'] ?? '',
+      userId: sender['_id'] ?? sender['id'] ?? '',
+      userName: sender['name'] ?? '',
+      userImage: sender['profileImage'] ?? '',
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      isSending: false,
+      isSendingFailed: false,
+      files: List<String>.from(json['attachments'] ?? []),
+    );
+  }
+
   ChatMessage copyWith({
     String? messageId,
     String? content,

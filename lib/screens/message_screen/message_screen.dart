@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/profile_avatar/profile_avatar.dart';
 import 'package:core_kit/core_kit.dart';
@@ -7,8 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/message_screen/controller/message_screen_controller.dart';
 import 'package:carely_caregiver/screens/message_screen/model/chat_model.dart';
-
-import '../../gen/assets.gen.dart';
 
 class MessageScreen extends StatelessWidget {
   const MessageScreen({super.key});
@@ -188,12 +188,27 @@ class MessageScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CommonText(
-            text: chat.content,
-            fontSize: 14,
-            textColor: isMe ? Colors.white : AppColors.instance.textPrimary,
-            fontWeight: FontWeight.w500,
-          ),
+          if (chat.files.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CommonImage(
+                  src: chat.files.first,
+                  width: 200,
+                  height: 200,
+                  fill: BoxFit.cover,
+                ),
+              ),
+            ),
+          if (chat.content.isNotEmpty)
+            CommonText(
+              text: chat.content,
+              fontSize: 14,
+              textColor: isMe ? Colors.white : AppColors.instance.textPrimary,
+              fontWeight: FontWeight.w500,
+              textAlign: TextAlign.start,
+            ),
           if (chat.isSending) ...[
             4.height,
             Row(
@@ -244,49 +259,161 @@ class MessageScreen extends StatelessWidget {
   }
 
   Widget _messageInputWidget(MessageScreenController controller) {
+    final colors = AppColors.instance;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: Colors.black.withAlpha(8),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
       child: SafeArea(
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-             child: Row(
-                children: [
-                  Expanded(
-                    child: CommonTextField(
-                      controller: controller.messageTextController,
-                      backgroundColor: AppColors.instance.secondaryColor
-                          .withAlpha(30),
-                      validationType: ValidationType.notRequired,
-                      hintText: 'Type a message',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            12.width,
+            // Image Preview Area
             Obx(() {
-              return GestureDetector(
-                onTap: controller.message.value.trim().isEmpty
-                    ? null
-                    : () => controller.send(),
-                child: CommonImage(
-                  src: Assets.icons.messageSend,
-                  height: 48,
-                  width: 48,
+              final xfile = controller.selectedImage.value;
+              if (xfile == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        height: 90,
+                        width: 90,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: colors.boxBg, width: 2),
+                          image: DecorationImage(
+                            image: FileImage(File(xfile.path)),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: -10,
+                        right: -10,
+                        child: GestureDetector(
+                          onTap: controller.clearSelectedImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: colors.error,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colors.error.withAlpha(50),
+                                  blurRadius: 5,
+                                )
+                              ],
+                            ),
+                            child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: colors.boxBg.withAlpha(40),
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: controller.pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: colors.primary.withAlpha(15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.add_photo_alternate_rounded, color: colors.primary, size: 22),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: controller.messageTextController,
+                            style: TextStyle(
+                              fontSize: 16, 
+                              fontWeight: FontWeight.w500, 
+                              color: colors.textPrimary,
+                              height: 1.2,
+                            ),
+                            cursorColor: colors.primary,
+                            cursorWidth: 2,
+                            textAlignVertical: TextAlignVertical.center,
+                            decoration: const InputDecoration(
+                              hintText: 'Type a message...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey, 
+                                fontSize: 15, 
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Obx(() {
+                  final canSend = controller.message.value.trim().isNotEmpty || 
+                                 controller.selectedImage.value != null;
+                  return GestureDetector(
+                    onTap: canSend ? () => controller.send() : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        color: canSend ? colors.primary : Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                        boxShadow: canSend ? [
+                          BoxShadow(
+                            color: colors.primary.withAlpha(60),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          )
+                        ] : null,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.send_rounded, 
+                          color: canSend ? Colors.white : Colors.grey.shade400, 
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ],
         ),
       ),

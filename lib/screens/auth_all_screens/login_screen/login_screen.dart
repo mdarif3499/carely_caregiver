@@ -263,7 +263,7 @@ Widget _googleSignIn() {
   return Column(
     children: [
       32.height,
-      Row(
+      const Row(
         children: [
           Expanded(child: Divider()),
           Padding(

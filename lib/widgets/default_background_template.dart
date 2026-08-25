@@ -1,7 +1,6 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:core_kit/app_bar/common_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class DefaultBackgroundTemplate extends StatelessWidget {
   final Widget child;

@@ -1,3 +1,4 @@
+import 'package:carely_caregiver/services/socket/socket_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceValue {
@@ -83,6 +84,9 @@ class SharePrefsHelper {
     SharePrefsHelper.remove(SharedPreferenceValue.userId);
     SharePrefsHelper.remove(SharedPreferenceValue.role);
     SharePrefsHelper.remove(SharedPreferenceValue.email);
+
+    // Disconnect WebSocket on logout
+    SocketService.disconnect();
   }
 
   //===========================Remove Value===================

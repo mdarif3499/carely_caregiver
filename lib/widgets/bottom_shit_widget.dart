@@ -2,11 +2,7 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/constant/app_constant.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-// ══════════════════════════════════════════════════════
-//  Filter Model – holds the current filter state
-// ══════════════════════════════════════════════════════
 class FilterState {
   final List<String> selectedSkills;
   final List<String> selectedDays;

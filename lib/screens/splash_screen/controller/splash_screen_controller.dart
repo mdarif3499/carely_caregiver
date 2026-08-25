@@ -1,4 +1,5 @@
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
+import 'package:carely_caregiver/services/socket/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,6 +24,9 @@ class SplashScreenController extends GetxController {
 
       Future.delayed(const Duration(seconds: 3), () {
         if (token.isNotEmpty) {
+          // Connect to WebSocket
+          SocketService.connect();
+          
           // Auto-login: Navigate to dashboard. AppNavigationScreenController will handle the role from storage.
           Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
         } else {

@@ -7,6 +7,7 @@ class AppApiEndPoint {
 
   final String domain = _getDomain();
   final String baseUrl = "${_getDomain()}/api/v1";
+  final String socketUrl = _getDomain();
   final String liveServer = "https://test.com";
   final String refreshToken = "https://test.com";
 
@@ -31,6 +32,8 @@ class AppApiEndPoint {
   static const String myBookings = "/booking/my";
   static const String caregiverBooking = "/booking/caregiver";
   static const String earningsSummary = "/earnings/me/summary";
+  static const String conversation = "/conversation";
+  static const String message = "/message";
 
   static String imageUrl(String? path) {
     if (path == null || path.isEmpty) return "";
