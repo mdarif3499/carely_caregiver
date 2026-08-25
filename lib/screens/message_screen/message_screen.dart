@@ -222,7 +222,7 @@ class MessageScreen extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
           if (hasImage)
@@ -232,14 +232,26 @@ class MessageScreen extends StatelessWidget {
               height: 240,
               fill: BoxFit.cover,
             ),
-          if (hasText)
-            Padding(
-              padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, 12, 10),
-              child: ExpandableChatText(
-                text: chat.content,
-                isMe: isMe,
-              ),
-            ),
+          
+          Stack(
+            children: [
+              if (hasText)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, 40, 10),
+                  child: ExpandableChatText(
+                    text: chat.content,
+                    isMe: isMe,
+                  ),
+                ),
+              if (isMe)
+                Positioned(
+                  bottom: 6,
+                  right: 8,
+                  child: _StatusTicks(status: chat.status),
+                ),
+            ],
+          ),
+
           if (chat.isSending || chat.isSendingFailed)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
@@ -416,9 +428,25 @@ class MessageScreen extends StatelessWidget {
       ),
     );
   }
-
-
-
-
-
 }
+
+class _StatusTicks extends StatelessWidget {
+  final String status;
+  const _StatusTicks({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == 'SENT') {
+      return const Icon(Icons.done_rounded, size: 16, color: Colors.white70);
+    } else if (status == 'DELIVERED') {
+      return const Icon(Icons.done_all_rounded, size: 16, color: Colors.white70);
+    } else if (status == 'SEEN') {
+      return const Icon(Icons.done_all_rounded, size: 16, color: Color(0xFF4FC3F7)); // Light blue for seen
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+
+
+

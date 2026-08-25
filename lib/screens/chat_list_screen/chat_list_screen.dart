@@ -206,10 +206,10 @@ class _ChatTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       CommonText(
-                        text: conversation.lastMessage,
+                        text: conversation.isTyping ? 'typing...' : conversation.lastMessage,
                         fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        textColor: colors.secondaryText,
+                        fontWeight: conversation.isTyping ? FontWeight.w600 : FontWeight.w400,
+                        textColor: conversation.isTyping ? colors.primary : colors.secondaryText,
                         textAlign: TextAlign.start,
                         isDescription: true,
                         preventScaling: true,

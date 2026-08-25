@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/utils/log/app_log.dart';
@@ -7,88 +8,89 @@ class SocketService {
   SocketService._();
 
   static io.Socket? _socket;
-  
-  // Internal event bus to manage multiple listeners per event name
   static final Map<String, List<void Function(dynamic)>> _handlers = {};
+  static final Completer<void> _initCompleter = Completer<void>();
+  static bool _isInitializing = false;
 
   static bool get isConnected => _socket?.connected ?? false;
 
-  static void connect() async {
-    final token = await SharePrefsHelper.getString(SharedPreferenceValue.token);
-    if (token.isEmpty) {
-      appLog('⚠️ Socket: Token empty, skipping connection.', source: 'SOCKET');
-      return;
-    }
-
+  static Future<void> connect() async {
+    if (_isInitializing) return;
     if (_socket != null && _socket!.connected) return;
 
-    if (_socket == null) {
-      final url = AppApiEndPoint.instance.socketUrl;
-      appLog('🔌 Socket: Initializing new connection to $url', source: 'SOCKET');
-      _socket = io.io(
-        url,
-        io.OptionBuilder()
-            .setTransports(['websocket'])
-            .setAuth({'token': token})
-            .enableAutoConnect()
-            .enableReconnection()
-            .setReconnectionAttempts(10)
-            .setReconnectionDelay(2000)
-            .build(),
-      );
+    _isInitializing = true;
+    try {
+      final token = await SharePrefsHelper.getString(SharedPreferenceValue.token);
+      if (token.isEmpty) {
+        appLog('⚠️ Socket: Token empty, skipping connection.', source: 'SOCKET');
+        _isInitializing = false;
+        return;
+      }
 
-      _socket!.onConnect((_) async {
-        appLog('✅ Socket: Connected', source: 'SOCKET');
+      if (_socket == null) {
+        final url = AppApiEndPoint.instance.socketUrl;
+        appLog('🔌 Socket: Initializing connection to $url', source: 'SOCKET');
         
-        final currentToken = await SharePrefsHelper.getString(SharedPreferenceValue.token);
-        if (currentToken.isNotEmpty) {
-          _socket!.emit('authenticate', currentToken);
-          appLog('🔑 Socket: Authenticated with token', source: 'SOCKET');
-        }
+        _socket = io.io(
+          url,
+          io.OptionBuilder()
+              .setTransports(['websocket'])
+              .setAuth({'token': token})
+              .enableAutoConnect()
+              .enableReconnection()
+              .setReconnectionAttempts(10)
+              .setReconnectionDelay(2000)
+              .build(),
+        );
 
-        _reRegisterListeners();
-      });
+        _socket!.onConnect((_) async {
+          appLog('✅ Socket: Connected', source: 'SOCKET');
+          final currentToken = await SharePrefsHelper.getString(SharedPreferenceValue.token);
+          if (currentToken.isNotEmpty) {
+            _socket!.emit('authenticate', currentToken);
+          }
+          _reRegisterListeners();
+        });
 
-      _socket!.onDisconnect((_) => appLog('⚠️ Socket: Disconnected', source: 'SOCKET'));
-      _socket!.onConnectError((e) => appLog('❌ Socket: Connect Error $e', source: 'SOCKET'));
-      _socket!.onError((e) => appLog('❌ Socket: General Error $e', source: 'SOCKET'));
+        _socket!.onDisconnect((_) => appLog('⚠️ Socket: Disconnected', source: 'SOCKET'));
+        _socket!.onConnectError((e) => appLog('❌ Socket: Connect Error $e', source: 'SOCKET'));
+      } else {
+        _socket!.connect();
+      }
 
-    } else {
-      appLog('🔌 Socket: Attempting to reconnect existing instance...', source: 'SOCKET');
-      _socket!.connect();
+      if (!_initCompleter.isCompleted) _initCompleter.complete();
+    } finally {
+      _isInitializing = false;
     }
   }
 
-  /// Internal helper to re-attach handlers when socket reconnects
   static void _reRegisterListeners() {
     if (_socket == null) return;
     _handlers.forEach((event, handlers) {
       _socket!.off(event);
       _socket!.on(event, (data) {
         appLog('📩 Socket: Event triggered [$event]', source: 'SOCKET');
-        final listeners = List<void Function(dynamic)>.from(handlers);
-        for (var h in listeners) {
-          try { h(data); } catch (e) { appLog('❌ Error in handler for $event: $e'); }
+        for (var h in List.from(handlers)) {
+          try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
         }
       });
     });
   }
 
-  /// Register a listener for a specific event
-  static void on(String event, void Function(dynamic data) handler) {
+  static void on(String event, void Function(dynamic data) handler) async {
+    if (_socket == null) await connect();
+    
     if (!_handlers.containsKey(event)) {
       _handlers[event] = [];
       
-      // If socket is already connected, register the core listener immediately
-      if (_socket != null) {
-        _socket!.on(event, (data) {
-          appLog('📩 Socket: Received data for [$event]', source: 'SOCKET');
-          final listeners = List<void Function(dynamic)>.from(_handlers[event] ?? []);
-          for (var h in listeners) {
-             try { h(data); } catch (e) { appLog('❌ Error in handler for $event: $e'); }
-          }
-        });
-      }
+      appLog('🔗 Socket: Binding core listener for [$event]', source: 'SOCKET');
+      _socket?.on(event, (data) {
+        appLog('📩 Socket: Raw data received for [$event]: $data', source: 'SOCKET');
+        final listeners = _handlers[event] ?? [];
+        for (var h in List.from(listeners)) {
+          try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
+        }
+      });
     }
 
     if (!_handlers[event]!.contains(handler)) {
@@ -97,7 +99,6 @@ class SocketService {
     appLog('👂 Socket: Registered listener for [$event]', source: 'SOCKET');
   }
 
-  /// Remove a specific listener
   static void off(String event, void Function(dynamic data) handler) {
     if (_handlers.containsKey(event)) {
       _handlers[event]!.remove(handler);
@@ -109,18 +110,26 @@ class SocketService {
     }
   }
 
-  /// Emit an event with data
-  static void emit(String event, dynamic data) {
-    if (_socket == null || !_socket!.connected) connect();
+  static void emit(String event, dynamic data) async {
+    if (_socket == null) await connect();
+    // Wait for connection if it's currently connecting
+    if (_socket != null && !_socket!.connected) {
+      appLog('⏳ Socket: Waiting for connection before emit [$event]...', source: 'SOCKET');
+      int attempts = 0;
+      while (!_socket!.connected && attempts < 10) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        attempts++;
+      }
+    }
+    
     _socket?.emit(event, data);
-    appLog('📤 Socket: Emitted event [$event] with data: $data', source: 'SOCKET');
+    appLog('📤 Socket: Emitted [$event] with: $data', source: 'SOCKET');
   }
 
-  /// Fully disconnect and clear state
   static void disconnect() {
     _socket?.dispose();
     _socket = null;
     _handlers.clear();
-    appLog('🔌 Socket: Manually disconnected and cleared', source: 'SOCKET');
+    appLog('🔌 Socket: Manually disconnected', source: 'SOCKET');
   }
 }
