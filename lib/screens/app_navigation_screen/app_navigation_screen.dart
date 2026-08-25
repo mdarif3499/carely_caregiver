@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../app_all_enum/app_login_status.dart';
 import '../care_giver_screens/care_giver_home_screen/care_giver_home_screen.dart';
+import '../client_screen/my_booking_screen/my_booking_screen.dart';
 import '../client_screen/select_service_type_screen/select_service_type_screen.dart';
 import '../profile_screens/profile_screen/profile_screen.dart';
 import 'controller/app_navigation_screen_controller.dart';
@@ -58,9 +59,8 @@ class AppNavigationScreen extends StatelessWidget {
     return [
       const ClientHomeScreen(),
       const FindCaregiverScreen(),
-      const SelectServiceTypeScreen(),
+      const MyBookingScreen(),
       const ChatListScreen(),
-      // const ReviewBookingScreen(),
       const ProfileScreen(),
     ];
   }

@@ -68,11 +68,22 @@ class ClientRepository {
     return await _apiClient.post(AppApiEndPoint.booking, body: data);
   }
 
-  Future<ApiResponseModel> getClientBookings({String? date}) async {
+  Future<ApiResponseModel> getClientBookings({String? date, String? status}) async {
+    final Map<String, dynamic> queryParams = {};
+    if (date != null) queryParams['date'] = date;
+    if (status != null) queryParams['status'] = status;
+
     String endpoint = AppApiEndPoint.myBookings;
-    if (date != null) {
-      endpoint = "$endpoint?date=$date";
+    if (queryParams.isNotEmpty) {
+      final queryString = queryParams.entries
+          .map((e) => "${e.key}=${Uri.encodeComponent(e.value.toString())}")
+          .join('&');
+      endpoint = "$endpoint?$queryString";
     }
     return await _apiClient.get(endpoint);
+  }
+
+  Future<ApiResponseModel> getCaregiverProfile(String id) async {
+    return await _apiClient.get("${AppApiEndPoint.caregiverProfiles}/$id");
   }
 }
