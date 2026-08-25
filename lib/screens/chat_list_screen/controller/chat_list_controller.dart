@@ -18,6 +18,7 @@ class ChatConversation {
   final String time;
   final int unreadCount;
   final bool isOnline;
+  final bool isTyping;
 
   const ChatConversation({
     required this.id,
@@ -28,7 +29,32 @@ class ChatConversation {
     required this.time,
     this.unreadCount = 0,
     this.isOnline = false,
+    this.isTyping = false,
   });
+
+  ChatConversation copyWith({
+    String? id,
+    String? name,
+    String? role,
+    String? avatarUrl,
+    String? lastMessage,
+    String? time,
+    int? unreadCount,
+    bool? isOnline,
+    bool? isTyping,
+  }) {
+    return ChatConversation(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      lastMessage: lastMessage ?? this.lastMessage,
+      time: time ?? this.time,
+      unreadCount: unreadCount ?? this.unreadCount,
+      isOnline: isOnline ?? this.isOnline,
+      isTyping: isTyping ?? this.isTyping,
+    );
+  }
 
   factory ChatConversation.fromJson(Map<String, dynamic> json, String currentUserId, String currentUserRole) {
     final List participants = json['participants'] ?? [];
@@ -92,15 +118,47 @@ class ChatListController extends GetxController {
     _setupGlobalSocketListeners();
   }
 
+  @override
+  void onClose() {
+    SocketService.off('message:new', _onNewMessageList);
+    SocketService.off('typing:start', _onPartnerTypingStartList);
+    SocketService.off('typing:stop', _onPartnerTypingStopList);
+    super.onClose();
+  }
+
   void _setupGlobalSocketListeners() {
-    SocketService.on('message:new', (data) {
-      if (data == null) return;
-      _handleIncomingMessage(data);
-    });
+    SocketService.on('message:new', _onNewMessageList);
+    SocketService.on('typing:start', _onPartnerTypingStartList);
+    SocketService.on('typing:stop', _onPartnerTypingStopList);
+  }
+
+  void _onPartnerTypingStartList(data) {
+    if (data == null) return;
+    final String conversationId = data['conversationId'] ?? '';
+    final index = conversations.indexWhere((c) => c.id == conversationId);
+    if (index != -1) {
+      conversations[index] = conversations[index].copyWith(isTyping: true);
+      conversations.refresh();
+    }
+  }
+
+  void _onPartnerTypingStopList(data) {
+    if (data == null) return;
+    final String conversationId = data['conversationId'] ?? '';
+    final index = conversations.indexWhere((c) => c.id == conversationId);
+    if (index != -1) {
+      conversations[index] = conversations[index].copyWith(isTyping: false);
+      conversations.refresh();
+    }
+  }
+
+  void _onNewMessageList(data) {
+    if (data == null) return;
+    _handleIncomingMessage(data);
   }
 
   Future<void> _handleIncomingMessage(Map<String, dynamic> data) async {
-    final String conversationId = data['conversation'] ?? '';
+    final String conversationId = data['conversationId'] ?? data['conversation'] ?? '';
     if (conversationId.isEmpty) return;
 
     final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
@@ -147,11 +205,7 @@ class ChatListController extends GetxController {
     }
   }
 
-  @override
-  void onClose() {
-    SocketService.off('message:new', (data) {});
-    super.onClose();
-  }
+
 
   Future<void> fetchConversations() async {
     try {

@@ -3,6 +3,7 @@ import 'package:carely_caregiver/repositories/chat_repository.dart';
 import 'package:carely_caregiver/screens/chat_list_screen/controller/chat_list_controller.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
+import 'package:carely_caregiver/utils/log/app_log.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -51,13 +52,17 @@ class MessageScreenController extends GetxController{
 
   void _joinConversation() {
     if (chatId.isNotEmpty) {
-      SocketService.emit('conversation:join', {"conversationId": chatId});
+      appLog("JOINING CONVERSATION ROOM: $chatId", source: "CHAT");
+      // Emitting as a direct string, matching Postman
+      SocketService.emit('conversation:join', chatId);
     }
   }
 
   void _leaveConversation() {
     if (chatId.isNotEmpty) {
-      SocketService.emit('conversation:leave', {"conversationId": chatId});
+      appLog("LEAVING CONVERSATION ROOM: $chatId", source: "CHAT");
+      // Emitting as a direct string, matching Postman
+      SocketService.emit('conversation:leave', chatId);
     }
   }
 
@@ -65,40 +70,82 @@ class MessageScreenController extends GetxController{
   DateTime? _lastTypingTime;
 
   void _setupSocketListeners() {
-    // 1. Listen for new messages
-    SocketService.on('message:new', (data) {
-      if (data != null && data['conversation'] == chatId) {
+    appLog("SETTING UP CHAT LISTENERS...", source: "CHAT");
+    SocketService.on('message:new', _onNewMessage);
+    SocketService.on('typing:start', _onPartnerTypingStart);
+    SocketService.on('typing:stop', _onPartnerTypingStop);
+    SocketService.on('message:delivered', _onMessageDelivered);
+    SocketService.on('message:seen', _onMessageSeen);
+  }
+
+  void _onNewMessage(data) {
+    appLog("SOCKET MESSAGE RECEIVED: $data", source: "CHAT");
+    if (data != null) {
+      final String incomingChatId = data['conversationId'] ?? data['conversation'] ?? '';
+      if (incomingChatId == chatId) {
         final incomingMsg = ChatMessage.fromJson(data);
         if (incomingMsg.userId != userId) {
-          chats.insert(0, incomingMsg);
-          // Mark as seen immediately if we are looking at this chat
-          emitSeenStatus(incomingMsg.messageId);
+          if (!chats.any((m) => m.messageId == incomingMsg.messageId)) {
+            chats.insert(0, incomingMsg);
+            emitSeenStatus(incomingMsg.messageId);
+          }
         }
       }
-    });
+    }
+  }
 
-    // 2. Listen for typing status
-    SocketService.on('typing:start', (data) {
-      if (data != null && data['conversationId'] == chatId) {
-        if (data['senderId'] != userId) {
-          isPartnerTyping.value = true;
-        }
+  void _onMessageDelivered(data) {
+    if (data != null && data['conversationId'] == chatId) {
+      final msgId = data['messageId'];
+      final index = chats.indexWhere((m) => m.messageId == msgId);
+      if (index != -1 && chats[index].status == 'SENT') {
+        chats[index] = chats[index].copyWith(status: 'DELIVERED');
+        chats.refresh();
       }
-    });
+    }
+  }
 
-    SocketService.on('typing:stop', (data) {
-      if (data != null && data['conversationId'] == chatId) {
-        if (data['senderId'] != userId) {
-          isPartnerTyping.value = false;
+  void _onMessageSeen(data) {
+    if (data != null && data['conversationId'] == chatId) {
+      // If server sends a specific ID
+      final msgId = data['messageId'];
+      if (msgId != null) {
+        final index = chats.indexWhere((m) => m.messageId == msgId);
+        if (index != -1) {
+          chats[index] = chats[index].copyWith(status: 'SEEN');
+          chats.refresh();
         }
+      } else {
+        // If it's a global room seen event, mark all partner messages as seen
+        for (int i = 0; i < chats.length; i++) {
+          if (chats[i].userId == userId && chats[i].status != 'SEEN') {
+            chats[i] = chats[i].copyWith(status: 'SEEN');
+          }
+        }
+        chats.refresh();
       }
-    });
+    }
+  }
+
+  void _onPartnerTypingStart(data) {
+    if (data != null && data['conversationId'] == chatId && data['senderId'] != userId) {
+      isPartnerTyping.value = true;
+    }
+  }
+
+  void _onPartnerTypingStop(data) {
+    if (data != null && data['conversationId'] == chatId && data['senderId'] != userId) {
+      isPartnerTyping.value = false;
+    }
   }
 
   void emitTypingStatus(bool isTyping) {
     if (chatId.isEmpty) return;
     final event = isTyping ? 'typing:start' : 'typing:stop';
-    SocketService.emit(event, {"conversationId": chatId});
+    SocketService.emit(event, {
+      "conversationId": chatId,
+      "senderId": userId,
+    });
   }
 
   void emitSeenStatus(String messageId) {
@@ -133,9 +180,11 @@ class MessageScreenController extends GetxController{
   @override
   void onClose() {
     _leaveConversation();
-    SocketService.off('message:new', (data) {});
-    SocketService.off('typing:start', (data) {});
-    SocketService.off('typing:stop', (data) {});
+    SocketService.off('message:new', _onNewMessage);
+    SocketService.off('typing:start', _onPartnerTypingStart);
+    SocketService.off('typing:stop', _onPartnerTypingStop);
+    SocketService.off('message:delivered', _onMessageDelivered);
+    SocketService.off('message:seen', _onMessageSeen);
     messageTextController = null;
     super.onClose();
   }
