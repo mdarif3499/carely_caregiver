@@ -78,15 +78,18 @@ class ChatListScreen extends StatelessWidget {
           );
         }
 
-        return SmartListLoader(
-          itemCount: chats.length,
-          appbar: header,
-          padding: EdgeInsets.zero,
-          onColapsAppbar: const SizedBox.shrink(),
-          itemBuilder: (_, index) => _ChatTile(
-            conversation: chats[index],
-            onTap: () => controller.onConversationTap(chats[index]),
-            showDivider: index < chats.length - 1,
+        return RefreshIndicator(
+          onRefresh: () => controller.fetchConversations(),
+          child: SmartListLoader(
+            itemCount: chats.length,
+            appbar: header,
+            padding: EdgeInsets.zero,
+            onColapsAppbar: const SizedBox.shrink(),
+            itemBuilder: (_, index) => _ChatTile(
+              conversation: chats[index],
+              onTap: () => controller.onConversationTap(chats[index]),
+              showDivider: index < chats.length - 1,
+            ),
           ),
         );
       }),
@@ -236,37 +239,30 @@ class _ChatTile extends StatelessWidget {
                     const SizedBox(height: 4),
                     if (hasUnread)
                       Container(
-                        width: 20,
-                        height: 20,
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: conversation.unreadCount == 1
-                              ? colors.primary
-                              : colors.primary,
+                          color: colors.primary,
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: colors.primary.withAlpha(50),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
                         ),
                         alignment: Alignment.center,
-                        child:
-                      //   conversation.unreadCount == 1
-                      //       ? Container(
-                      //           width: 8,
-                      //           height: 8,
-                      //           decoration: const BoxDecoration(
-                      //             color: Colors.white,
-                      //             shape: BoxShape.circle,
-                      //           ),
-                      //         )
-                      //       :
-                        CommonText(
-                                text: '${conversation.unreadCount}',
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                textColor: Colors.white,
-                                isDescription: true,
-                                preventScaling: true,
-                              ),
+                        child: CommonText(
+                          text: '${conversation.unreadCount}',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          textColor: Colors.white,
+                          isDescription: true,
+                          preventScaling: true,
+                        ),
                       )
                     else
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 22),
                   ],
                 ),
               ],

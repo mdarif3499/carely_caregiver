@@ -1,4 +1,3 @@
-import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/repositories/chat_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
@@ -194,7 +193,8 @@ class CareGiverHomeController extends GetxController {
       if (response.isSuccess) {
         final data = response.data['data'] ?? {};
         final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-        final conversation = ChatConversation.fromJson(data, currentUserId);
+        final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+        final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
 
         Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
       } else {

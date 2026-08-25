@@ -31,7 +31,7 @@ class MessageScreenController extends GetxController{
     super.onInit();
     messageTextController = TextEditingController()
       ..addListener(() {
-        message.value = messageTextController?.text ?? '';
+        onTextChanged(messageTextController?.text ?? '');
       });
     
     if (Get.arguments is ChatConversation) {
@@ -45,23 +45,97 @@ class MessageScreenController extends GetxController{
     userId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
     await fetchConversationDetails();
     await fetchMessages();
-    _setupSocketListener();
+    _setupSocketListeners();
+    _joinConversation();
   }
 
-  void _setupSocketListener() {
-    SocketService.on('message', (data) {
+  void _joinConversation() {
+    if (chatId.isNotEmpty) {
+      SocketService.emit('conversation:join', {"conversationId": chatId});
+    }
+  }
+
+  void _leaveConversation() {
+    if (chatId.isNotEmpty) {
+      SocketService.emit('conversation:leave', {"conversationId": chatId});
+    }
+  }
+
+  final RxBool isPartnerTyping = false.obs;
+  DateTime? _lastTypingTime;
+
+  void _setupSocketListeners() {
+    // 1. Listen for new messages
+    SocketService.on('message:new', (data) {
       if (data != null && data['conversation'] == chatId) {
         final incomingMsg = ChatMessage.fromJson(data);
         if (incomingMsg.userId != userId) {
           chats.insert(0, incomingMsg);
+          // Mark as seen immediately if we are looking at this chat
+          emitSeenStatus(incomingMsg.messageId);
+        }
+      }
+    });
+
+    // 2. Listen for typing status
+    SocketService.on('typing:start', (data) {
+      if (data != null && data['conversationId'] == chatId) {
+        if (data['senderId'] != userId) {
+          isPartnerTyping.value = true;
+        }
+      }
+    });
+
+    SocketService.on('typing:stop', (data) {
+      if (data != null && data['conversationId'] == chatId) {
+        if (data['senderId'] != userId) {
+          isPartnerTyping.value = false;
         }
       }
     });
   }
 
+  void emitTypingStatus(bool isTyping) {
+    if (chatId.isEmpty) return;
+    final event = isTyping ? 'typing:start' : 'typing:stop';
+    SocketService.emit(event, {"conversationId": chatId});
+  }
+
+  void emitSeenStatus(String messageId) {
+    if (chatId.isEmpty || messageId.isEmpty) return;
+    SocketService.emit('message:seen', {
+      "conversationId": chatId,
+      "messageId": messageId,
+      "senderId": userId,
+    });
+  }
+
+  void onTextChanged(String val) {
+    message.value = val;
+    if (val.isNotEmpty) {
+      if (_lastTypingTime == null || 
+          DateTime.now().difference(_lastTypingTime!) > const Duration(seconds: 2)) {
+        emitTypingStatus(true);
+      }
+      _lastTypingTime = DateTime.now();
+      
+      // Stop typing indicator after 3 seconds of inactivity
+      Future.delayed(const Duration(seconds: 3), () {
+        if (_lastTypingTime != null && 
+            DateTime.now().difference(_lastTypingTime!) >= const Duration(seconds: 3)) {
+          emitTypingStatus(false);
+          _lastTypingTime = null;
+        }
+      });
+    }
+  }
+
   @override
   void onClose() {
-    SocketService.off('message', (data) {});
+    _leaveConversation();
+    SocketService.off('message:new', (data) {});
+    SocketService.off('typing:start', (data) {});
+    SocketService.off('typing:stop', (data) {});
     messageTextController = null;
     super.onClose();
   }
