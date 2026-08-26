@@ -42,7 +42,7 @@ class NotificationScreen extends StatelessWidget {
                 color: Colors.grey.shade300,
               ),
               12.height,
-              CommonText(
+              const CommonText(
                 text: 'No notifications',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
