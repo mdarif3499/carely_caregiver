@@ -10,6 +10,7 @@ import 'package:carely_caregiver/screens/notification_screen/notification_screen
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/basic_info_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/care_recipients_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/all_schedule_screen.dart';
+import 'package:carely_caregiver/screens/cms_screen/cms_content_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/my_booking_screen/client_booking_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/payment/stripe_webview_screen.dart';
@@ -153,19 +154,19 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.termsAndConditions,
     binding: ProfileBinding(),
-    page: () => const TermsAndConditionsScreen(),
+    page: () => const CMSContentScreen(title: 'Terms of Service', slug: 'terms-of-service'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.privacyPolicy,
     binding: ProfileBinding(),
-    page: () => const PrivacyPolicyScreen(),
+    page: () => const CMSContentScreen(title: 'Privacy Policy', slug: 'privacy-policy'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.aboutUs,
     binding: ProfileBinding(),
-    page: () => const AboutUsScreen(),
+    page: () => const CMSContentScreen(title: 'About Us', slug: 'about-us'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(

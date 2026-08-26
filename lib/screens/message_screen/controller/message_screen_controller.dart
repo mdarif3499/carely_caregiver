@@ -48,6 +48,7 @@ class MessageScreenController extends GetxController{
     await fetchMessages();
     _setupSocketListeners();
     _joinConversation();
+    emitSeenStatus();
   }
 
   void _joinConversation() {
@@ -81,13 +82,31 @@ class MessageScreenController extends GetxController{
   void _onNewMessage(data) {
     appLog("SOCKET MESSAGE RECEIVED: $data", source: "CHAT");
     if (data != null) {
-      final String incomingChatId = data['conversationId'] ?? data['conversation'] ?? '';
+      final String incomingChatId = (data['conversationId'] ?? data['conversation'] ?? '').toString();
       if (incomingChatId == chatId) {
         final incomingMsg = ChatMessage.fromJson(data);
+        
         if (incomingMsg.userId != userId) {
+          // 1. PARTNER MESSAGE: Add to list and confirm receipt
           if (!chats.any((m) => m.messageId == incomingMsg.messageId)) {
             chats.insert(0, incomingMsg);
-            emitSeenStatus(incomingMsg.messageId);
+            
+            // Emit Delivered instantly
+            emitDeliveredStatus(incomingMsg.messageId);
+            
+            // Emit Seen after tiny delay (matching your manual Postman seen action)
+            Future.delayed(const Duration(milliseconds: 300), () {
+              emitSeenStatus();
+            });
+          }
+        } else {
+          // 2. MY MESSAGE BROADCAST: Sync local placeholder with Server ID
+          final index = chats.indexWhere((m) => m.userId == userId && (m.isSending || m.messageId.contains('local') || m.messageId.length >= 13));
+          if (index != -1) {
+            appLog("SYNCING SENT MESSAGE DATA: $data", source: "CHAT");
+            chats[index] = incomingMsg;
+            chats.refresh();
+            update();
           }
         }
       }
@@ -95,34 +114,65 @@ class MessageScreenController extends GetxController{
   }
 
   void _onMessageDelivered(data) {
-    if (data != null && data['conversationId'] == chatId) {
-      final msgId = data['messageId'];
-      final index = chats.indexWhere((m) => m.messageId == msgId);
-      if (index != -1 && chats[index].status == 'SENT') {
-        chats[index] = chats[index].copyWith(status: 'DELIVERED');
-        chats.refresh();
+    appLog("SOCKET DELIVERED RECEIVED: $data", source: "CHAT");
+    if (data != null) {
+      final String incomingChatId = (data['conversationId'] ?? data['conversation'] ?? '').toString();
+      if (incomingChatId == chatId) {
+        final String senderOfStatus = (data['senderId'] ?? '').toString();
+        
+        // If my partner confirms delivery
+        if (senderOfStatus.isNotEmpty && senderOfStatus != userId) {
+          final String? msgId = data['messageId']?.toString();
+          if (msgId != null && msgId.isNotEmpty) {
+            final index = chats.indexWhere((m) => m.messageId == msgId);
+            if (index != -1 && chats[index].status == 'SENT') {
+              appLog("TICK UPDATE: Message $msgId is DELIVERED", source: "CHAT");
+              chats[index] = chats[index].copyWith(status: 'DELIVERED');
+              chats.refresh();
+              update();
+            }
+          }
+        }
       }
     }
   }
 
   void _onMessageSeen(data) {
-    if (data != null && data['conversationId'] == chatId) {
-      // If server sends a specific ID
-      final msgId = data['messageId'];
-      if (msgId != null) {
-        final index = chats.indexWhere((m) => m.messageId == msgId);
-        if (index != -1) {
-          chats[index] = chats[index].copyWith(status: 'SEEN');
-          chats.refresh();
-        }
-      } else {
-        // If it's a global room seen event, mark all partner messages as seen
-        for (int i = 0; i < chats.length; i++) {
-          if (chats[i].userId == userId && chats[i].status != 'SEEN') {
-            chats[i] = chats[i].copyWith(status: 'SEEN');
+    appLog("SOCKET SEEN RECEIVED: $data", source: "CHAT");
+    if (data != null) {
+      final String incomingChatId = (data['conversationId'] ?? data['conversation'] ?? '').toString();
+      if (incomingChatId == chatId) {
+        // Who performed the 'seen' action (matching your seenBy log)
+        final String seenBy = (data['seenBy'] ?? data['senderId'] ?? '').toString();
+        
+        // Only update my sent ticks if the OTHER person saw them
+        if (seenBy.isNotEmpty && seenBy != userId) {
+          bool changed = false;
+          final String? msgId = data['messageId']?.toString();
+          
+          if (msgId != null && msgId.isNotEmpty) {
+            // Partner saw a specific message
+            final index = chats.indexWhere((m) => m.messageId == msgId);
+            if (index != -1 && chats[index].status != 'SEEN') {
+              chats[index] = chats[index].copyWith(status: 'SEEN');
+              changed = true;
+            }
+          } else {
+            // Room-wide seen: mark all MY sent messages as SEEN
+            for (int i = 0; i < chats.length; i++) {
+              if (chats[i].userId == userId && chats[i].status != 'SEEN') {
+                chats[i] = chats[i].copyWith(status: 'SEEN');
+                changed = true;
+              }
+            }
+          }
+
+          if (changed) {
+            appLog("TICK UPDATE: Messages are now BLUE (SEEN)", source: "CHAT");
+            chats.refresh();
+            update();
           }
         }
-        chats.refresh();
       }
     }
   }
@@ -148,12 +198,25 @@ class MessageScreenController extends GetxController{
     });
   }
 
-  void emitSeenStatus(String messageId) {
-    if (chatId.isEmpty || messageId.isEmpty) return;
+  void emitSeenStatus() {
+    if (chatId.isEmpty) return;
+    // The 'senderId' here is the person who originally sent the messages we just saw
+    final partnerId = selectedConversation.value?.partnerId ?? '';
+    if (partnerId.isEmpty) return;
+
     SocketService.emit('message:seen', {
+      "senderId": partnerId,
       "conversationId": chatId,
+    });
+  }
+
+  void emitDeliveredStatus(String messageId) {
+    if (chatId.isEmpty || messageId.isEmpty) return;
+    // Matching 1st screenshot: messageId, senderId, conversationId
+    SocketService.emit('message:delivered', {
       "messageId": messageId,
       "senderId": userId,
+      "conversationId": chatId,
     });
   }
 
@@ -207,6 +270,8 @@ class MessageScreenController extends GetxController{
           orElse: () => participants.isNotEmpty ? participants.first : {}
         );
 
+        final pId = (partner['_id'] ?? partner['id'] ?? '').toString();
+
         selectedConversation.value = ChatConversation(
           id: data['_id'] ?? chatId,
           name: partner['name'] ?? 'Chat',
@@ -214,6 +279,7 @@ class MessageScreenController extends GetxController{
           avatarUrl: AppApiEndPoint.imageUrl(partner['profileImage']),
           lastMessage: data['lastMessage'] ?? '',
           time: '',
+          partnerId: pId,
         );
       }
     } catch (e) {
@@ -280,9 +346,10 @@ class MessageScreenController extends GetxController{
 
     final content = message.value.trim();
     final pickedFile = selectedImage.value;
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
 
     final newMessage = ChatMessage(
-      messageId: DateTime.now().millisecondsSinceEpoch.toString(),
+      messageId: "local_$timestamp", // Explicitly mark as local
       content: content,
       userId: userId,
       userName: 'Me',

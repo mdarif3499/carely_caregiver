@@ -69,7 +69,7 @@ class SocketService {
     _handlers.forEach((event, handlers) {
       _socket!.off(event);
       _socket!.on(event, (data) {
-        appLog('📩 Socket: Event triggered [$event]', source: 'SOCKET');
+        appLog('📩 Socket: Event triggered [$event] WITH DATA: $data', source: 'SOCKET');
         for (var h in List.from(handlers)) {
           try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
         }
@@ -83,14 +83,16 @@ class SocketService {
     if (!_handlers.containsKey(event)) {
       _handlers[event] = [];
       
-      appLog('🔗 Socket: Binding core listener for [$event]', source: 'SOCKET');
-      _socket?.on(event, (data) {
-        appLog('📩 Socket: Raw data received for [$event]: $data', source: 'SOCKET');
-        final listeners = _handlers[event] ?? [];
-        for (var h in List.from(listeners)) {
+      final handlerWrapper = (data) {
+        appLog('📩 Socket: Data received for [$event] WITH DATA: $data', source: 'SOCKET');
+        final listeners = List.from(_handlers[event] ?? []);
+        for (var h in listeners) {
           try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
         }
-      });
+      };
+
+      _socket?.on(event, handlerWrapper);
+      appLog('👂 Socket: Registered core listener for [$event]', source: 'SOCKET');
     }
 
     if (!_handlers[event]!.contains(handler)) {
