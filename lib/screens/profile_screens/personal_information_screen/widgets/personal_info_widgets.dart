@@ -58,11 +58,11 @@ class EditableProfilePhoto extends StatelessWidget {
           const SizedBox(height: 12),
           GestureDetector(
             onTap: onUploadTap,
-            child: CommonText(
+            child:const CommonText(
               text: 'Upload Photo',
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              textColor: const Color(0xFF4DB6FF),
+              textColor: Color(0xFF4DB6FF),
             ),
           ),
         ],

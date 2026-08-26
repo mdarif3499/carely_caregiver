@@ -1,7 +1,6 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class SettingsToggleTile extends StatelessWidget {
   final IconData icon;
@@ -46,7 +45,7 @@ class SettingsToggleTile extends StatelessWidget {
           CupertinoSwitch(
             value: value,
             onChanged: onChanged,
-            activeColor: colors.primary,
+            activeTrackColor: colors.primary,
           ),
         ],
       ),

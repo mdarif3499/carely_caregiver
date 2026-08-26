@@ -72,7 +72,7 @@ class HomeHeaderWidget extends StatelessWidget {
         ),
 
         // Filter icon
-       showFilter? AppIconButton(icon: Icons.tune_rounded, onTap: onFilterTap):SizedBox(),
+       showFilter? AppIconButton(icon: Icons.tune_rounded, onTap: onFilterTap):const SizedBox(),
         const SizedBox(width: 8),
 
         // Notification icon

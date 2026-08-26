@@ -19,6 +19,7 @@ class ChatConversation {
   final int unreadCount;
   final bool isOnline;
   final bool isTyping;
+  final String partnerId;
 
   const ChatConversation({
     required this.id,
@@ -27,6 +28,7 @@ class ChatConversation {
     required this.avatarUrl,
     required this.lastMessage,
     required this.time,
+    required this.partnerId,
     this.unreadCount = 0,
     this.isOnline = false,
     this.isTyping = false,
@@ -42,6 +44,7 @@ class ChatConversation {
     int? unreadCount,
     bool? isOnline,
     bool? isTyping,
+    String? partnerId,
   }) {
     return ChatConversation(
       id: id ?? this.id,
@@ -53,6 +56,7 @@ class ChatConversation {
       unreadCount: unreadCount ?? this.unreadCount,
       isOnline: isOnline ?? this.isOnline,
       isTyping: isTyping ?? this.isTyping,
+      partnerId: partnerId ?? this.partnerId,
     );
   }
 
@@ -100,6 +104,7 @@ class ChatConversation {
       lastMessage: displayMsg,
       time: lastTime,
       unreadCount: unread,
+      partnerId: partner['_id'] ?? partner['id'] ?? '',
       isOnline: json['isActive'] ?? false,
     );
   }
@@ -118,18 +123,28 @@ class ChatListController extends GetxController {
     _setupGlobalSocketListeners();
   }
 
+  void _setupGlobalSocketListeners() {
+    SocketService.on('message:new', _onNewMessageList);
+    SocketService.on('typing:start', _onPartnerTypingStartList);
+    SocketService.on('typing:stop', _onPartnerTypingStopList);
+    SocketService.on('message:delivered', _onMessageStatusUpdateList);
+    SocketService.on('message:seen', _onMessageStatusUpdateList);
+  }
+
+  void _onMessageStatusUpdateList(data) {
+    // When a message is seen or delivered, we should refresh the inbox to update indicators if needed
+    // or just fetch conversations again for absolute accuracy.
+    fetchConversations();
+  }
+
   @override
   void onClose() {
     SocketService.off('message:new', _onNewMessageList);
     SocketService.off('typing:start', _onPartnerTypingStartList);
     SocketService.off('typing:stop', _onPartnerTypingStopList);
+    SocketService.off('message:delivered', _onMessageStatusUpdateList);
+    SocketService.off('message:seen', _onMessageStatusUpdateList);
     super.onClose();
-  }
-
-  void _setupGlobalSocketListeners() {
-    SocketService.on('message:new', _onNewMessageList);
-    SocketService.on('typing:start', _onPartnerTypingStartList);
-    SocketService.on('typing:stop', _onPartnerTypingStopList);
   }
 
   void _onPartnerTypingStartList(data) {
@@ -162,7 +177,6 @@ class ChatListController extends GetxController {
     if (conversationId.isEmpty) return;
 
     final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-    final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
 
     // Find the conversation in our list
     final index = conversations.indexWhere((c) => c.id == conversationId);
@@ -193,16 +207,32 @@ class ChatListController extends GetxController {
         time: DateFormat('hh:mm a').format(DateTime.now()),
         unreadCount: newUnread,
         isOnline: oldConv.isOnline,
+        partnerId: oldConv.partnerId,
       );
 
       // Move to top
       conversations.removeAt(index);
       conversations.insert(0, updatedConv);
       conversations.refresh();
+
+      // Emit Delivered Status globally if message is not from us
+      if (senderId != currentUserId) {
+        final messageId = data['_id'] ?? data['id'] ?? '';
+        _emitDeliveredStatus(conversationId, messageId, currentUserId);
+      }
     } else {
       // It's a new conversation we don't have yet - Refresh list to be safe
       fetchConversations();
     }
+  }
+
+  void _emitDeliveredStatus(String convId, String msgId, String userId) {
+    if (convId.isEmpty || msgId.isEmpty) return;
+    SocketService.emit('message:delivered', {
+      "messageId": msgId,
+      "senderId": userId,
+      "conversationId": convId,
+    });
   }
 
 

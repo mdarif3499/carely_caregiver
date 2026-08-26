@@ -32,10 +32,6 @@ class EditProfessionalProfileController extends GetxController {
     await fetchProfileData();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   // ── Skills ──
   final List<String> allSkills = [

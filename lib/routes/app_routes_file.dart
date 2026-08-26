@@ -10,6 +10,7 @@ import 'package:carely_caregiver/screens/notification_screen/notification_screen
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/basic_info_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/care_recipients_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/all_schedule_screen.dart';
+import 'package:carely_caregiver/screens/cms_screen/cms_content_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/my_booking_screen/client_booking_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/payment/stripe_webview_screen.dart';
@@ -20,7 +21,6 @@ import 'package:carely_caregiver/screens/client_screen/booking_status_screen/boo
 import 'package:get/get.dart';
 import 'package:carely_caregiver/screens/profile_screens/edit_professional_profile_screen/edit_professional_profile_screen.dart';
 import 'package:carely_caregiver/screens/on_boarding_screen/on_boarding_screen.dart';
-import '../screens/about_us_screen/about_us_screen.dart';
 import '../screens/app_navigation_screen/app_navigation_screen.dart';
 import '../screens/auth_all_screens/change_password_screen/change_password_screen.dart';
 import '../screens/auth_all_screens/forgot_screen/forgot_screen.dart';
@@ -28,9 +28,7 @@ import '../screens/auth_all_screens/login_screen/login_screen.dart';
 import '../screens/auth_all_screens/otp_verification_screen/otp_verification_screen.dart';
 import '../screens/auth_all_screens/sign_up_screen/sign_up_screen.dart';
 import '../screens/error_screen/error_screen.dart';
-import '../screens/privacy_policy_screen/privacy_policy_screen.dart';
 import '../screens/splash_screen/splash_screen.dart';
-import '../screens/terms_and_conditions_screen/terms_and_conditions_screen.dart';
 import 'app_routes.dart';
 import 'bindings/auth_binding.dart';
 import 'bindings/care_giver_home_binding.dart';
@@ -153,19 +151,19 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.termsAndConditions,
     binding: ProfileBinding(),
-    page: () => const TermsAndConditionsScreen(),
+    page: () => const CMSContentScreen(title: 'Terms & Conditions', slug: 'terms-and-conditions'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.privacyPolicy,
     binding: ProfileBinding(),
-    page: () => const PrivacyPolicyScreen(),
+    page: () => const CMSContentScreen(title: 'Privacy Policy', slug: 'privacy-policy'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.aboutUs,
     binding: ProfileBinding(),
-    page: () => const AboutUsScreen(),
+    page: () => const CMSContentScreen(title: 'About Us', slug: 'about-us'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(

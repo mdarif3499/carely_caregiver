@@ -26,10 +26,6 @@ class ProfileSetupScreenController extends GetxController {
     fetchCategories();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   // ── Skills ──
   final List<String> allSkills = [

@@ -226,31 +226,55 @@ class MessageScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (hasImage)
-            CommonImage(
-              src: chat.files.first,
-              width: 240,
-              height: 240,
-              fill: BoxFit.cover,
+            Stack(
+              children: [
+                CommonImage(
+                  src: chat.files.first,
+                  width: 240,
+                  height: 240,
+                  fill: BoxFit.cover,
+                ),
+                if (isMe && !hasText)
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: _StatusTicks(status: chat.status),
+                    ),
+                  ),
+              ],
             ),
           
-          Stack(
-            children: [
-              if (hasText)
-                Padding(
-                  padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, 40, 10),
-                  child: ExpandableChatText(
-                    text: chat.content,
-                    isMe: isMe,
+          if (hasText)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, isMe ? 40 : 12, 10),
+                        child: ExpandableChatText(
+                          text: chat.content,
+                          isMe: isMe,
+                        ),
+                      ),
+                      if (isMe)
+                        Positioned(
+                          bottom: 6,
+                          right: 8,
+                          child: _StatusTicks(status: chat.status),
+                        ),
+                    ],
                   ),
                 ),
-              if (isMe)
-                Positioned(
-                  bottom: 6,
-                  right: 8,
-                  child: _StatusTicks(status: chat.status),
-                ),
-            ],
-          ),
+              ],
+            ),
 
           if (chat.isSending || chat.isSendingFailed)
             Padding(
@@ -441,7 +465,7 @@ class _StatusTicks extends StatelessWidget {
     } else if (status == 'DELIVERED') {
       return const Icon(Icons.done_all_rounded, size: 16, color: Colors.white70);
     } else if (status == 'SEEN') {
-      return const Icon(Icons.done_all_rounded, size: 16, color: Color(0xFF4FC3F7)); // Light blue for seen
+      return const Icon(Icons.done_all_rounded, size: 16, color: Color(0xFF00E676)); // Vibrant green for seen
     }
     return const SizedBox.shrink();
   }

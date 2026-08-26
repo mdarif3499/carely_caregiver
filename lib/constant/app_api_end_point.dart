@@ -34,6 +34,7 @@ class AppApiEndPoint {
   static const String earningsSummary = "/earnings/me/summary";
   static const String conversation = "/conversation";
   static const String message = "/message";
+  static const String cms = "/cms";
 
   static String imageUrl(String? path) {
     if (path == null || path.isEmpty) return "";
