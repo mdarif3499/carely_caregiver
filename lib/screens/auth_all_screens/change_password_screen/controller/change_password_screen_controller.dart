@@ -10,6 +10,8 @@ class ChangePasswordScreenController extends GetxController {
   late final TextEditingController newPasswordTextEditingController;
   late final TextEditingController confirmPasswordTextEditingController;
 
+  final RxBool isLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();

@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carely_caregiver/gen/assets.gen.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../utils/app_size.dart';
 import 'controller/login_screen_controller.dart';
@@ -23,235 +24,201 @@ class LoginScreen extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           backgroundColor: AppColors.instance.screenBg,
-          body: FormBuilder(
-            entity: AuthEntity(),
-            builder: (context, formKey, entity) {
-              return SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Obx(
-                          () => Center(
-                            child: Column(
+          body: Obx(
+            () => Skeletonizer(
+              enabled: controller.isLoading.value,
+              child: FormBuilder(
+                entity: AuthEntity(),
+                builder: (context, formKey, entity) {
+                  return SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0.r),
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Column(
+                                children: [
+                                  CommonImage(
+                                    src: Assets.logo.appLogoPng.path,
+                                    height: 70.h,
+                                    width: 124.w,
+                                  ),
+                                  16.height,
+                                  AppPrimaryText(
+                                    isDescription: false,
+                                    text: controller.isSignInPage.value
+                                        ? "Welcome Back!"
+                                        : "Create Caregiver Account",
+                                  ),
+                                  8.height,
+                                  AppSecondaryText(
+                                    textAlign: TextAlign.center,
+                                    text: controller.isSignInPage.value
+                                        ? "Access your dashboard and care plans."
+                                        : "Join our community of healthcare professionals and start providing quality care.",
+                                  ),
+                                ],
+                              ),
+                            ),
+                            38.height,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CommonImage(
-                                  src: Assets.logo.appLogoPng.path,
-                                  height: 70,
-                                  width: 124,
+                                if (!controller.isSignInPage.value)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const AppContentHeader(text: 'Full Name'),
+                                      12.height,
+                                      CommonTextField(
+                                        controller: controller.fullNameTextEditingController,
+                                        validationType: ValidationType.validateRequired,
+                                        hintText: 'Enter your Full Name',
+                                        validation: (value) {
+                                          if (value == null || value.trim().isEmpty) {
+                                            return "Full Name is required";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      16.height,
+                                    ],
+                                  ),
+                                const AppContentHeader(text: 'Email'),
+                                12.height,
+                                CommonTextField(
+                                  controller: controller.emailTextEditingController,
+                                  validationType: ValidationType.validateEmail,
+                                  hintText: 'Enter your email',
+                                  validation: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return "Email is required";
+                                    }
+                                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
+                                      return "Enter a valid email";
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 16.height,
-                                AppPrimaryText(
-                                  isDescription: false,
-                                  text: controller.isSignInPage.value
-                                      ? "Welcome Back!"
-                                      : "Create Caregiver Account",
+                                if (!controller.isSignInPage.value)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const AppContentHeader(text: 'Phone Number'),
+                                      12.height,
+                                      PhoneTextField(
+                                        controller: controller.phoneTextEditingController,
+                                        validator: (value) {
+                                          if (value == null || value.trim().isEmpty) {
+                                            return "Phone number is required";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      16.height,
+                                    ],
+                                  ),
+                                const AppContentHeader(text: 'Password'),
+                                12.height,
+                                CommonTextField(
+                                  controller: controller.passwordTextEditingController,
+                                  validationType: ValidationType.validatePassword,
+                                  hintText: 'Enter your Password',
+                                  validation: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return "Password is required";
+                                    }
+                                    if (value.length < 8) {
+                                      return "Password must be at least 8 characters";
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 8.height,
-                                AppSecondaryText(
-                                  textAlign: TextAlign.center,
-                                  text: controller.isSignInPage.value
-                                      ? "Access your dashboard and care plans."
-                                      : "Join our community of healthcare professionals and start providing quality care.",
+                                if (controller.isSignInPage.value)
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Get.toNamed(AppRoutes.instance.forgotScreen);
+                                      },
+                                      child: CommonText(
+                                        text: 'Forgot Password?',
+                                        textColor: AppColors.instance.error,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16.sp,
+                                      ),
+                                    ),
+                                  ),
+                                32.height,
+                                CommonButton(
+                                  isLoading: controller.isLoading.value,
+                                  onTap: controller.isLoading.value 
+                                    ? null 
+                                    : () {
+                                    if (formKey.currentState!.validate()) {
+                                      if (controller.isSignInPage.value) {
+                                        controller.loginUser();
+                                      } else {
+                                        Get.toNamed(
+                                          AppRoutes.instance.welcomeScreen,
+                                          arguments: {
+                                            "name": controller.fullNameTextEditingController.text.trim(),
+                                            "email": controller.emailTextEditingController.text.trim(),
+                                            "phone": controller.phoneTextEditingController.text.trim(),
+                                            "password": controller.passwordTextEditingController.text,
+                                          },
+                                        );
+                                      }
+                                    }
+                                  },
+                                  titleText: controller.isSignInPage.value ? 'Login' : 'Continue',
+                                  buttonWidth: double.infinity,
+                                  buttonHeight: 54.h,
+                                  buttonRadius: 16.r,
+                                ),
+                                48.height,
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: controller.isSignInPage.value
+                                          ? "Don't have an account?"
+                                          : "Already have an account?",
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        color: AppColors.instance.textPrimary,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: controller.isSignInPage.value ? ' Sign Up' : ' Login',
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: AppColors.instance.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              controller.isSignInPage.value = !controller.isSignInPage.value;
+                                            },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                        38.height,
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Obx(
-                              () => controller.isSignInPage.value
-                                  ? const SizedBox()
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const AppContentHeader(
-                                            text: 'Full Name'),
-                                        12.height,
-                                        CommonTextField(
-                                          controller: controller
-                                              .fullNameTextEditingController,
-                                          validationType:
-                                              ValidationType.validateRequired,
-                                          hintText: 'Enter your Full Name',
-                                          validation: (value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Full Name is required";
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                        16.height,
-                                      ],
-                                    ),
-                            ),
-                            const AppContentHeader(text: 'Email'),
-                            12.height,
-                            CommonTextField(
-                              controller: controller.emailTextEditingController,
-                              validationType: ValidationType.validateEmail,
-                              hintText: 'Enter your email',
-                              validation: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return "Email is required";
-                                }
-                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$')
-                                    .hasMatch(value)) {
-                                  return "Enter a valid email";
-                                }
-                                return null;
-                              },
-                            ),
-                            16.height,
-                            Obx(
-                              () => controller.isSignInPage.value
-                                  ? const SizedBox()
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const AppContentHeader(
-                                            text: 'Phone Number'),
-                                        12.height,
-                                        PhoneTextField(
-                                          controller: controller
-                                              .phoneTextEditingController,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return "Phone number is required";
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                        16.height,
-                                      ],
-                                    ),
-                            ),
-                            const AppContentHeader(text: 'Password'),
-                            12.height,
-                            CommonTextField(
-                              controller:
-                                  controller.passwordTextEditingController,
-                              validationType: ValidationType.validatePassword,
-                              hintText: 'Enter your Password',
-                              validation: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return "Password is required";
-                                }
-                                if (value.length < 8) {
-                                  return "Password must be at least 8 characters";
-                                }
-                                return null;
-                              },
-                            ),
-                            8.height,
-                            Obx(
-                              () => controller.isSignInPage.value
-                                  ? Align(
-                                      alignment: Alignment.centerRight,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Get.toNamed(
-                                              AppRoutes.instance.forgotScreen);
-                                        },
-                                        child: CommonText(
-                                          text: 'Forgot Password?',
-                                          textColor: AppColors.instance.error,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                            ),
-                            32.height,
-                            Obx(
-                              () => CommonButton(
-                                isLoading: controller.isLoading.value,
-                                onTap: controller.isLoading.value 
-                                  ? null 
-                                  : () {
-                                  if (formKey.currentState!.validate()) {
-                                    if (controller.isSignInPage.value) {
-                                      controller.loginUser();
-                                    } else {
-                                      Get.toNamed(
-                                        AppRoutes.instance.welcomeScreen,
-                                        arguments: {
-                                          "name": controller
-                                              .fullNameTextEditingController
-                                              .text
-                                              .trim(),
-                                          "email": controller
-                                              .emailTextEditingController.text
-                                              .trim(),
-                                          "phone": controller
-                                              .phoneTextEditingController.text
-                                              .trim(),
-                                          "password": controller
-                                              .passwordTextEditingController
-                                              .text,
-                                        },
-                                      );
-                                    }
-                                  }
-                                },
-                                titleText: controller.isSignInPage.value
-                                    ? 'Login'
-                                    : 'Continue',
-                                buttonWidth: double.infinity,
-                              ),
-                            ),
-                            48.height,
-                            Obx(
-                              () => Align(
-                                alignment: Alignment.center,
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: controller.isSignInPage.value
-                                        ? "Don't have an account?"
-                                        : "Already have an account?",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.instance.textPrimary,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: controller.isSignInPage.value
-                                            ? ' Sign Up'
-                                            : ' Login',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.instance.primary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            controller.isSignInPage.value =
-                                                !controller.isSignInPage.value;
-                                          },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
         );
       },

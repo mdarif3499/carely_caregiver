@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../services/socket/socket_service.dart';
+import '../../../utils/log/app_log.dart';
 
 // ── Model ─────────────────────────────────────────────
 class ChatConversation {
@@ -72,7 +73,7 @@ class ChatConversation {
     String lastTime = "";
     try {
       if (json['lastMessageAt'] != null) {
-        final dt = DateTime.parse(json['lastMessageAt']);
+        final dt = DateTime.parse(json['lastMessageAt']).toLocal();
         lastTime = DateFormat('hh:mm a').format(dt);
       }
     } catch (_) {}
@@ -119,8 +120,21 @@ class ChatListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholders();
     fetchConversations();
     _setupGlobalSocketListeners();
+  }
+
+  void _setPlaceholders() {
+    conversations.value = List.generate(5, (index) => ChatConversation(
+      id: 'placeholder_$index',
+      name: 'User Name',
+      role: 'Role',
+      avatarUrl: '',
+      lastMessage: 'This is a long placeholder message for shimmering...',
+      time: '12:00 PM',
+      partnerId: '',
+    ));
   }
 
   void _setupGlobalSocketListeners() {
@@ -129,6 +143,26 @@ class ChatListController extends GetxController {
     SocketService.on('typing:stop', _onPartnerTypingStopList);
     SocketService.on('message:delivered', _onMessageStatusUpdateList);
     SocketService.on('message:seen', _onMessageStatusUpdateList);
+    SocketService.on('conversation:updated', _onConversationUpdated);
+  }
+
+  void _onConversationUpdated(data) async {
+    if (data == null) return;
+    appLog("CONVERSATION UPDATED RECEIVED: $data", source: "CHAT");
+    
+    final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+    
+    final updatedConv = ChatConversation.fromJson(data, currentUserId, currentUserRole);
+    
+    final index = conversations.indexWhere((c) => c.id == updatedConv.id);
+    if (index != -1) {
+      conversations.removeAt(index);
+      conversations.insert(0, updatedConv);
+    } else {
+      conversations.insert(0, updatedConv);
+    }
+    conversations.refresh();
   }
 
   void _onMessageStatusUpdateList(data) {
@@ -144,6 +178,7 @@ class ChatListController extends GetxController {
     SocketService.off('typing:stop', _onPartnerTypingStopList);
     SocketService.off('message:delivered', _onMessageStatusUpdateList);
     SocketService.off('message:seen', _onMessageStatusUpdateList);
+    SocketService.off('conversation:updated', _onConversationUpdated);
     super.onClose();
   }
 

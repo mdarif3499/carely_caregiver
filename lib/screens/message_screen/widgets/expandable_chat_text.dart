@@ -20,8 +20,8 @@ class _ExpandableChatTextState extends State<ExpandableChatText> {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = widget.isMe ? Colors.white : Colors.black87;
-    final linkColor = widget.isMe ? Colors.white.withAlpha(200) : Colors.blue.shade700;
+    const textColor = Colors.black87; // Dark text for both light backgrounds
+    final linkColor = widget.isMe ? Colors.blueGrey.shade700 : Colors.blue.shade700;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

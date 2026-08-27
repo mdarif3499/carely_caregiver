@@ -5,6 +5,7 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../app_navigation_screen/controller/app_navigation_screen_controller.dart';
 
@@ -63,96 +64,94 @@ class ClientHomeScreen extends StatelessWidget {
 
             ///
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Obx(
-              () {
-                if (controller.isBookingsLoading.value && controller.upcomingBookings.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                
-                if (controller.upcomingBookings.isEmpty) {
-                  return Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 32),
-                    decoration: BoxDecoration(
-                      color: colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: colors.boxBg),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(Icons.calendar_today_outlined, size: 40, color: Colors.grey.shade300),
-                        const SizedBox(height: 12),
-                        const CommonText(
-                          text: 'No bookings for today.',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          textColor: Colors.grey,
+              () => Skeletonizer(
+                enabled: controller.isBookingsLoading.value,
+                child: controller.upcomingBookings.isEmpty && !controller.isBookingsLoading.value
+                    ? Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 32.h),
+                        decoration: BoxDecoration(
+                          color: colors.white,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: colors.boxBg),
                         ),
-                      ],
-                    ),
-                  );
-                }
-
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: controller.upcomingBookings.map((booking) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: ClientUpcomingBookingCard(
-                          booking: booking,
-                          onViewDetails: controller.onViewDetails,
-                          onChat: () {},
+                        child: Column(
+                          children: [
+                            Icon(Icons.calendar_today_outlined, size: 40.sp, color: Colors.grey.shade300),
+                            SizedBox(height: 12.h),
+                            CommonText(
+                              text: 'No bookings for today.',
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              textColor: Colors.grey,
+                            ),
+                          ],
                         ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              },
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: controller.upcomingBookings.map((booking) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 16.w),
+                              child: ClientUpcomingBookingCard(
+                                booking: booking,
+                                onViewDetails: () => controller.onViewDetails(booking.id),
+                                onChat: () {},
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+              ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32.h),
 
             // ── Recent Activity ──
-            const CommonText(
+            CommonText(
               text: 'Recent Activity',
-              fontSize: 20,
+              fontSize: 20.sp,
               fontWeight: FontWeight.w700,
             ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(5),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+            SizedBox(height: 20.h),
+            Obx(
+              () => Skeletonizer(
+                enabled: controller.isBookingsLoading.value,
+                child: Container(
+                  padding: EdgeInsets.all(20.r),
+                  decoration: BoxDecoration(
+                    color: colors.white,
+                    borderRadius: BorderRadius.circular(24.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(5),
+                        blurRadius: 10.r,
+                        offset: Offset(0, 4.h),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Obx(
-                () => Column(
-                  children: List.generate(controller.recentActivities.length, (index) {
-                    final activity = controller.recentActivities[index];
-                    final isLast = index == controller.recentActivities.length - 1;
-                    return Column(
-                      children: [
-                        ClientActivityItem(activity: activity),
-                        if (!isLast)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: Divider(color: colors.boxBg, height: 1),
-                          ),
-                      ],
-                    );
-                  }),
+                  child: Column(
+                    children: List.generate(controller.recentActivities.length, (index) {
+                      final activity = controller.recentActivities[index];
+                      final isLast = index == controller.recentActivities.length - 1;
+                      return Column(
+                        children: [
+                          ClientActivityItem(activity: activity),
+                          if (!isLast)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 20.h),
+                              child: Divider(color: colors.boxBg, height: 1.h),
+                            ),
+                        ],
+                      );
+                    }),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
           ],
         ),
       ),

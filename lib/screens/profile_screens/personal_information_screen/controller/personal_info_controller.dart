@@ -20,7 +20,7 @@ class PersonalInfoController extends GetxController {
   @override
   void onInit() {
     final user = profileController.userModel.value;
-    if (user != null) {
+    if (user != null && user.id != 'placeholder') {
       nameController.text = user.name;
       emailController.text = user.email;
       phoneController.text = user.phone;

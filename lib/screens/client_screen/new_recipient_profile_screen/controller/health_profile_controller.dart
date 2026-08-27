@@ -11,6 +11,14 @@ class HealthProfileController extends GetxController {
   final Rxn<String> selectedRelationship = Rxn<String>();
   final RxBool isLoading = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Shimmer template
+    nameController.text = "Recipient Name";
+    selectedRelationship.value = relationships.first;
+  }
+
   final List<String> relationships = [
     'Parent',
     'Spouse',

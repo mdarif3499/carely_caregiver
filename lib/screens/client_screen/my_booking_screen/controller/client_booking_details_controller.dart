@@ -15,12 +15,35 @@ class ClientBookingDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholder();
     final String? bookingId = Get.arguments;
     if (bookingId != null) {
       fetchBookingDetails(bookingId);
     } else {
       showCustomSnackbar(message: "Invalid booking ID", isError: true);
     }
+  }
+
+  void _setPlaceholder() {
+    booking.value = CareGiverScheduleModel(
+      id: 'placeholder',
+      clientId: '',
+      clientName: 'Client Name',
+      clientAvatar: '',
+      caregiverId: '',
+      caregiverName: 'Caregiver Name',
+      caregiverAvatar: '',
+      recipientName: 'Recipient',
+      relationship: 'Family',
+      serviceName: 'General Care',
+      date: '2026-08-27',
+      shift: 'MORNING',
+      startTime: '09:00',
+      endTime: '11:00',
+      status: 'PENDING',
+      amount: 0.0,
+      instructions: 'Placeholder instructions for shimmering shimmer effect.',
+    );
   }
 
   Future<void> fetchBookingDetails(String id) async {

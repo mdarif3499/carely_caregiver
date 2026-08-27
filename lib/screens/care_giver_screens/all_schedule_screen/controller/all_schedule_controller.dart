@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../routes/app_routes.dart';
+
 class AllScheduleController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxList<CareGiverScheduleModel> schedules = <CareGiverScheduleModel>[].obs;
@@ -14,7 +16,30 @@ class AllScheduleController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholders();
     fetchSchedules();
+  }
+
+  void _setPlaceholders() {
+    schedules.value = List.generate(5, (index) => CareGiverScheduleModel(
+      id: 'placeholder_$index',
+      clientId: '',
+      clientName: 'Client Name',
+      clientAvatar: '',
+      caregiverId: '',
+      caregiverName: 'Caregiver Name',
+      caregiverAvatar: '',
+      recipientName: 'Recipient',
+      relationship: 'Family',
+      serviceName: 'General Care',
+      date: '2026-08-27',
+      shift: 'MORNING',
+      startTime: '09:00',
+      endTime: '11:00',
+      status: 'PENDING',
+      amount: 0.0,
+      instructions: '',
+    ));
   }
 
   Future<void> fetchSchedules() async {
@@ -44,4 +69,12 @@ class AllScheduleController extends GetxController {
   }
 
   void onRefresh() => fetchSchedules();
+
+  void onViewDetails(CareGiverScheduleModel item) {
+    if (selectedAppUserType == AppUserType.caregiver) {
+      Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
+    } else {
+      Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: item.id);
+    }
+  }
 }

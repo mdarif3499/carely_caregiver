@@ -4,6 +4,7 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
   const BookingDetailsScreen({super.key});
@@ -15,44 +16,42 @@ class BookingDetailsScreen extends StatelessWidget {
     return DefaultBackgroundTemplate(
       appBarTitle: 'Booking Details',
       child: Obx(() {
-        if (ctrl.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final BookingDetails? b = ctrl.booking.value;
-        if (b == null) {
-          return const Center(child: CommonText(text: 'Booking not found'));
-        }
-
-        return Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        final b = ctrl.booking.value;
+        
+        return Skeletonizer(
+          enabled: ctrl.isLoading.value,
+          child: b == null && !ctrl.isLoading.value
+              ? const Center(child: CommonText(text: 'Booking not found'))
+              : Column(
                   children: [
-                    ClientProfileHeader(booking: b),
-                    20.height,
-                    ScheduleEarningsCard(booking: b),
-                    20.height,
-                    AdditionalInstructionsCard(
-                      instructions: b.instructions,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(16.r),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClientProfileHeader(booking: b!),
+                            20.height,
+                            ScheduleEarningsCard(booking: b),
+                            20.height,
+                            AdditionalInstructionsCard(
+                              instructions: b.instructions,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(16.r),
+                      child: BookingDetailActions(
+                        isLoading: ctrl.isActionLoading.value,
+                        status: b.status,
+                        onAccept: ctrl.accept,
+                        onDecline: ctrl.decline,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: BookingDetailActions(
-                isLoading: ctrl.isActionLoading.value,
-                status: b.status,
-                onAccept: ctrl.accept,
-                onDecline: ctrl.decline,
-              ),
-            ),
-          ],
         );
       }),
     );

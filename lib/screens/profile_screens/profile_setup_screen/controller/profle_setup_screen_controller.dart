@@ -15,15 +15,25 @@ class ProfileSetupScreenController extends GetxController {
   late final TextEditingController stateController;
   late final TextEditingController countryController;
 
+  final RxBool isLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholder();
     bioController = TextEditingController();
     hourlyRateController = TextEditingController();
     cityController = TextEditingController();
     stateController = TextEditingController();
     countryController = TextEditingController();
     fetchCategories();
+  }
+
+  void _setPlaceholder() {
+    // Shimmer template data
+    if (categories.isEmpty) {
+      categories.value = List.generate(4, (index) => CategoryModel(id: 'p$index', name: 'Specialty $index', description: ''));
+    }
   }
 
 

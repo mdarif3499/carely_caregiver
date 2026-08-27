@@ -6,6 +6,7 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../constant/app_colors.dart';
 
@@ -28,18 +29,21 @@ class CareGiverHomeScreen extends StatelessWidget {
       ),
       hideBackButton: true,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Weekly Earnings Chart Card ───────────────
             Obx(
-              () => WeeklyEarningsChartCard(
-                totalEarnings: c.totalWeeklyEarnings.value,
-                bars: c.weeklyBars.toList(),
+              () => Skeletonizer(
+                enabled: c.isEarningsLoading.value,
+                child: WeeklyEarningsChartCard(
+                  totalEarnings: c.totalWeeklyEarnings.value,
+                  bars: c.weeklyBars.toList(),
+                ),
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32.h),
 
             // ── Today's Schedule Section ────────────────
             Row(
@@ -47,7 +51,7 @@ class CareGiverHomeScreen extends StatelessWidget {
               children: [
                 CommonText(
                   text: "Today's Schedule",
-                  fontSize: 20,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.w700,
                   textColor: colors.textPrimary,
                 ),
@@ -55,25 +59,28 @@ class CareGiverHomeScreen extends StatelessWidget {
                   onTap: c.onSeeAllSchedule,
                   child: CommonText(
                     text: 'See All',
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                     textColor: colors.secondaryColor,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Obx(
-              () => Column(
-                children: c.todaySchedule
-                    .map((item) => CareGiverScheduleCard(
-                          item: item,
-                          onTap: () => c.onViewDetails(item),
-                        ))
-                    .toList(),
+              () => Skeletonizer(
+                enabled: c.isLoading.value,
+                child: Column(
+                  children: c.todaySchedule
+                      .map((item) => CareGiverScheduleCard(
+                            item: item,
+                            onTap: () => c.onViewDetails(item),
+                          ))
+                      .toList(),
+                ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
           ],
         ),
       ),

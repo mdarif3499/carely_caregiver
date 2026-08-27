@@ -1,6 +1,7 @@
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../routes/app_routes.dart';
@@ -19,102 +20,105 @@ class OtpVerificationScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSize.width(value: 24)),
-                child: Column(
-                  children: [
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () => Get.back(),
-                        child: Container(
-                          padding: EdgeInsets.all(AppSize.width(value: 10)),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFA53200).withValues(alpha: 0.08),
-                          ),
-                          child: Icon(
-                            Icons.arrow_back_ios_new,
-                            size: 16.sp,
-                            color: const Color(0xFFA53200),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40.h),
-                    const CommonText(
-                      text: 'OTP Verification',
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                      textAlign: TextAlign.center,
-                      textColor: Color(0xFF333333),
-                    ),
-                    SizedBox(height: 6.h),
-                    Obx(() => CommonText(
-                          text:
-                              'Please enter the 6-digit code sent to your\n${controller.type.value}.',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          textColor: const Color(0xFF6A7282),
-                          textAlign: TextAlign.center,
-                        )),
-                    SizedBox(height: 8.h),
-                    Obx(() => CommonText(
-                          text: controller.maskedIdentity,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          textColor: const Color(0xFF333333),
-                          textAlign: TextAlign.center,
-                        )),
-                    SizedBox(height: 40.h),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+            child: Obx(
+              () => Skeletonizer(
+                enabled: controller.isLoading.value,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Column(
                       children: [
-                        const CommonText(
-                          text: 'OTP Code',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          textColor: Color(0xFF333333),
-                        ),
-                        12.height,
+                        SizedBox(height: 20.h),
                         Align(
-                          alignment: Alignment.center,
-                          child: MaterialPinField(
-                            length: 6,
-                            pinController: controller.pinController,
-                            onChanged: (value) {},
-                            onCompleted: (value) {
-                          controller.checkOtpFunction(
-                            onSuccess: () =>
-                                _showSuccessDialog(context, controller),
-                          );
-                        },
-
-                            theme: MaterialPinTheme(
-                              shape: MaterialPinShape.outlined,
-                              borderRadius: BorderRadius.circular(8.r),
-                              cellSize: Size(45.w, 50.h),
-                              spacing: 6.w,
-                              borderColor: const Color(0xFFF2F2F2),
-                              focusedBorderColor: const Color(0xFFA53200),
-                              filledBorderColor: const Color(0xFFF2F2F2),
-                              fillColor: const Color(0xFFF2F2F2),
-                              focusedFillColor: const Color(0xFFF2F2F2),
-                              filledFillColor: Colors.white,
-                              textStyle: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                          alignment: Alignment.centerLeft,
+                          child: GestureDetector(
+                            onTap: () => Get.back(),
+                            child: Container(
+                              padding: EdgeInsets.all(10.r),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xFFA53200).withValues(alpha: 0.08),
+                              ),
+                              child: Icon(
+                                Icons.arrow_back_ios_new,
+                                size: 16.sp,
+                                color: const Color(0xFFA53200),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 45.h),
-                    Obx(() => CommonButton(
+                        SizedBox(height: 40.h),
+                        CommonText(
+                          text: 'OTP Verification',
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w500,
+                          textAlign: TextAlign.center,
+                          textColor: const Color(0xFF333333),
+                        ),
+                        SizedBox(height: 6.h),
+                        CommonText(
+                          text:
+                              'Please enter the 6-digit code sent to your\n${controller.type.value}.',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          textColor: const Color(0xFF6A7282),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 8.h),
+                        CommonText(
+                          text: controller.maskedIdentity,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          textColor: const Color(0xFF333333),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 40.h),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CommonText(
+                              text: 'OTP Code',
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                              textColor: const Color(0xFF333333),
+                            ),
+                            12.height,
+                            Align(
+                              alignment: Alignment.center,
+                              child: MaterialPinField(
+                                length: 6,
+                                pinController: controller.pinController,
+                                onChanged: (value) {},
+                                onCompleted: (value) {
+                              controller.checkOtpFunction(
+                                onSuccess: () =>
+                                    _showSuccessDialog(context, controller),
+                              );
+                            },
+
+                                theme: MaterialPinTheme(
+                                  shape: MaterialPinShape.outlined,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  cellSize: Size(45.w, 50.h),
+                                  spacing: 6.w,
+                                  borderColor: const Color(0xFFF2F2F2),
+                                  focusedBorderColor: const Color(0xFFA53200),
+                                  filledBorderColor: const Color(0xFFF2F2F2),
+                                  fillColor: const Color(0xFFF2F2F2),
+                                  focusedFillColor: const Color(0xFFF2F2F2),
+                                  filledFillColor: Colors.white,
+                                  textStyle: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 45.h),
+                        CommonButton(
                           isLoading: controller.isLoading.value,
                           buttonColor: Colors.black,
                           titleText: 'Verify',
@@ -126,22 +130,24 @@ class OtpVerificationScreen extends StatelessWidget {
                             }
                           },
                           buttonWidth: double.infinity,
-                        )),
-                    SizedBox(height: 12.h),
-                    const CommonText(
-                      text: "Don't receive the code?",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      textColor: Color(0xFF333333),
-                    ),
-                    SizedBox(height: 12.h),
-                    Obx(() => Row(
+                          buttonHeight: 54.h,
+                          buttonRadius: 14.r,
+                        ),
+                        SizedBox(height: 12.h),
+                        CommonText(
+                          text: "Don't receive the code?",
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                          textColor: const Color(0xFF333333),
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: AppSize.width(value: 16),
-                                vertical: AppSize.height(value: 8),
+                                horizontal: 16.w,
+                                vertical: 8.h,
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFf0ded7),
@@ -152,9 +158,9 @@ class OtpVerificationScreen extends StatelessWidget {
                                   _timerBox(controller.minutes, 'minutes'),
                                   Container(
                                     margin: EdgeInsets.symmetric(
-                                        horizontal: AppSize.width(value: 8)),
+                                        horizontal: 8.w),
                                     height: 30.h,
-                                    width: 2,
+                                    width: 2.w,
                                     color: Colors.white,
                                   ),
                                   _timerBox(controller.seconds, 'seconds'),
@@ -175,7 +181,7 @@ class OtpVerificationScreen extends StatelessWidget {
                                         : null,
                                     child: CommonText(
                                       text: 'Resend',
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w600,
                                       textColor: controller.canResend.value
                                           ? const Color(0xFFA53200)
@@ -183,8 +189,10 @@ class OtpVerificationScreen extends StatelessWidget {
                                     ),
                                   ),
                           ],
-                        )),
-                  ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
