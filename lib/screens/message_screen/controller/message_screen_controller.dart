@@ -30,6 +30,7 @@ class MessageScreenController extends GetxController{
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholders();
     messageTextController = TextEditingController()
       ..addListener(() {
         onTextChanged(messageTextController?.text ?? '');
@@ -42,8 +43,28 @@ class MessageScreenController extends GetxController{
     }
   }
 
+  void _setPlaceholders() {
+    chats.value = List.generate(10, (index) => ChatMessage(
+      messageId: 'placeholder_$index',
+      content: index % 2 == 0 
+          ? 'Short placeholder.' 
+          : 'This is a longer placeholder message to simulate a conversation flow with shimmer effect.',
+      userId: index % 2 == 0 ? userId : 'other',
+      userName: index % 2 == 0 ? 'Me' : 'Partner',
+      userImage: '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isSending: false,
+      isSendingFailed: false,
+      files: [],
+      status: 'SENT',
+    ));
+  }
+
   Future<void> _initUserIdAndData() async {
     userId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    // Refresh placeholders with the actual userId to maintain correct alignment during shimmer
+    _setPlaceholders(); 
     await fetchConversationDetails();
     await fetchMessages();
     _setupSocketListeners();

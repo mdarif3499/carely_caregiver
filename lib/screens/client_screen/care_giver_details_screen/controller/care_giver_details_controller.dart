@@ -1,7 +1,7 @@
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/model/care_giver_profile_model.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -30,18 +30,40 @@ class CareGiverDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final String? caregiverId = Get.arguments;
-    if (caregiverId != null) {
-      fetchCaregiverProfile(caregiverId);
-    } else {
-      showCustomSnackbar(message: "Invalid caregiver ID", isError: true);
-    }
+    _setPlaceholder();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final String? caregiverId = Get.arguments;
+      if (caregiverId != null) {
+        fetchCaregiverProfile(caregiverId);
+      } else {
+        showCustomSnackbar(message: "Invalid caregiver ID", isError: true);
+      }
+    });
+  }
+
+  void _setPlaceholder() {
+    caregiverProfile.value = CareGiverProfileModel(
+      id: 'placeholder',
+      name: 'Caregiver Name',
+      profileImage: '',
+      averageRating: 0.0,
+      experience: 0,
+      skills: ['Skill 1', 'Skill 2'],
+      specialties: ['Specialty 1'],
+      totalReviews: 0,
+      verifiedBadge: true,
+      bio: 'This is a placeholder bio for skeletonizer shimmer effect.',
+      city: 'City',
+      state: 'State',
+      hourlyRate: 0.0,
+      availability: [],
+    );
+    _generateWeekAvailability();
   }
 
   Future<void> fetchCaregiverProfile(String id) async {
     try {
       isLoading.value = true;
-      update();
 
       final response = await ClientRepository.instance.getCaregiverProfile(id);
 
@@ -55,7 +77,6 @@ class CareGiverDetailsController extends GetxController {
       debugPrint("Error fetching caregiver profile: $e");
     } finally {
       isLoading.value = false;
-      update();
     }
   }
 

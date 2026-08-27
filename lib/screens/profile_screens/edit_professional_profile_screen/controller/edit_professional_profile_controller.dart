@@ -19,12 +19,21 @@ class EditProfessionalProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholder();
     bioController = TextEditingController();
     hourlyRateController = TextEditingController();
     cityController = TextEditingController();
     stateController = TextEditingController();
     countryController = TextEditingController();
     initData();
+  }
+
+  void _setPlaceholder() {
+    // We don't need much data here for skeletonizer as the screen uses Obx
+    // but having some default categories/skills helps the grid shimmer correctly
+    if (categories.isEmpty) {
+      categories.value = List.generate(4, (index) => CategoryModel(id: 'p$index', name: 'Specialty $index', description: ''));
+    }
   }
 
   Future<void> initData() async {

@@ -16,67 +16,60 @@ class ClientProfileHeader extends StatelessWidget {
         Stack(
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 80.w,
+              height: 80.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: colors.primary.withAlpha(50), width: 2),
+                border: Border.all(color: colors.primary.withAlpha(50), width: 2.w),
               ),
               child: ClipOval(
-
-
                 child: CommonImage(
                   src: booking.avatarUrl,
                   fill: BoxFit.cover,
                 ),
-
-
               ),
             ),
-
             Positioned(
               right: 0,
               bottom: 0,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: EdgeInsets.all(4.r),
                 decoration: BoxDecoration(
                   color: Colors.green,
                   shape: BoxShape.circle,
-                  border: Border.all(color: colors.white, width: 2),
+                  border: Border.all(color: colors.white, width: 2.w),
                 ),
-                child: const Icon(Icons.check, size: 12, color: Colors.white),
+                child: Icon(Icons.check, size: 12.sp, color: Colors.white),
               ),
             ),
-
           ],
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16.w),
         Expanded(
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CommonText(
                 text: booking.clientName,
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.w700,
                 textColor: colors.textPrimary,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.h),
               CommonText(
                 text: '${booking.recipientName} (${booking.relationship})',
-                fontSize: 14,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
                 textColor: colors.primary,
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6.h),
               Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Colors.amber, size: 18),
-                  const SizedBox(width: 4),
+                  Icon(Icons.info_outline, color: Colors.amber, size: 18.sp),
+                  SizedBox(width: 4.w),
                   CommonText(
                     text: 'Status: ${booking.status}',
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                     textColor: colors.secondaryText,
                   ),
@@ -84,8 +77,6 @@ class ClientProfileHeader extends StatelessWidget {
               ),
             ],
           ),
-
-
         ),
       ],
     );
@@ -101,10 +92,10 @@ class ScheduleEarningsCard extends StatelessWidget {
     final colors = AppColors.instance;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: colors.boxBg),
       ),
       child: Column(
@@ -117,14 +108,14 @@ class ScheduleEarningsCard extends StatelessWidget {
                 children: [
                   CommonText(
                     text: 'SCHEDULE',
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                     textColor: colors.secondaryText,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   CommonText(
                     text: booking.formattedDate,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
                     textColor: colors.textPrimary,
                   ),
@@ -135,14 +126,14 @@ class ScheduleEarningsCard extends StatelessWidget {
                 children: [
                   CommonText(
                     text: 'EARNINGS',
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                     textColor: colors.secondaryText,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   CommonText(
                     text: '\$${booking.earnings.toStringAsFixed(2)}',
-                    fontSize: 20,
+                    fontSize: 20.sp,
                     fontWeight: FontWeight.w700,
                     textColor: colors.secondaryColor,
                   ),
@@ -150,43 +141,43 @@ class ScheduleEarningsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Align(
             alignment: Alignment.centerLeft,
             child: CommonText(
               text: booking.timeRange,
-              fontSize: 14,
+              fontSize: 14.sp,
               fontWeight: FontWeight.w400,
               textColor: colors.secondaryText,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Divider(color: colors.boxBg),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10.r),
                 decoration: BoxDecoration(
                   color: colors.primary.withAlpha(20),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(Icons.business_center_outlined, color: colors.primary, size: 20),
+                child: Icon(Icons.business_center_outlined, color: colors.primary, size: 20.sp),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CommonText(
                       text: booking.serviceName,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       textColor: colors.textPrimary,
                     ),
                     CommonText(
-                      text: 'Service ID: #${booking.id.substring(booking.id.length - 6).toUpperCase()}',
-                      fontSize: 12,
+                      text: 'Service ID: #${booking.id.length > 6 ? booking.id.substring(booking.id.length - 6).toUpperCase() : booking.id}',
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
                       textColor: colors.secondaryText,
                     ),
@@ -212,33 +203,33 @@ class AdditionalInstructionsCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const CommonText(
+        CommonText(
           text: 'Additional Instructions',
-          fontSize: 18,
+          fontSize: 18.sp,
           fontWeight: FontWeight.w700,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.r),
           decoration: BoxDecoration(
             color: colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(24.r),
             border: Border.all(color: colors.boxBg),
           ),
           child: Stack(
             children: [
               CommonText(
                 text: instructions.isEmpty ? 'No instructions provided.' : instructions,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 textColor: colors.textPrimary,
                 textAlign: TextAlign.start,
               ),
               Positioned(
-                bottom: -10,
-                right: -10,
-                child: Icon(Icons.format_quote_rounded, color: colors.boxBg, size: 40),
+                bottom: -10.h,
+                right: -10.w,
+                child: Icon(Icons.format_quote_rounded, color: colors.boxBg, size: 40.sp),
               ),
             ],
           ),
@@ -280,7 +271,7 @@ class BookingDetailActions extends StatelessWidget {
             onTap: isLoading ? null : onAccept,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         SizedBox(
           width: double.infinity,
           child: CommonButton(

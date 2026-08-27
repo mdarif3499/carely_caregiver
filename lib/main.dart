@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +12,12 @@ Future<void> main() async {
   //////////////  flutter binding initialize
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
+
   ///////////// internet connectivity status check
-  await ConnectivityService().initConnectivity();
+  // ConnectivityService is initialized via InitialBinding in GetMaterialApp,
+  // we don't need to await it here to avoid blocking the app launch.
+  ConnectivityService(); 
+
   ///////////// devices orientation set
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   //////////// app navigation style set
@@ -20,8 +25,8 @@ Future<void> main() async {
     SystemUiOverlayStyle(systemNavigationBarColor: AppColors.instance.transparent, statusBarColor: AppColors.instance.transparent, systemNavigationBarDividerColor: Colors.transparent),
   );
 
-  // Initialize Socket connection early
-  SocketService.connect();
+  // Initialize Socket connection early in background
+  unawaited(SocketService.connect());
 
   /////////  flutter main widget call
 

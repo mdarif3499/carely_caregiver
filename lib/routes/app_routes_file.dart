@@ -1,5 +1,6 @@
 import 'package:carely_caregiver/screens/auth_all_screens/welcome_screen/welcome_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/availability_screen/availability_screen.dart';
+import 'package:carely_caregiver/screens/profile_screens/caregiver_documents_screen/caregiver_documents_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/booking_details_screen/booking_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/book_caregiver_screen/book_caregiver_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/care_giver_details_screen.dart';
@@ -10,6 +11,7 @@ import 'package:carely_caregiver/screens/notification_screen/notification_screen
 import 'package:carely_caregiver/screens/profile_screens/basic_info_screen/basic_info_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_recipients_screen/care_recipients_screen.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/all_schedule_screen.dart';
+import 'package:carely_caregiver/screens/message_screen/full_screen_image_screen.dart';
 import 'package:carely_caregiver/screens/cms_screen/cms_content_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/my_booking_screen/client_booking_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
@@ -151,7 +153,7 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.termsAndConditions,
     binding: ProfileBinding(),
-    page: () => const CMSContentScreen(title: 'Terms & Conditions', slug: 'terms-and-conditions'),
+    page: () => const CMSContentScreen(title: 'Terms of Service', slug: 'terms-of-service'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
@@ -211,6 +213,12 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   ),
 
   GetPage(
+    name: AppRoutes.instance.fullScreenImage,
+    page: () => const FullScreenImageScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+
+  GetPage(
     name: AppRoutes.instance.messageScreen,
     binding: MessageBinding(),
     page: () => const MessageScreen(),
@@ -235,6 +243,12 @@ List<GetPage> appRootRoutesFile = <GetPage>[
     name: AppRoutes.instance.availabilityScreen,
     binding: CareGiverHomeBinding(),
     page: () => const AvailabilityScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+
+  GetPage(
+    name: AppRoutes.instance.caregiverDocumentsScreen,
+    page: () => const CaregiverDocumentsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 

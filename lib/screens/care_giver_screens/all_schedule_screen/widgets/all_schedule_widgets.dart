@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 
 class ScheduleDetailCard extends StatelessWidget {
   final CareGiverScheduleModel item;
-  const ScheduleDetailCard({super.key, required this.item});
+  final VoidCallback? onTap;
+  const ScheduleDetailCard({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -17,94 +18,97 @@ class ScheduleDetailCard extends StatelessWidget {
     final displayAvatar = isCaregiver ? item.clientAvatar : item.caregiverAvatar;
     final displayRole = isCaregiver ? 'Client' : 'Caregiver';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(8),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CommonImage(
-                  src: displayAvatar,
-                  height: 50,
-                  width: 50,
-                  fill: BoxFit.cover,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(8),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CommonImage(
+                    src: displayAvatar,
+                    height: 50,
+                    width: 50,
+                    fill: BoxFit.cover,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CommonText(
-                      text: displayName,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      textColor: colors.textPrimary,
-                    ),
-                    CommonText(
-                      text: displayRole,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      textColor: colors.secondaryText,
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CommonText(
+                        text: displayName,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        textColor: colors.textPrimary,
+                      ),
+                      CommonText(
+                        text: displayRole,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        textColor: colors.secondaryText,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              _StatusBadge(status: item.status),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Divider(height: 1, color: colors.boxBg),
-          const SizedBox(height: 16),
-          _InfoRow(
-            icon: Icons.person_outline_rounded,
-            label: 'Recipient:',
-            value: '${item.recipientName} (${item.relationship})',
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.medical_services_outlined,
-            label: 'Service:',
-            value: item.serviceName,
-          ),
-          const SizedBox(height: 8),
-          _InfoRow(
-            icon: Icons.access_time_rounded,
-            label: 'Time:',
-            value: item.formattedTimeRange,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CommonText(
-                text: 'Expected Earnings:',
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              CommonText(
-                text: '\$${item.amount.toStringAsFixed(2)}',
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                textColor: colors.secondaryColor,
-              ),
-            ],
-          ),
-        ],
+                _StatusBadge(status: item.status),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: colors.boxBg),
+            const SizedBox(height: 16),
+            _InfoRow(
+              icon: Icons.person_outline_rounded,
+              label: 'Recipient:',
+              value: '${item.recipientName} (${item.relationship})',
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.medical_services_outlined,
+              label: 'Service:',
+              value: item.serviceName,
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.access_time_rounded,
+              label: 'Time:',
+              value: item.formattedTimeRange,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CommonText(
+                  text: 'Expected Earnings:',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                CommonText(
+                  text: '\$${item.amount.toStringAsFixed(2)}',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  textColor: colors.secondaryColor,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

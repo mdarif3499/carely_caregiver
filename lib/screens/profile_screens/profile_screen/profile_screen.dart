@@ -4,17 +4,13 @@ import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/widgets/profile_widgets.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
+import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-// ── Menu Item Model ──────────────────────────────────────
-class ProfileMenuItem {
-  final IconData icon;
-  final String title;
-  final VoidCallback? onTap;
-
-  const ProfileMenuItem({required this.icon, required this.title, this.onTap});
-}
+// ProfileMenuItem is now imported from widgets/profile_widgets.dart
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -69,7 +65,9 @@ class ProfileScreen extends StatelessWidget {
       ProfileMenuItem(
         icon: Icons.description_outlined,
         title: 'Documents & Verification',
-        onTap: () {},
+        onTap: () {
+          Get.toNamed(AppRoutes.instance.caregiverDocumentsScreen);
+        },
       ),
     ];
 
@@ -101,55 +99,48 @@ class ProfileScreen extends StatelessWidget {
     return DefaultBackgroundTemplate(
       appBarTitle: 'Profile',
       hideBackButton: true,
-      child: Column(
-        children: [
-          // Subtle loading indicator at the top
-          Obx(() => controller.isLoading.value
-              ? LinearProgressIndicator(
-                  backgroundColor: Colors.transparent,
-                  color: AppColors.instance.primary,
-                  minHeight: 2,
-                )
-              : const SizedBox(height: 2)),
+      child: Obx(
+        () => Skeletonizer(
+          enabled: controller.isLoading.value,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Header (User Data) ──
+                      ProfileAvatarHeader(
+                        name: controller.userModel.value?.name ?? "...",
+                        memberSince: controller.userModel.value?.memberSince ?? "...",
+                        avatarUrl: controller.userModel.value?.profileImage ?? "",
+                      ),
+                      SizedBox(height: 32.h),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Header (User Data) ──
-                  Obx(() {
-                    final user = controller.userModel.value;
-                    return ProfileAvatarHeader(
-                      name: user?.name ?? "",
-                      memberSince: user?.memberSince ?? "",
-                      avatarUrl: user?.profileImage ?? "",
-                    );
-                  }),
-                  const SizedBox(height: 32),
+                      // ── Account Section ──
+                      ProfileSection(
+                        title: 'Account',
+                        items: isClient ? clientAccountItems : caregiverAccountItems,
+                      ),
+                      SizedBox(height: 24.h),
 
-                  // ── Account Section ──
-                  ProfileSection(
-                    title: 'Account',
-                    items: isClient ? clientAccountItems : caregiverAccountItems,
+                      // ── Settings Section ──
+                      ProfileSection(
+                        title: 'Settings',
+                        items: settingsItems,
+                      ),
+                      SizedBox(height: 32.h),
+
+                      // ── Logout ──
+                      LogoutButton(onTap: controller.logout),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-
-                  // ── Settings Section ──
-                  ProfileSection(
-                    title: 'Settings',
-                    items: settingsItems,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // ── Logout ──
-                  LogoutButton(onTap: controller.logout),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

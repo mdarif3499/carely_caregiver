@@ -8,6 +8,7 @@ import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfileSetupScreen extends StatelessWidget {
   const ProfileSetupScreen({super.key});
@@ -18,114 +19,119 @@ class ProfileSetupScreen extends StatelessWidget {
 
     return DefaultBackgroundTemplate(
       appBarTitle: 'Profile Setup',
-      child: Column(
-        children: [
-          // ── Scrollable body ──
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 28),
-                  _buildSectionTitle('Professional Bio'),
-                  const SizedBox(height: 14),
-                  AppMultilineTextField(
-                    controller: controller.bioController,
-                    hintText: 'Tell families about yourself, your experience and why you love caregiving...',
-                    validationType: ValidationType.notRequired,
-                    borderRadius: 12,
-                    backgroundColor: AppColors.instance.textFiledBg,
-                  ),
-                  const SizedBox(height: 28),
-                  _buildSectionTitle('Expertise & Specialties'),
-                  const SizedBox(height: 14),
-                  _buildSpecialtiesGrid(controller),
-                  const SizedBox(height: 28),
-                  _buildSectionTitle('Skills'),
-                  const SizedBox(height: 14),
-                  _buildSkillsGrid(controller),
-                  const SizedBox(height: 28),
-                  Row(
+      child: Obx(
+        () => Skeletonizer(
+          enabled: controller.isLoading.value,
+          child: Column(
+            children: [
+              // ── Scrollable body ──
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle('Hourly Rate (\$)'),
-                            const SizedBox(height: 14),
-                            CommonTextField(
-                              controller: controller.hourlyRateController,
-                              validationType: ValidationType.validateNumber,
-                              hintText: 'e.g. 25',
-                              borderRadius: 12,
+                      _buildHeader(),
+                      SizedBox(height: 28.h),
+                      _buildSectionTitle('Professional Bio'),
+                      SizedBox(height: 14.h),
+                      AppMultilineTextField(
+                        controller: controller.bioController,
+                        hintText: 'Tell families about yourself, your experience and why you love caregiving...',
+                        validationType: ValidationType.notRequired,
+                        borderRadius: 12.r,
+                        backgroundColor: AppColors.instance.textFiledBg,
+                      ),
+                      SizedBox(height: 28.h),
+                      _buildSectionTitle('Expertise & Specialties'),
+                      SizedBox(height: 14.h),
+                      _buildSpecialtiesGrid(controller),
+                      SizedBox(height: 28.h),
+                      _buildSectionTitle('Skills'),
+                      SizedBox(height: 14.h),
+                      _buildSkillsGrid(controller),
+                      SizedBox(height: 28.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildSectionTitle('Hourly Rate (\$)'),
+                                SizedBox(height: 14.h),
+                                CommonTextField(
+                                  controller: controller.hourlyRateController,
+                                  validationType: ValidationType.validateNumber,
+                                  hintText: 'e.g. 25',
+                                  borderRadius: 12.r,
+                                  backgroundColor: AppColors.instance.textFiledBg,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 16.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildSectionTitle('Experience'),
+                                SizedBox(height: 14.h),
+                                _buildExperienceDropdown(controller),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 28.h),
+                      _buildSectionTitle('Location'),
+                      SizedBox(height: 14.h),
+                      CommonTextField(
+                        controller: controller.cityController,
+                        validationType: ValidationType.notRequired,
+                        hintText: 'City',
+                        borderRadius: 12.r,
+                        backgroundColor: AppColors.instance.textFiledBg,
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CommonTextField(
+                              controller: controller.stateController,
+                              validationType: ValidationType.notRequired,
+                              hintText: 'State',
+                              borderRadius: 12.r,
                               backgroundColor: AppColors.instance.textFiledBg,
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: CommonTextField(
+                              controller: controller.countryController,
+                              validationType: ValidationType.notRequired,
+                              hintText: 'Country',
+                              borderRadius: 12.r,
+                              backgroundColor: AppColors.instance.textFiledBg,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle('Experience'),
-                            const SizedBox(height: 14),
-                            _buildExperienceDropdown(controller),
-                          ],
-                        ),
-                      ),
+                      SizedBox(height: 28.h),
+                      _buildSectionTitle('Certifications & Licenses'),
+                      SizedBox(height: 14.h),
+                      _buildCertificationsList(controller),
+                      SizedBox(height: 8.h),
                     ],
                   ),
-                  const SizedBox(height: 28),
-                  _buildSectionTitle('Location'),
-                  const SizedBox(height: 14),
-                  CommonTextField(
-                    controller: controller.cityController,
-                    validationType: ValidationType.notRequired,
-                    hintText: 'City',
-                    borderRadius: 12,
-                    backgroundColor: AppColors.instance.textFiledBg,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CommonTextField(
-                          controller: controller.stateController,
-                          validationType: ValidationType.notRequired,
-                          hintText: 'State',
-                          borderRadius: 12,
-                          backgroundColor: AppColors.instance.textFiledBg,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: CommonTextField(
-                          controller: controller.countryController,
-                          validationType: ValidationType.notRequired,
-                          hintText: 'Country',
-                          borderRadius: 12,
-                          backgroundColor: AppColors.instance.textFiledBg,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-                  _buildSectionTitle('Certifications & Licenses'),
-                  const SizedBox(height: 14),
-                  _buildCertificationsList(controller),
-                  const SizedBox(height: 8),
-                ],
+                ),
               ),
-            ),
-          ),
 
-          // ── Fixed bottom buttons ──
-          _buildBottomButtons(context, controller),
-          20.height,
-        ],
+              // ── Fixed bottom buttons ──
+              _buildBottomButtons(context, controller),
+              20.height,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -135,13 +141,13 @@ class ProfileSetupScreen extends StatelessWidget {
   // ─────────────────────────────
 
   Widget _buildHeader() {
-    return const Center(
+    return Center(
       child: Column(
         children: [
           AuthScreenHeader(text: 'Professional Details'),
-          SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: AppSecondaryText(
               textAlign: TextAlign.center,
               text:
@@ -160,7 +166,7 @@ class ProfileSetupScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return AppPrimaryText(
       text: title,
-      fontSize: 20,
+      fontSize: 20.sp,
       fontWeight: FontWeight.w700,
     );
   }
@@ -172,8 +178,8 @@ class ProfileSetupScreen extends StatelessWidget {
   Widget _buildSpecialtiesGrid(ProfileSetupScreenController controller) {
     return Obx(
       () => Wrap(
-        spacing: 10,
-        runSpacing: 10,
+        spacing: 10.w,
+        runSpacing: 10.h,
         children: controller.categories.map(
           (category) => SkillChip(
             label: category.name,
@@ -192,8 +198,8 @@ class ProfileSetupScreen extends StatelessWidget {
   Widget _buildSkillsGrid(ProfileSetupScreenController controller) {
     return Obx(
       () => Wrap(
-        spacing: 10,
-        runSpacing: 10,
+        spacing: 10.w,
+        runSpacing: 10.h,
         children: [
           // Skill chips
           ...controller.visibleSkills.map(
@@ -209,21 +215,21 @@ class ProfileSetupScreen extends StatelessWidget {
             GestureDetector(
               onTap: controller.expandSkills,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 10.h,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.instance.primary.withAlpha(50),
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(50.r),
                   border: Border.all(
                     color: AppColors.instance.primary,
-                    width: 1.5,
+                    width: 1.5.w,
                   ),
                 ),
                 child: CommonText(
                   text: '+ More',
-                  fontSize: 13,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w500,
                   textColor: AppColors.instance.primary,
                   isDescription: true,
@@ -247,7 +253,7 @@ class ProfileSetupScreen extends StatelessWidget {
       items: controller.experienceOptions,
       backgroundColor: AppColors.instance.textFiledBg,
       borderColor: AppColors.instance.transparent,
-      borderRadius: 12,
+      borderRadius: 12.r,
       onChanged: controller.onExperienceChanged,
       nameBuilder: (val) => val,
     );
@@ -264,7 +270,7 @@ class ProfileSetupScreen extends StatelessWidget {
           // Existing certifications
           ...controller.certifications.asMap().entries.map(
             (entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 12.h),
               child: CertificationCard(
                 title: entry.value['title']!,
                 subtitle: entry.value['subtitle']!,
@@ -275,9 +281,9 @@ class ProfileSetupScreen extends StatelessWidget {
 
           // Uploading state
           if (controller.isUploading.value)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             ),
@@ -301,7 +307,7 @@ class ProfileSetupScreen extends StatelessWidget {
   Widget _buildBottomButtons(BuildContext context, ProfileSetupScreenController controller) {
     return Container(
       color: AppColors.instance.screenBg,
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
       child: Row(
         children: [
           Expanded(
@@ -313,15 +319,19 @@ class ProfileSetupScreen extends StatelessWidget {
                 Get.back();
               },
               buttonWidth: double.infinity,
+              buttonHeight: 54.h,
+              buttonRadius: 16.r,
             ),
           ),
-          16.width,
+          SizedBox(width: 16.w),
           Expanded(
             child: Obx(
               () => CommonButton(
                 isLoading: controller.isSubmitting.value,
                 titleText: 'Continue',
                 buttonWidth: double.infinity,
+                buttonHeight: 54.h,
+                buttonRadius: 16.r,
                 elevation: 0,
                 onTap: () {
                   controller.updateProfile();

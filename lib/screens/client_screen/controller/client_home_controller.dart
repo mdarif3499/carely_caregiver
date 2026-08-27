@@ -51,7 +51,30 @@ class ClientHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholders();
     fetchUpcomingBookings();
+  }
+
+  void _setPlaceholders() {
+    upcomingBookings.value = List.generate(2, (index) => CareGiverScheduleModel(
+      id: 'placeholder_$index',
+      clientId: '',
+      clientName: 'Loading Name',
+      clientAvatar: '',
+      caregiverId: '',
+      caregiverName: 'Caregiver Name',
+      caregiverAvatar: '',
+      recipientName: 'Recipient',
+      relationship: 'Family',
+      serviceName: 'General Care',
+      date: '2026-08-27',
+      shift: 'MORNING',
+      startTime: '09:00',
+      endTime: '11:00',
+      status: 'PENDING',
+      amount: 0.0,
+      instructions: '',
+    ));
   }
 
   Future<void> fetchUpcomingBookings() async {
@@ -99,8 +122,8 @@ class ClientHomeController extends GetxController {
     ),
   ].obs;
 
-  void onViewDetails() {
-    Get.toNamed(AppRoutes.instance.careGiverDetailsScreen);
+  void onViewDetails(String bookingId) {
+    Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: bookingId);
   }
 
   void onSeeAllBookings() {

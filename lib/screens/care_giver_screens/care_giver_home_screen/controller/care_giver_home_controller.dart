@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../constant/app_api_end_point.dart';
+
 
 // ── Models ─────────────────────────────────────────────
 class WeeklyBarData {
@@ -93,9 +95,30 @@ class CareGiverHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholders();
     fetchEarningsSummary();
     _loadSchedule();
     _loadRecentActivities();
+  }
+
+  void _setPlaceholders() {
+    todaySchedule.value = List.generate(2, (index) => TodayScheduleItem(
+      id: 'placeholder_$index',
+      clientId: '',
+      startTime: '09:00',
+      endTime: '11:00',
+      clientName: 'Client Name',
+      clientRole: 'Client',
+      address: 'Client Address',
+      status: 'PENDING',
+      avatarUrl: '',
+      tags: ['General Care'],
+    ));
+    
+    weeklyBars.value = List.generate(7, (index) => WeeklyBarData(
+      day: DateFormat('EEE').format(DateTime.now().add(Duration(days: index))),
+      value: 0.5,
+    ));
   }
 
   Future<void> fetchEarningsSummary() async {
@@ -138,21 +161,47 @@ class CareGiverHomeController extends GetxController {
     }
   }
 
-  void _loadSchedule() {
-    todaySchedule.assignAll([
-      const TodayScheduleItem(
-        id: '1',
-        clientId: '6a80072600c0207c32bf6acd', // Real client ID from your JSON
-        startTime: '2:00 PM',
-        endTime: '4:00 PM',
-        clientName: 'Sarah Jenkins',
-        clientRole: 'RN',
-        address: '456 Oak Avenue, Apt 4B',
-        status: 'Confirmed',
-        avatarUrl: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=1000&auto=format&fit=crop',
-        tags: ['Rehab', 'Vital Signs'],
-      ),
-    ]);
+  Future<void> _loadSchedule() async {
+    try {
+      final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final response = await CaregiverRepository.instance.getCaregiverBookings(date: today);
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data']?['data'] ?? [];
+        final List<TodayScheduleItem> items = dataList.map((json) {
+          final client = json['client'] ?? {};
+          final recipient = json['careRecipient'] ?? {};
+          final service = json['serviceCategory'] ?? {};
+          
+          return TodayScheduleItem(
+            id: json['_id'] ?? '',
+            clientId: (client is Map) ? (client['_id'] ?? client['id'] ?? '') : '',
+            startTime: _formatTime(json['slotStartTime'] ?? '00:00'),
+            endTime: _formatTime(json['slotEndTime'] ?? '00:00'),
+            clientName: client['name'] ?? 'Unknown',
+            clientRole: 'Client',
+            address: 'Contact for Address', // Address usually sensitive, placeholder
+            status: json['status'] ?? 'PENDING',
+            avatarUrl: AppApiEndPoint.imageUrl(client['profileImage']),
+            tags: [service['name'] ?? 'General Care'],
+          );
+        }).toList();
+        
+        todaySchedule.assignAll(items);
+      }
+    } catch (e) {
+      debugPrint("Error loading today's schedule: $e");
+    }
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      final dt = DateTime(0, 1, 1, int.parse(parts[0]), int.parse(parts[1]));
+      return DateFormat('hh:mm a').format(dt);
+    } catch (_) {
+      return time;
+    }
   }
 
   void _loadRecentActivities() {

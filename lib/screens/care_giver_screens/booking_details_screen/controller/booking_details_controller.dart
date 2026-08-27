@@ -89,10 +89,28 @@ class BookingDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _setPlaceholder();
     final id = Get.arguments;
     if (id != null && id is String) {
       fetchBookingDetails(id);
     }
+  }
+
+  void _setPlaceholder() {
+    booking.value = const BookingDetails(
+      id: 'placeholder',
+      clientName: 'Client Name',
+      avatarUrl: '',
+      recipientName: 'Recipient',
+      relationship: 'Family',
+      serviceName: 'General Care',
+      date: '2026-08-27',
+      startTime: '09:00',
+      endTime: '11:00',
+      earnings: 0.0,
+      status: 'PENDING',
+      instructions: 'Placeholder instructions for shimmering effect.',
+    );
   }
 
   Future<void> fetchBookingDetails(String id) async {

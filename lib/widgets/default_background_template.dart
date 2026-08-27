@@ -11,25 +11,38 @@ class DefaultBackgroundTemplate extends StatelessWidget {
   final Widget? titleWidget;
   final VoidCallback? onBackPress;
   final List<Widget>? actions;
-  const DefaultBackgroundTemplate({super.key, required this.child, this.hideBackButton = false, this.appBarBackgroundColor, this.appBarTitle, this.actions, this.onBackPress, this.bodyBackgroundColor, this.titleWidget});
+  final String? backgroundImage;
+  const DefaultBackgroundTemplate({super.key, required this.child, this.hideBackButton = false, this.appBarBackgroundColor, this.appBarTitle, this.actions, this.onBackPress, this.bodyBackgroundColor, this.titleWidget, this.backgroundImage});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bodyBackgroundColor??AppColors.instance.screenBg,
+      extendBodyBehindAppBar: true,
+      backgroundColor: backgroundImage != null ? Colors.transparent : (bodyBackgroundColor ?? AppColors.instance.screenBg),
       appBar: CommonAppBar(
+
         titleWidget: titleWidget,
         hideBack: hideBackButton,
-
         appbarConfig: AppbarConfig(
           titleSpacing: -10,
-        titleAlignment: Alignment.topLeft,
-        backgroundColor: appBarBackgroundColor,
-          actions: actions??[],
+          titleAlignment: Alignment.topLeft,
+          backgroundColor: appBarBackgroundColor,
+          actions: actions ?? [],
         ),
         title: appBarTitle,
       ),
-      body: SafeArea(child: child),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: backgroundImage != null ? BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(backgroundImage!),
+            fit: BoxFit.cover,
+            opacity: 0.8, // Increased opacity for better visibility
+          ),
+        ) : null,
+        child: SafeArea(child: child),
+      ),
     );
   }
 }

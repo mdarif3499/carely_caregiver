@@ -8,8 +8,7 @@ class AppApiEndPoint {
   final String domain = _getDomain();
   final String baseUrl = "${_getDomain()}/api/v1";
   final String socketUrl = _getDomain();
-  final String liveServer = "https://test.com";
-  final String refreshToken = "https://test.com";
+  final String refreshToken = "${_getDomain()}/api/v1/auth/refresh-token";
 
   static const String signUp = "/auth/register";
   static const String sendOtp = "/auth/send-otp";
@@ -23,6 +22,7 @@ class AppApiEndPoint {
   static const String createCareRecipient = "/care-recipient";
 
   static const String uploadDocument = "/document/upload";
+  static const String getMyDocuments = "/document/me";
   static const String updateCaregiverProfile = "/caregiver-profiles/me";
   static const String availability = "/availability";
   static const String getMyAvailability = "/availability/me";
@@ -45,16 +45,8 @@ class AppApiEndPoint {
 }
 
 String _getDomain() {
-  String liveServer = "http://10.10.26.188:5050";
-  String localServer = "http://10.10.26.188:5050";
+  const String liveServer = "http://10.10.26.188:5050";
+  const String localServer = "http://10.10.26.188:5050";
 
-  try {
-    if (kDebugMode) {
-      localServer;
-    }
-    return liveServer;
-  } catch (e) {
-    AppLogger.debug("Error in getting domain: $e");
-    return liveServer;
-  }
+  return kDebugMode ? localServer : liveServer;
 }

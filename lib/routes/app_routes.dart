@@ -28,11 +28,13 @@ class AppRoutes {
   final String careGiverDetailsScreen = "/careGiverDetailsScreen";
   final String reviewBookingScreen = "/reviewBookingScreen";
   final String bookCareGiverScreen = "/bookCareGiverScreen";
+  final String caregiverDocumentsScreen = "/caregiverDocumentsScreen";
   final String messageScreen = "/messageScreen";
   final String bookingDetailsScreen = "/bookingDetailsScreen";
   final String stripePaymentWebView = "/stripePaymentWebView";
   final String clientBookingDetails = "/clientBookingDetails";
   final String allScheduleScreen = "/allScheduleScreen";
+  final String fullScreenImage = "/fullScreenImage";
   final String notificationScreen = "/notificationScreen";
   final String availabilityScreen = "/availabilityScreen";
   final String bookingStatusScreen = "/bookingStatusScreen";

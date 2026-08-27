@@ -6,10 +6,13 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/message_screen/controller/message_screen_controller.dart';
 import 'package:carely_caregiver/screens/message_screen/model/chat_model.dart';
 import 'package:carely_caregiver/screens/message_screen/widgets/expandable_chat_text.dart';
+
+import '../../routes/app_routes.dart';
 
 class MessageScreen extends StatelessWidget {
   const MessageScreen({super.key});
@@ -19,6 +22,7 @@ class MessageScreen extends StatelessWidget {
     MessageScreenController controller = Get.find<MessageScreenController>();
     return DefaultBackgroundTemplate(
       onBackPress: Get.back,
+      backgroundImage: 'assets/images/img_1.png',
 
       titleWidget: Obx(() {
         final conversation = controller.selectedConversation.value;
@@ -41,21 +45,22 @@ class MessageScreen extends StatelessWidget {
                   text: conversation != null ? conversation.name : 'Chat',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  textColor: Colors.white,
                 ),
                 Obx(() {
                   if (controller.isPartnerTyping.value) {
-                    return CommonText(
+                    return const CommonText(
                       text: 'typing...',
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
-                      textColor: AppColors.instance.primary,
+                      textColor: Color(0xFF22C55E), // WhatsApp-like green
                     );
                   }
                   return CommonText(
                     text: conversation != null ? conversation.role : '',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    textColor: AppColors.instance.textGrey,
+                    textColor: Colors.white70,
                   );
                 }),
               ],
@@ -63,31 +68,38 @@ class MessageScreen extends StatelessWidget {
           ],
         );
       }),
-      child: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Obx(
-                () => SmartListLoader(
-                  isReverse: true,
-                  onLoadMore: (index) async {
-                    await controller.loadMore();
-                  },
-                  isLoading: controller.isLoading.value,
-                  itemCount: controller.chats.length,
-                  itemBuilder: (context, index) => _chatItem(
-                    controller.chats[index],
-                    context,
-                    controller,
-                    index,
+      appBarBackgroundColor: const Color(0xFF1F2C34),
+      child: Container(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Obx(
+                  () => Skeletonizer(
+                    enabled: controller.isLoading.value,
+                    child: SmartListLoader(
+                      isReverse: true,
+                      onLoadMore: (index) async {
+                        await controller.loadMore();
+                      },
+                      isLoading: controller.isLoading.value,
+                      itemCount: controller.chats.length,
+                      itemBuilder: (context, index) => _chatItem(
+                        controller.chats[index],
+                        context,
+                        controller,
+                        index,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          _messageInputWidget(controller),
-        ],
+             _messageInputWidget(controller),
+          ],
+        ),
       ),
     );
   }
@@ -105,7 +117,7 @@ class MessageScreen extends StatelessWidget {
       children: [
         if (showDate) _dateHeader(chat.createdAt),
         Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.only(bottom: 12.h),
           child: Row(
             mainAxisAlignment: isMe
                 ? MainAxisAlignment.end
@@ -113,7 +125,7 @@ class MessageScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (isMe) ...[
-                const SizedBox(width: 50),
+                SizedBox(width: 50.w),
                 Flexible(
                   child: _messageBubble(
                     chat: chat,
@@ -124,16 +136,16 @@ class MessageScreen extends StatelessWidget {
               ] else ...[
                 // Partner Avatar
                 CircleAvatar(
-                  radius: 16,
+                  radius: 16.r,
                   backgroundColor: AppColors.instance.boxBg,
                   backgroundImage: chat.userImage.isNotEmpty
                       ? NetworkImage(chat.userImage)
                       : null,
                   child: chat.userImage.isEmpty
-                      ? Icon(Icons.person, size: 18, color: AppColors.instance.primary)
+                      ? Icon(Icons.person, size: 18.sp, color: AppColors.instance.primary)
                       : null,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Flexible(
                   child: _messageBubble(
                     chat: chat,
@@ -141,7 +153,7 @@ class MessageScreen extends StatelessWidget {
                     controller: controller,
                   ),
                 ),
-                const SizedBox(width: 50),
+                SizedBox(width: 50.w),
               ],
             ],
           ),
@@ -177,17 +189,17 @@ class MessageScreen extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
           decoration: BoxDecoration(
             color: AppColors.instance.boxBg,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: CommonText(
             text: dateText,
-            fontSize: 12,
+            fontSize: 12.sp,
             textColor: AppColors.instance.textGrey,
             fontWeight: FontWeight.w500,
           ),
@@ -203,23 +215,25 @@ class MessageScreen extends StatelessWidget {
   }) {
     final hasImage = chat.files.isNotEmpty;
     final hasText = chat.content.isNotEmpty;
+    final timeStr = DateFormat('hh:mm a').format(chat.createdAt);
 
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: isMe
-            ? AppColors.instance.secondaryColor
-            : AppColors.instance.secondaryColor.withAlpha(50),
+        color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(16),
-          topRight: const Radius.circular(16),
-          bottomLeft: isMe
-              ? const Radius.circular(16)
-              : const Radius.circular(4),
-          bottomRight: isMe
-              ? const Radius.circular(4)
-              : const Radius.circular(16),
+          topLeft: Radius.circular(12.r),
+          topRight: Radius.circular(12.r),
+          bottomLeft: isMe ? Radius.circular(12.r) : Radius.circular(2.r),
+          bottomRight: isMe ? Radius.circular(2.r) : Radius.circular(12.r),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 1.r,
+            offset: Offset(0, 1.h),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -228,23 +242,32 @@ class MessageScreen extends StatelessWidget {
           if (hasImage)
             Stack(
               children: [
-                CommonImage(
-                  src: chat.files.first,
-                  width: 240,
-                  height: 240,
-                  fill: BoxFit.cover,
+                GestureDetector(
+                  onTap: () => Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: chat.files.first),
+                  child: Hero(
+                    tag: chat.files.first,
+                    child: CommonImage(
+                      src: chat.files.first,
+                      width: 240.w,
+                      height: 240.h,
+                      fill: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 if (isMe && !hasText)
                   Positioned(
-                    bottom: 8,
-                    right: 8,
+                    bottom: 8.h,
+                    right: 8.w,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                       decoration: BoxDecoration(
                         color: Colors.black26,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: _StatusTicks(status: chat.status),
+                      child: _StatusTicks(
+                        status: chat.status,
+                        isFailed: chat.isSendingFailed,
+                      ),
                     ),
                   ),
               ],
@@ -258,7 +281,7 @@ class MessageScreen extends StatelessWidget {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(12, hasImage ? 8 : 10, isMe ? 40 : 12, 10),
+                        padding: EdgeInsets.fromLTRB(12.w, (hasImage ? 8 : 10).h, isMe ? 40.w : 12.w, 10.h),
                         child: ExpandableChatText(
                           text: chat.content,
                           isMe: isMe,
@@ -266,9 +289,12 @@ class MessageScreen extends StatelessWidget {
                       ),
                       if (isMe)
                         Positioned(
-                          bottom: 6,
-                          right: 8,
-                          child: _StatusTicks(status: chat.status),
+                          bottom: 6.h,
+                          right: 8.w,
+                          child: _StatusTicks(
+                            status: chat.status,
+                            isFailed: chat.isSendingFailed,
+                          ),
                         ),
                     ],
                   ),
@@ -276,44 +302,25 @@ class MessageScreen extends StatelessWidget {
               ],
             ),
 
-          if (chat.isSending || chat.isSendingFailed)
+          if (chat.isSending)
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 4.h),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (chat.isSending) ...[
-                    SizedBox(
-                      width: 10,
-                      height: 10,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          isMe ? Colors.white70 : AppColors.instance.textGrey,
-                        ),
-                      ),
+                  SizedBox(
+                    width: 8.w,
+                    height: 8.h,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.w,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.grey),
                     ),
-                    4.width,
-                    CommonText(
-                      text: 'Sending...',
-                      fontSize: 10,
-                      textColor: isMe
-                          ? Colors.white70
-                          : AppColors.instance.textGrey,
-                    ),
-                  ] else if (chat.isSendingFailed) ...[
-                    Icon(
-                      Icons.error_outline,
-                      size: 12,
-                      color: AppColors.instance.error,
-                    ),
-                    4.width,
-                    CommonText(
-                      text: 'Failed',
-                      fontSize: 10,
-                      textColor: AppColors.instance.error,
-                    ),
-                  ],
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    'sending...',
+                    style: TextStyle(fontSize: 9.sp, color: Colors.grey),
+                  ),
                 ],
               ),
             ),
@@ -324,7 +331,7 @@ class MessageScreen extends StatelessWidget {
 
   Widget _messageInputWidget(MessageScreenController controller) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
       color: Colors.transparent,
       child: SafeArea(
         child: Column(
@@ -335,18 +342,18 @@ class MessageScreen extends StatelessWidget {
               final xfile = controller.selectedImage.value;
               if (xfile == null) return const SizedBox.shrink();
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16, left: 40),
+                padding: EdgeInsets.only(bottom: 16.h, left: 40.w),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
                       Container(
-                        height: 90,
-                        width: 90,
+                        height: 90.h,
+                        width: 90.w,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200, width: 2),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: Colors.grey.shade200, width: 2.w),
                           image: DecorationImage(
                             image: FileImage(File(xfile.path)),
                             fit: BoxFit.cover,
@@ -354,18 +361,18 @@ class MessageScreen extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        top: -10,
-                        right: -10,
+                        top: -10.h,
+                        right: -10.w,
                         child: GestureDetector(
                           onTap: controller.clearSelectedImage,
                           child: Container(
-                            padding: const EdgeInsets.all(5),
+                            padding: EdgeInsets.all(5.r),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
-                              boxShadow: [BoxShadow(color: Colors.red.withAlpha(50), blurRadius: 5)],
+                              boxShadow: [BoxShadow(color: Colors.red.withAlpha(50), blurRadius: 5.r)],
                             ),
-                            child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                            child: Icon(Icons.close_rounded, size: 16.sp, color: Colors.white),
                           ),
                         ),
                       ),
@@ -376,13 +383,13 @@ class MessageScreen extends StatelessWidget {
             }),
             // Single Pill Bubble containing everything
             Container(
-              height: 50,
+              height: 50.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.grey.shade300, width: 1),
+                borderRadius: BorderRadius.circular(30.r),
+                border: Border.all(color: Colors.grey.shade300, width: 1.w),
               ),
-              padding: const EdgeInsets.only(left: 6, right: 4),
+              padding: EdgeInsets.only(left: 6.w, right: 4.w),
               child: Row(
                 children: [
                   // 1. Plus Icon (Inside, no splash circle)
@@ -393,22 +400,22 @@ class MessageScreen extends StatelessWidget {
                       customBorder: const CircleBorder(),
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Icon(Icons.add, size: 24, color: Colors.black87),
+                      child: Padding(
+                        padding: EdgeInsets.all(8.r),
+                        child: Icon(Icons.add, size: 24.sp, color: Colors.black87),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4.w),
                   // TextField
                   Expanded(
                     child: TextField(
                       controller: controller.messageTextController,
-                      style: const TextStyle(fontSize: 15, color: Colors.black87),
+                      style: TextStyle(fontSize: 15.sp, color: Colors.black87),
                       cursorColor: Colors.black87,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Type a message',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
+                        hintStyle: TextStyle(color: Colors.grey, fontSize: 15.sp),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -417,11 +424,11 @@ class MessageScreen extends StatelessWidget {
                         focusedErrorBorder: InputBorder.none,
                         isDense: true,
                         filled: false,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.h),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6.w),
                   // 3. Green Send Button
                   Obx(() {
                     final canSend = controller.message.value.trim().isNotEmpty ||
@@ -430,16 +437,16 @@ class MessageScreen extends StatelessWidget {
                       onTap: canSend ? () => controller.send() : null,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        width: 38,
-                        height: 38,
+                        width: 38.w,
+                        height: 38.h,
                         decoration: BoxDecoration(
                           color: canSend
                               ? const Color(0xFF22C55E)
                               : Colors.grey.shade300,
                           shape: BoxShape.circle,
                         ),
-                        child: const Center(
-                          child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                        child: Center(
+                          child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20.sp),
                         ),
                       ),
                     );
@@ -456,21 +463,21 @@ class MessageScreen extends StatelessWidget {
 
 class _StatusTicks extends StatelessWidget {
   final String status;
-  const _StatusTicks({required this.status});
+  final bool isFailed;
+  const _StatusTicks({required this.status, this.isFailed = false});
 
   @override
   Widget build(BuildContext context) {
+    if (isFailed) {
+      return Icon(Icons.error_outline_rounded, size: 14.sp, color: Colors.redAccent);
+    }
     if (status == 'SENT') {
-      return const Icon(Icons.done_rounded, size: 16, color: Colors.white70);
+      return Icon(Icons.done_rounded, size: 14.sp, color: Colors.grey);
     } else if (status == 'DELIVERED') {
-      return const Icon(Icons.done_all_rounded, size: 16, color: Colors.white70);
+      return Icon(Icons.done_all_rounded, size: 14.sp, color: Colors.grey);
     } else if (status == 'SEEN') {
-      return const Icon(Icons.done_all_rounded, size: 16, color: Color(0xFF00E676)); // Vibrant green for seen
+      return Icon(Icons.done_all_rounded, size: 14.sp, color: const Color(0xFF34B7F1)); // WhatsApp blue for seen
     }
     return const SizedBox.shrink();
   }
 }
-
-
-
-

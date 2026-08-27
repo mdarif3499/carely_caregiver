@@ -16,15 +16,29 @@ class CaregiverRepository {
     required String documentType,
     required File file,
   }) async {
+    // Dynamic field name based on document type as per backend documentation
+    String fieldName = "";
+    switch (documentType) {
+      case "GOVERNMENT_ID": fieldName = "governmentId"; break;
+      case "NURSING_CERT": fieldName = "nursingCert"; break;
+      case "CRIMINAL_RECORD": fieldName = "criminalRecord"; break;
+      case "INSURANCE": fieldName = "insurance"; break;
+      default: fieldName = "document";
+    }
+
     Map<String, dynamic> body = {
       "documentType": documentType,
-      "nursingCert": await MultipartFile.fromFile(
+      fieldName: await MultipartFile.fromFile(
         file.path,
         filename: file.path.split('/').last,
       ),
     };
 
     return await _apiClient.multipart(AppApiEndPoint.uploadDocument, body: body, method: 'POST');
+  }
+
+  Future<ApiResponseModel> getMyDocuments() async {
+    return await _apiClient.get(AppApiEndPoint.getMyDocuments);
   }
 
   Future<ApiResponseModel> updateProfile({

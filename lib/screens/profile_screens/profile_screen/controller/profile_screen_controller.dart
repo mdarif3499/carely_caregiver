@@ -12,8 +12,21 @@ class ProfileScreenController extends GetxController {
 
   @override
   void onInit() {
-    fetchProfile();
     super.onInit();
+    _setPlaceholder();
+    fetchProfile();
+  }
+
+  void _setPlaceholder() {
+    userModel.value = UserModel(
+      id: 'placeholder',
+      name: 'User Name',
+      role: 'Role',
+      email: 'user@example.com',
+      phone: '(123) 456-7890',
+      intakeCompleted: true,
+      createdAt: DateTime.now(),
+    );
   }
 
   Future<void> fetchProfile() async {
