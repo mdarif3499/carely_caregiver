@@ -179,9 +179,12 @@ class FindCaregiverController extends GetxController {
       if (response.isSuccess) {
         final List data = response.data['data'] ?? [];
         caregivers.value = data.map((json) => CaregiverModel.fromJson(json)).toList();
+      } else {
+        caregivers.clear();
       }
     } catch (e) {
       debugPrint("Error fetching caregivers: $e");
+      caregivers.clear();
     } finally {
       isLoading.value = false;
       update();

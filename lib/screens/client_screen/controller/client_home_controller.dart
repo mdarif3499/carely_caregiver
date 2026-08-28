@@ -65,9 +65,12 @@ class ClientHomeController extends GetxController {
       if (response.isSuccess) {
         final List dataList = response.data['data']?['data'] ?? [];
         upcomingBookings.value = dataList.map((e) => CareGiverScheduleModel.fromJson(e)).toList();
+      } else {
+        upcomingBookings.clear();
       }
     } catch (e) {
       debugPrint("Error fetching upcoming bookings: $e");
+      upcomingBookings.clear();
     } finally {
       isBookingsLoading.value = false;
       update();
@@ -83,9 +86,12 @@ class ClientHomeController extends GetxController {
       if (response.isSuccess) {
         final List data = response.data['data'] ?? [];
         categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
+      } else {
+        categories.clear();
       }
     } catch (e) {
       debugPrint("Error fetching categories: $e");
+      categories.clear();
     } finally {
       isCategoriesLoading.value = false;
       update();

@@ -149,9 +149,12 @@ class EarningScreenController extends GetxController {
           ));
         }
         transactions.assignAll(items);
+      } else {
+        transactions.clear();
       }
     } catch (e) {
       debugPrint("Error fetching earnings list: $e");
+      transactions.clear();
     }
   }
 

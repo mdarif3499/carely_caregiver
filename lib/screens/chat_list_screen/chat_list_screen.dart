@@ -41,9 +41,6 @@ class ChatListScreen extends StatelessWidget {
                 onChanged: controller.onSearchChanged,
               ),
               SizedBox(height: 12.h),
-              // Encryption banner
-              const EncryptedBanner(),
-              SizedBox(height: 4.h),
             ],
           ),
         );
@@ -87,38 +84,6 @@ class ChatListScreen extends StatelessWidget {
                 ),
         );
       }),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  Encrypted Messaging Banner
-// ═══════════════════════════════════════════════════════
-class EncryptedBanner extends StatelessWidget {
-  final String? text;
-  final Color? textColor;
-  const EncryptedBanner({super.key, this.text, this.textColor});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10.h),
-      color: AppColors.instance.secondaryColor.withAlpha(30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.lock_rounded, size: 14.sp, color: textColor??AppColors.instance.secondaryColor),
-          SizedBox(width: 6.w),
-          CommonText(
-            text: text??'SECURE END-TO-END ENCRYPTED MESSAGING',
-            fontSize: 11.sp,
-            fontWeight: FontWeight.w700,
-            textColor:textColor?? AppColors.instance.secondaryColor,
-            isDescription: true,
-            preventScaling: true,
-          ),
-        ],
-      ),
     );
   }
 }

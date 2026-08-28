@@ -284,9 +284,12 @@ class ChatListController extends GetxController {
       if (response.isSuccess) {
         final List dataList = response.data['data']?['conversations'] ?? [];
         conversations.value = dataList.map((e) => ChatConversation.fromJson(e, currentUserId, currentUserRole)).toList();
+      } else {
+        conversations.clear();
       }
     } catch (e) {
       debugPrint("Error fetching conversations: $e");
+      conversations.clear();
     } finally {
       isLoading.value = false;
       update();
