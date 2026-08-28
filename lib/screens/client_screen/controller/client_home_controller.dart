@@ -1,42 +1,13 @@
+import 'package:carely_caregiver/models/category_model.dart';
+import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
+import 'package:carely_caregiver/screens/app_navigation_screen/controller/app_navigation_screen_controller.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/model/care_giver_schedule_model.dart';
+import 'package:carely_caregiver/screens/client_screen/find_caregiver_screen/controller/find_caregiver_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-// ── Data Models ─────────────────────────
-class BookingModel {
-  final String name;
-  final String role;
-  final String status;
-  final String dateTime;
-  final String avatarUrl;
-
-  const BookingModel({
-    required this.name,
-    required this.role,
-    required this.status,
-    required this.dateTime,
-    required this.avatarUrl,
-  });
-}
-
-class ActivityModel {
-  final String title;
-  final String description;
-  final String timeAgo;
-  final ActivityType type;
-
-  const ActivityModel({
-    required this.title,
-    required this.description,
-    required this.timeAgo,
-    required this.type,
-  });
-}
-
-enum ActivityType { booking, message }
 
 // ── Controller ──────────────────────────
 class ClientHomeController extends GetxController {
@@ -48,11 +19,16 @@ class ClientHomeController extends GetxController {
   final RxList<CareGiverScheduleModel> upcomingBookings = <CareGiverScheduleModel>[].obs;
   final RxBool isBookingsLoading = false.obs;
 
+  // Service Categories
+  final RxList<CategoryModel> categories = <CategoryModel>[].obs;
+  final RxBool isCategoriesLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     _setPlaceholders();
     fetchUpcomingBookings();
+    fetchCategories();
   }
 
   void _setPlaceholders() {
@@ -72,6 +48,7 @@ class ClientHomeController extends GetxController {
       startTime: '09:00',
       endTime: '11:00',
       status: 'PENDING',
+      paymentStatus: 'UNPAID',
       amount: 0.0,
       instructions: '',
     ));
@@ -82,9 +59,6 @@ class ClientHomeController extends GetxController {
       isBookingsLoading.value = true;
       update();
 
-      // Fetch all bookings for the client. The API /booking/my already filters by user.
-      // We don't filter by date here to show any upcoming booking, 
-      // or we can pass the current date to get today's.
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final response = await ClientRepository.instance.getClientBookings(date: today);
 
@@ -100,27 +74,23 @@ class ClientHomeController extends GetxController {
     }
   }
 
-  // Recent activities
-  final RxList<ActivityModel> recentActivities = <ActivityModel>[
-    const ActivityModel(
-      title: 'Booking confirmed for Friday',
-      description: 'Your session with Marcus L. has been scheduled.',
-      timeAgo: '2 hours ago',
-      type: ActivityType.booking,
-    ),
-    const ActivityModel(
-      title: 'New message from Sarah J.',
-      description: '"I\'ll be arriving 5 minutes early today ... "',
-      timeAgo: '4 hours ago',
-      type: ActivityType.message,
-    ),
-    const ActivityModel(
-      title: 'Booking confirmed for Friday',
-      description: 'Your session with Marcus L. has been scheduled.',
-      timeAgo: '12 hours ago',
-      type: ActivityType.booking,
-    ),
-  ].obs;
+  Future<void> fetchCategories() async {
+    try {
+      isCategoriesLoading.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.getCategories();
+      if (response.isSuccess) {
+        final List data = response.data['data'] ?? [];
+        categories.value = data.map((e) => CategoryModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      debugPrint("Error fetching categories: $e");
+    } finally {
+      isCategoriesLoading.value = false;
+      update();
+    }
+  }
 
   void onViewDetails(String bookingId) {
     Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: bookingId);
@@ -128,6 +98,18 @@ class ClientHomeController extends GetxController {
 
   void onSeeAllBookings() {
     Get.toNamed(AppRoutes.instance.allScheduleScreen);
+  }
+
+  void onCategoryTap(CategoryModel category) {
+    try {
+      final navC = Get.find<AppNavigationScreenController>();
+      final findC = Get.find<FindCaregiverController>();
+      
+      navC.changeIndex(1); // Switch to FindCaregiver tab
+      findC.applyCategoryFilter(category.id, category.name);
+    } catch (e) {
+      debugPrint("Error navigating to category: $e");
+    }
   }
 
   void onLearnMore() {

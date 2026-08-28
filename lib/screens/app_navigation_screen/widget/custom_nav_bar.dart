@@ -50,13 +50,13 @@ class CustomBottomNavBar extends StatelessWidget {
     ];
 
     return Container(
-      decoration: BoxDecoration(
+      decoration:const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: const Color.fromRGBO(0, 0, 0, 0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
-            offset: const Offset(0, -5),
+            offset:  Offset(0, -5),
           ),
         ],
       ),

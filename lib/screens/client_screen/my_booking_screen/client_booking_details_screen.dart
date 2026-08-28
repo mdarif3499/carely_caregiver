@@ -169,7 +169,14 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                             _DetailRow(
                               icon: Icons.info_outline_rounded,
                               label: 'Status:',
-                              value: (b?.status ?? '...').replaceAll('_', ' '),
+                              value: b?.formattedStatus ?? '...',
+                              isStatus: true,
+                            ),
+                            SizedBox(height: 12.h),
+                            _DetailRow(
+                              icon: Icons.payments_outlined,
+                              label: 'Payment:',
+                              value: b?.formattedPaymentStatus ?? '...',
                               isStatus: true,
                             ),
                             SizedBox(height: 32.h),

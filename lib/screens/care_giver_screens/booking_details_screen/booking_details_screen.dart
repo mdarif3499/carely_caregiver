@@ -45,9 +45,10 @@ class BookingDetailsScreen extends StatelessWidget {
                       padding: EdgeInsets.all(16.r),
                       child: BookingDetailActions(
                         isLoading: ctrl.isActionLoading.value,
-                        status: b.status,
+                        booking: b,
                         onAccept: ctrl.accept,
                         onDecline: ctrl.decline,
+                        onComplete: ctrl.complete,
                       ),
                     ),
                   ],

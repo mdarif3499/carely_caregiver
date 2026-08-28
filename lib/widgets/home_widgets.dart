@@ -1,11 +1,43 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
-import 'package:carely_caregiver/screens/client_screen/controller/client_home_controller.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../gen/assets.gen.dart';
+
+// ── Models (Legacy/Placeholder) ──────────
+class BookingModel {
+  final String name;
+  final String role;
+  final String status;
+  final String dateTime;
+  final String avatarUrl;
+
+  const BookingModel({
+    required this.name,
+    required this.role,
+    required this.status,
+    required this.dateTime,
+    required this.avatarUrl,
+  });
+}
+
+class ActivityModel {
+  final String title;
+  final String description;
+  final String timeAgo;
+  final ActivityType type;
+
+  const ActivityModel({
+    required this.title,
+    required this.description,
+    required this.timeAgo,
+    required this.type,
+  });
+}
+
+enum ActivityType { booking, message }
+// ──────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════
 //  1. Home Header — Avatar + Name + Icons

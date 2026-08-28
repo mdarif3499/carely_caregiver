@@ -17,6 +17,7 @@ class CareGiverScheduleModel {
   final String startTime;
   final String endTime;
   final String status;
+  final String paymentStatus;
   final double amount;
   final String instructions;
 
@@ -36,6 +37,7 @@ class CareGiverScheduleModel {
     required this.startTime,
     required this.endTime,
     required this.status,
+    required this.paymentStatus,
     required this.amount,
     required this.instructions,
   });
@@ -62,6 +64,7 @@ class CareGiverScheduleModel {
       startTime: json['slotStartTime'] ?? '00:00',
       endTime: json['slotEndTime'] ?? '00:00',
       status: json['status'] ?? 'PENDING',
+      paymentStatus: json['paymentStatus'] ?? 'UNPAID',
       amount: (json['totalAmount'] ?? 0.0).toDouble(),
       instructions: json['instructions'] ?? '',
     );
@@ -69,6 +72,18 @@ class CareGiverScheduleModel {
 
   String get formattedTimeRange {
     return '${_formatTime(startTime)} - ${_formatTime(endTime)}';
+  }
+
+  String get formattedStatus {
+    String text = status.replaceAll('_', ' ').toLowerCase();
+    if (text.isEmpty) return "";
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  String get formattedPaymentStatus {
+    String text = paymentStatus.replaceAll('_', ' ').toLowerCase();
+    if (text.isEmpty) return "";
+    return text[0].toUpperCase() + text.substring(1);
   }
 
   String _formatTime(String time) {

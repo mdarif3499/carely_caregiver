@@ -14,6 +14,7 @@ class CareGiverProfileModel {
   final String city;
   final String state;
   final double hourlyRate;
+  final String serviceCategoryId;
   final List<AvailabilityDate> availability;
 
   CareGiverProfileModel({
@@ -30,6 +31,7 @@ class CareGiverProfileModel {
     required this.city,
     required this.state,
     required this.hourlyRate,
+    required this.serviceCategoryId,
     required this.availability,
   });
 
@@ -52,6 +54,7 @@ class CareGiverProfileModel {
       city: json['city'] ?? '',
       state: json['state'] ?? '',
       hourlyRate: (json['hourlyRate'] ?? 0.0).toDouble(),
+      serviceCategoryId: specialtiesData.isNotEmpty ? (specialtiesData.first as Map)['_id'] ?? (specialtiesData.first as Map)['id'] ?? '' : '',
       availability: availabilityData.map((e) => AvailabilityDate.fromJson(e)).toList(),
     );
   }

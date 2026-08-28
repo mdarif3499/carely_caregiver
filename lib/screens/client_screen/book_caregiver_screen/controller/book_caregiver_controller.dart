@@ -68,6 +68,7 @@ class BookCaregiverController extends GetxController
   final Rxn<CaregiverModel> caregiver = Rxn<CaregiverModel>();
   final RxBool isLoading = false.obs;
   final RxBool isBooking = false.obs;
+  final RxString serviceCategoryId = "".obs;
   
   RxBool rebuild = false.obs;
   // ── Calendar ──
@@ -93,6 +94,7 @@ class BookCaregiverController extends GetxController
     
     if (args is Map) {
       final profile = args['profile'];
+      final caregiverArg = args['caregiver'];
       final DateTime? date = args['selectedDate'];
 
       if (profile is CareGiverProfileModel) {
@@ -105,15 +107,23 @@ class BookCaregiverController extends GetxController
           rating: profile.averageRating,
           hourlyRate: profile.hourlyRate,
           avatarUrl: profile.profileImage,
+          serviceCategoryId: profile.serviceCategoryId,
         );
+      } else if (caregiverArg is CaregiverModel) {
+        caregiver.value = caregiverArg;
       }
 
       if (date != null) {
         selectedDay.value = date;
         focusedMonth.value = DateTime(date.year, date.month, 1);
       }
+      
+      if (args['serviceCategoryId'] != null) {
+        serviceCategoryId.value = args['serviceCategoryId'].toString();
+      }
     } else if (args is CaregiverModel) {
       caregiver.value = args;
+      serviceCategoryId.value = args.serviceCategoryId;
     }
     
     // Auto-select first recipient if available
@@ -242,7 +252,9 @@ class BookCaregiverController extends GetxController
 
   @override
   void selectDay(DateTime day) {
-    if (day.month != focusedMonth.value.month) return;
+    if (day.month != focusedMonth.value.month) {
+      focusedMonth.value = DateTime(day.year, day.month, 1);
+    }
     selectedDay.value = day;
     rebuild.value = !rebuild.value;
     
@@ -312,20 +324,25 @@ class BookCaregiverController extends GetxController
       String? caregiverId = caregiver.value?.id;
       String? careRecipientId = selectedRecipient.value?.id;
       
-      // Get Service Category ID from SelectedServiceTypeController
-      String serviceCategoryId = "";
-      try {
-        final serviceController = Get.find<SelectedServiceTypeController>();
-        if (serviceController.serviceTypes.isNotEmpty && 
-            serviceController.selectedIndex.value < serviceController.serviceTypes.length) {
-          serviceCategoryId = serviceController.serviceTypes[serviceController.selectedIndex.value].id;
+      // If serviceCategoryId is still empty, try to get it from caregiver model 
+      // or fallback to SelectedServiceTypeController
+      if (serviceCategoryId.value.isEmpty) {
+        if (caregiver.value?.serviceCategoryId != null && caregiver.value!.serviceCategoryId.isNotEmpty) {
+          serviceCategoryId.value = caregiver.value!.serviceCategoryId;
+        } else {
+          try {
+            final serviceController = Get.find<SelectedServiceTypeController>();
+            if (serviceController.serviceTypes.isNotEmpty) {
+              serviceCategoryId.value = serviceController.serviceTypes[serviceController.selectedIndex.value].id;
+            }
+          } catch (_) {}
         }
-      } catch (_) {}
+      }
 
       final bookingData = {
         "caregiver": caregiverId,
         "careRecipient": careRecipientId,
-        "serviceCategory": serviceCategoryId,
+        "serviceCategory": serviceCategoryId.value,
         "date": DateFormat('yyyy-MM-dd').format(selectedDay.value),
         "shift": slot.shiftType,
         "slotStartTime": slot.startTime,

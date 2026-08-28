@@ -62,21 +62,65 @@ class ClientProfileHeader extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 textColor: colors.primary,
               ),
-              SizedBox(height: 6.h),
-              Row(
+              SizedBox(height: 10.h),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, color: Colors.amber, size: 18.sp),
-                  SizedBox(width: 4.w),
-                  CommonText(
-                    text: 'Status: ${booking.status}',
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    textColor: colors.secondaryText,
+                  _StatusItem(
+                    icon: Icons.info_outline,
+                    label: 'Status:',
+                    value: booking.formattedStatus,
+                    valueColor: Colors.amber,
+                  ),
+                  SizedBox(height: 6.h),
+                  _StatusItem(
+                    icon: Icons.payments_outlined,
+                    label: 'Payment:',
+                    value: booking.formattedPaymentStatus,
+                    valueColor: Colors.blue,
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color valueColor;
+
+  const _StatusItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.instance;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: colors.secondaryText, size: 16.sp),
+        SizedBox(width: 4.w),
+        CommonText(
+          text: '$label ',
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w400,
+          textColor: colors.secondaryText,
+        ),
+        CommonText(
+          text: value,
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w600,
+          textColor: valueColor,
         ),
       ],
     );
@@ -241,47 +285,67 @@ class AdditionalInstructionsCard extends StatelessWidget {
 
 class BookingDetailActions extends StatelessWidget {
   final bool isLoading;
-  final String status;
+  final BookingDetails booking;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
+  final VoidCallback onComplete;
 
   const BookingDetailActions({
     super.key,
     required this.isLoading,
-    required this.status,
+    required this.booking,
     required this.onAccept,
     required this.onDecline,
+    required this.onComplete,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (status != 'PENDING') return const SizedBox.shrink();
-
     final colors = AppColors.instance;
+    final status = booking.status;
 
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: CommonButton(
-            titleText: 'Accept Request',
-            buttonColor: colors.secondaryColor,
-            titleColor: colors.white,
-            isLoading: isLoading,
-            onTap: isLoading ? null : onAccept,
+    if (status == 'PENDING') {
+      return Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: CommonButton(
+              titleText: 'Accept Request',
+              buttonColor: colors.secondaryColor,
+              titleColor: colors.white,
+              isLoading: isLoading,
+              onTap: isLoading ? null : onAccept,
+            ),
           ),
-        ),
-        SizedBox(height: 12.h),
-        SizedBox(
-          width: double.infinity,
-          child: CommonButton(
-            titleText: 'Decline',
-            buttonColor: colors.boxBg,
-            titleColor: colors.textPrimary,
-            onTap: isLoading ? null : onDecline,
+          SizedBox(height: 12.h),
+          SizedBox(
+            width: double.infinity,
+            child: CommonButton(
+              titleText: 'Decline',
+              buttonColor: colors.boxBg,
+              titleColor: colors.textPrimary,
+              onTap: isLoading ? null : onDecline,
+            ),
           ),
+        ],
+      );
+    }
+
+    if (status == 'CONFIRMED') {
+      final canComplete = booking.canBeCompleted;
+      
+      return SizedBox(
+        width: double.infinity,
+        child: CommonButton(
+          titleText: 'Complete Booking',
+          buttonColor: canComplete ? colors.secondaryColor : colors.secondaryColor.withAlpha(100),
+          titleColor: colors.white,
+          isLoading: isLoading,
+          onTap: (isLoading || !canComplete) ? null : onComplete,
         ),
-      ],
-    );
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }

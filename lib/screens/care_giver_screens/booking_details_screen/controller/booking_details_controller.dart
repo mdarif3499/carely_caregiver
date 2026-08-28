@@ -18,6 +18,7 @@ class BookingDetails {
   final String endTime;
   final double earnings;
   final String status;
+  final String paymentStatus;
   final String instructions;
 
   const BookingDetails({
@@ -32,6 +33,7 @@ class BookingDetails {
     required this.endTime,
     required this.earnings,
     required this.status,
+    required this.paymentStatus,
     required this.instructions,
   });
 
@@ -52,6 +54,7 @@ class BookingDetails {
       endTime: json['slotEndTime'] ?? '00:00',
       earnings: (json['totalAmount'] ?? 0.0).toDouble(),
       status: json['status'] ?? 'PENDING',
+      paymentStatus: json['paymentStatus'] ?? 'UNPAID',
       instructions: json['instructions'] ?? 'No instructions provided.',
     );
   }
@@ -65,7 +68,40 @@ class BookingDetails {
     }
   }
 
+  String get formattedStatus {
+    String text = status.replaceAll('_', ' ').toLowerCase();
+    if (text.isEmpty) return "";
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  String get formattedPaymentStatus {
+    String text = paymentStatus.replaceAll('_', ' ').toLowerCase();
+    if (text.isEmpty) return "";
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   String get timeRange => '${_formatTime(startTime)} - ${_formatTime(endTime)}';
+
+  bool get canBeCompleted {
+    try {
+      // Parse scheduled date
+      final dateParts = date.split('T')[0].split('-');
+      final year = int.parse(dateParts[0]);
+      final month = int.parse(dateParts[1]);
+      final day = int.parse(dateParts[2]);
+
+      // Parse start time (expected format HH:mm)
+      final timeParts = startTime.split(':');
+      final hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+
+      final scheduledStart = DateTime(year, month, day, hour, minute);
+      return DateTime.now().isAfter(scheduledStart);
+    } catch (_) {
+      // If parsing fails, default to allowing (or logging error)
+      return true;
+    }
+  }
 
   String _formatTime(String time) {
     try {
@@ -109,6 +145,7 @@ class BookingDetailsController extends GetxController {
       endTime: '11:00',
       earnings: 0.0,
       status: 'PENDING',
+      paymentStatus: 'UNPAID',
       instructions: 'Placeholder instructions for shimmering effect.',
     );
   }
@@ -175,6 +212,30 @@ class BookingDetailsController extends GetxController {
       }
     } catch (e) {
       showCustomSnackbar(message: "Failed to decline booking", isError: true);
+    } finally {
+      isActionLoading.value = false;
+      update();
+    }
+  }
+
+  Future<void> complete() async {
+    final id = booking.value?.id;
+    if (id == null) return;
+
+    try {
+      isActionLoading.value = true;
+      update();
+
+      final response = await CaregiverRepository.instance.completeBooking(id);
+
+      if (response.isSuccess) {
+        showCustomSnackbar(message: "Booking completed successfully!", isError: false);
+        fetchBookingDetails(id);
+      } else {
+        showCustomSnackbar(message: response.message, isError: true);
+      }
+    } catch (e) {
+      showCustomSnackbar(message: "Failed to complete booking", isError: true);
     } finally {
       isActionLoading.value = false;
       update();

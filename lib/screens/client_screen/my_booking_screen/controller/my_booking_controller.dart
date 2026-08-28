@@ -55,9 +55,8 @@ class MyBookingController extends GetxController {
 
   String formatStatus(String status) {
     if (status == 'ALL') return 'All';
-    return status.split('_').map((word) {
-      if (word.isEmpty) return "";
-      return word[0].toUpperCase() + word.substring(1).toLowerCase();
-    }).join(' ');
+    String text = status.replaceAll('_', ' ').toLowerCase();
+    if (text.isEmpty) return "";
+    return text[0].toUpperCase() + text.substring(1);
   }
 }
