@@ -163,6 +163,9 @@ class CareGiverHomeController extends GetxController {
 
   Future<void> _loadSchedule() async {
     try {
+      isLoading.value = true;
+      update();
+
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final response = await CaregiverRepository.instance.getCaregiverBookings(date: today);
 
@@ -188,9 +191,15 @@ class CareGiverHomeController extends GetxController {
         }).toList();
         
         todaySchedule.assignAll(items);
+      } else {
+        todaySchedule.clear();
       }
     } catch (e) {
       debugPrint("Error loading today's schedule: $e");
+      todaySchedule.clear();
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
 

@@ -60,69 +60,70 @@ class CustomBottomNavBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          selectedAppUserType == AppUserType.client
-              ? clientIcons.length
-              : caregiverIcons.length,
-          (index) {
-            final isSelected = currentIndex == index;
-            return Expanded(
-              child: InkWell(
-                onTap: () => onTap(index),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Indicator Bar
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      height: 6,
-                      width: isSelected ? 50 : 0,
-                      decoration: BoxDecoration(
-                        color: AppColors.instance.primary, // Purple indicator
-                        borderRadius:const BorderRadius.only(
-                          bottomLeft: Radius.circular(6),
-                          bottomRight: Radius.circular(6),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(
+            selectedAppUserType == AppUserType.client
+                ? clientIcons.length
+                : caregiverIcons.length,
+            (index) {
+              final isSelected = currentIndex == index;
+              return Expanded(
+                child: InkWell(
+                  onTap: () => onTap(index),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Indicator Bar
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        height: 6,
+                        width: isSelected ? 50 : 0,
+                        decoration: BoxDecoration(
+                          color: AppColors.instance.primary, // Purple indicator
+                          borderRadius:const BorderRadius.only(
+                            bottomLeft: Radius.circular(6),
+                            bottomRight: Radius.circular(6),
+                          ),
                         ),
                       ),
-                    ),
-                    12.height,
-                    // Icon
-                    CommonImage(
-                      src: isSelected
-                          ? (selectedAppUserType == AppUserType.client
-                              ? clientSelectedIcons[index].keys.first
-                              : careGiverSelectedIcons[index].keys.first)
-                          : (selectedAppUserType == AppUserType.client
-                              ? clientIcons[index].keys.first
-                              : caregiverIcons[index].keys.first),
-                      width: 24.w,
-                      height: 24.w,
-                      // If the icon is not colorful enough, we might need to handle colors
-                      // But the design shows colorful icons, so we assume SVGs are colorful
-                    ),
-                    4.height,
-                    CommonText(
-                      text: isSelected
-                          ? (selectedAppUserType == AppUserType.client
-                              ? clientSelectedIcons[index].values.first
-                              : careGiverSelectedIcons[index].values.first)
-                          : (selectedAppUserType == AppUserType.client
-                              ? clientIcons[index].values.first
-                              : caregiverIcons[index].values.first),
-                      fontSize: 14,
-                      textColor: isSelected
-                          ? AppColors.instance.primary
-                          : AppColors.instance.subTextColor,
-                      fontWeight: isSelected? FontWeight.w600 : FontWeight.w400,
-                    ),
-                    30.height,
-                  ],
+                      12.height,
+                      // Icon
+                      CommonImage(
+                        src: isSelected
+                            ? (selectedAppUserType == AppUserType.client
+                                ? clientSelectedIcons[index].keys.first
+                                : careGiverSelectedIcons[index].keys.first)
+                            : (selectedAppUserType == AppUserType.client
+                                ? clientIcons[index].keys.first
+                                : caregiverIcons[index].keys.first),
+                        width: 24.w,
+                        height: 24.w,
+                      ),
+                      4.height,
+                      CommonText(
+                        text: isSelected
+                            ? (selectedAppUserType == AppUserType.client
+                                ? clientSelectedIcons[index].values.first
+                                : careGiverSelectedIcons[index].values.first)
+                            : (selectedAppUserType == AppUserType.client
+                                ? clientIcons[index].values.first
+                                : caregiverIcons[index].values.first),
+                        fontSize: 14,
+                        textColor: isSelected
+                            ? AppColors.instance.primary
+                            : AppColors.instance.subTextColor,
+                        fontWeight: isSelected? FontWeight.w600 : FontWeight.w400,
+                      ),
+                      12.height,
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
