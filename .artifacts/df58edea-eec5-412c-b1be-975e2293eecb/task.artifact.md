@@ -1,9 +1,9 @@
-# Tasks - Auth Flow Professional UI Polish
+# Tasks - Fix Missing Service Category in Booking Flow
 
-- `[x]` Implement scaling and Skeletonizer in `lib/screens/auth_all_screens/login_screen/login_screen.dart`
-- `[x]` Implement scaling and Skeletonizer in `lib/screens/auth_all_screens/sign_up_screen/sign_up_screen.dart`
-- `[x]` Implement scaling and Skeletonizer in Forgot Password flow
-- `[x]` Implement scaling and Skeletonizer in OTP & Verification screens
-- `[x]` Implement scaling and Skeletonizer in Role Selection (Welcome) screen
-- `[x]` Verify build and static analysis
-- `[x]` Create walkthrough summary
+- `[x]` Update `CaregiverModel` to store `serviceCategoryId`
+- `[x]` Update `CareGiverProfileModel` to store `serviceCategoryId`
+- `[x]` Update `FindCaregiverScreen` to pass `serviceCategoryId`
+- `[x]` Update `CareGiverDetailsScreen` to pass `serviceCategoryId`
+- `[x]` Update `BookCaregiverController` to use passed `serviceCategoryId`
+- `[x]` Verify fix and check logs
+- `[x]` Update walkthrough summary

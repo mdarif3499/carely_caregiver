@@ -56,6 +56,7 @@ class CareGiverDetailsController extends GetxController {
       city: 'City',
       state: 'State',
       hourlyRate: 0.0,
+      serviceCategoryId: 'placeholder',
       availability: [],
     );
     _generateWeekAvailability();

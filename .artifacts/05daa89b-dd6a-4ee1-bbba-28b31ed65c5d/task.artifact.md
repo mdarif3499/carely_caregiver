@@ -1,0 +1,5 @@
+- [x] Add `earnings` endpoint to `AppApiEndPoint`
+- [x] Add `getEarnings` to `CaregiverRepository`
+- [x] Update `EarningScreenController` to fetch and map earnings list
+- [x] Update `EarningScreen` UI to show real-time transactions
+- [x] Verify functionality

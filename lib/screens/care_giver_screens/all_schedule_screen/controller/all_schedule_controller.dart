@@ -37,6 +37,7 @@ class AllScheduleController extends GetxController {
       startTime: '09:00',
       endTime: '11:00',
       status: 'PENDING',
+      paymentStatus: 'UNPAID',
       amount: 0.0,
       instructions: '',
     ));

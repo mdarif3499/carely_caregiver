@@ -109,52 +109,67 @@ class ClientHomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
 
-            // ── Recent Activity ──
+            // ── Service Categories ──
             CommonText(
-              text: 'Recent Activity',
+              text: 'Service Categories',
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
             ),
             SizedBox(height: 20.h),
             Obx(
               () => Skeletonizer(
-                enabled: controller.isBookingsLoading.value,
-                child: Container(
-                  padding: EdgeInsets.all(20.r),
-                  decoration: BoxDecoration(
-                    color: colors.white,
-                    borderRadius: BorderRadius.circular(24.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(5),
-                        blurRadius: 10.r,
-                        offset: Offset(0, 4.h),
-                      ),
-                    ],
+                enabled: controller.isCategoriesLoading.value,
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: 0.9,
                   ),
-                  child: Column(
-                    children: List.generate(controller.recentActivities.length, (index) {
-                      final activity = controller.recentActivities[index];
-                      final isLast = index == controller.recentActivities.length - 1;
-                      return Column(
-                        children: [
-                          ClientActivityItem(activity: activity),
-                          if (!isLast)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 20.h),
-                              child: Divider(color: colors.boxBg, height: 1.h),
-                            ),
-                        ],
+                  itemCount: controller.isCategoriesLoading.value ? 6 : controller.categories.length,
+                  itemBuilder: (context, index) {
+                    if (controller.isCategoriesLoading.value) {
+                      return ServiceCategoryItem(
+                        title: '...',
+                        icon: Icons.category_outlined,
+                        onTap: () {},
                       );
-                    }),
-                  ),
+                    }
+                    final category = controller.categories[index];
+                    return ServiceCategoryItem(
+                      title: category.name,
+                      icon: _getCategoryIcon(category.name),
+                      onTap: () => controller.onCategoryTap(category),
+                    );
+                  },
                 ),
               ),
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 32.h),
           ],
         ),
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String name) {
+    switch (name.toLowerCase()) {
+      case 'memory care':
+        return Icons.psychology_outlined;
+      case 'daily living':
+        return Icons.home_work_outlined;
+      case 'elderly care':
+        return Icons.elderly_outlined;
+      case 'post-surgical':
+        return Icons.healing_outlined;
+      case 'dementia care':
+        return Icons.medical_services_outlined;
+      case 'companion care':
+        return Icons.people_outline_rounded;
+      default:
+        return Icons.category_outlined;
+    }
   }
 }

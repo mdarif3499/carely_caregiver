@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:core_kit/core_kit.dart';
 class AppApiEndPoint {
   AppApiEndPoint._privateConstructor();
   static final AppApiEndPoint _instance = AppApiEndPoint._privateConstructor();
@@ -32,6 +31,7 @@ class AppApiEndPoint {
   static const String myBookings = "/booking/my";
   static const String caregiverBooking = "/booking/caregiver";
   static const String earningsSummary = "/earnings/me/summary";
+  static const String earnings = "/earnings/me";
   static const String conversation = "/conversation";
   static const String message = "/message";
   static const String cms = "/cms";

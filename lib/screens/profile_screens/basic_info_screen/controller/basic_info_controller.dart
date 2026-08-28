@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:carely_caregiver/repositories/user_repository.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../routes/app_routes.dart';

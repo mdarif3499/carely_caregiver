@@ -106,7 +106,15 @@ class CaregiverRepository {
     return await _apiClient.patch("${AppApiEndPoint.booking}/$id/decline");
   }
 
+  Future<ApiResponseModel> completeBooking(String id) async {
+    return await _apiClient.patch("${AppApiEndPoint.booking}/$id/complete");
+  }
+
   Future<ApiResponseModel> getEarningsSummary() async {
     return await _apiClient.get(AppApiEndPoint.earningsSummary);
+  }
+
+  Future<ApiResponseModel> getEarnings() async {
+    return await _apiClient.get(AppApiEndPoint.earnings);
   }
 }

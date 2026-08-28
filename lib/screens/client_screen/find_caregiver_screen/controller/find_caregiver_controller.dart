@@ -17,6 +17,7 @@ class CaregiverModel {
   final double rating;
   final double hourlyRate;
   final String avatarUrl;
+  final String serviceCategoryId;
 
   const CaregiverModel({
     required this.id,
@@ -26,6 +27,7 @@ class CaregiverModel {
     required this.description,
     required this.rating,
     required this.hourlyRate,
+    required this.serviceCategoryId,
     this.avatarUrl = '',
   });
 
@@ -38,6 +40,7 @@ class CaregiverModel {
       name: userData['name'] ?? 'Unknown',
       role: 'Caregiver',
       specialty: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['name'] ?? 'General Care') : specialties.join(', ')) : 'General Care',
+      serviceCategoryId: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['_id'] ?? specialties.first['id'] ?? '') : '') : '',
       description: json['bio'] ?? '',
       rating: (json['averageRating'] ?? 0.0).toDouble(),
       hourlyRate: (json['hourlyRate'] ?? 0.0).toDouble(),
@@ -93,8 +96,19 @@ class FindCaregiverController extends GetxController {
   void onInit() {
     super.onInit();
     searchController = TextEditingController();
-    initData();
+    
+    // Handle incoming arguments for pre-filtering
+    final args = Get.arguments;
+    if (args is Map) {
+      if (args['categoryId'] != null) {
+        selectedFilterId.value = args['categoryId'];
+      }
+      if (args['categoryName'] != null) {
+        selectedFilterName.value = args['categoryName'];
+      }
+    }
 
+    initData();
 
     debounce(searchQuery, (_) {
       debugPrint("Search query triggered: ${searchQuery.value}");
@@ -123,6 +137,12 @@ class FindCaregiverController extends GetxController {
   void onClose() {
     searchController.dispose();
     super.onClose();
+  }
+
+  void applyCategoryFilter(String id, String name) {
+    selectedFilterId.value = id;
+    selectedFilterName.value = name;
+    fetchCaregivers();
   }
 
 

@@ -173,6 +173,7 @@ class CareGiverDetailsScreen extends StatelessWidget {
                             Get.toNamed(AppRoutes.instance.bookCareGiverScreen, arguments: {
                               "profile": profile,
                               "selectedDate": controller.selectedDate.value,
+                              "serviceCategoryId": profile?.serviceCategoryId,
                             });
                           } : null,
                           buttonWidth: double.infinity,

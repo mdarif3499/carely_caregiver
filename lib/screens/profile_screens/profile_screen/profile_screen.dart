@@ -1,16 +1,13 @@
 import 'package:carely_caregiver/app_all_enum/app_login_status.dart';
-import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/controller/profile_screen_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/profile_screen/widgets/profile_widgets.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-// ProfileMenuItem is now imported from widgets/profile_widgets.dart
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -190,8 +190,17 @@ class CaregiverCard extends StatelessWidget {
                   buttonWidth: 120,
                   titleText: 'Book Now',
                   onTap: () {
+                    final findC = Get.find<FindCaregiverController>();
+                    String selectedId = findC.selectedFilterId.value;
+                    if (selectedId == 'All') {
+                      selectedId = caregiver.serviceCategoryId;
+                    }
+                    
                     Get.toNamed(AppRoutes.instance.bookCareGiverScreen,
-                        arguments: caregiver);
+                        arguments: {
+                          "caregiver": caregiver,
+                          "serviceCategoryId": selectedId,
+                        });
                   },
                 ),
               ],

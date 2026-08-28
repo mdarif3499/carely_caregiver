@@ -1,6 +1,5 @@
 import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/routes/app_routes.dart';
-import 'package:carely_caregiver/screens/client_screen/controller/client_home_controller.dart';
 import 'package:carely_caregiver/utils/app_utils.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
@@ -316,39 +315,60 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-class ClientActivityItem extends StatelessWidget {
-  final ActivityModel activity;
-  const ClientActivityItem({super.key, required this.activity});
+class ServiceCategoryItem extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const ServiceCategoryItem({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
-    final isMessage = activity.type == ActivityType.message;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: isMessage ? colors.orange.withAlpha(20) : colors.secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(12)),
-            child: Icon(isMessage ? Icons.chat_bubble_outline_rounded : Icons.check_circle_outline_rounded, size: 20, color: isMessage ? colors.orange : colors.secondaryColor),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonText(text: activity.title, fontSize: 16, fontWeight: FontWeight.w600, textColor: colors.textPrimary, textAlign: TextAlign.start),
-                const SizedBox(height: 2),
-                CommonText(text: activity.description, fontSize: 14, fontWeight: FontWeight.w400, textColor: colors.secondaryText, textAlign: TextAlign.start),
-                const SizedBox(height: 4),
-                CommonText(text: activity.timeAgo, fontSize: 12, fontWeight: FontWeight.w500, textColor: colors.textGrey, textAlign: TextAlign.start),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(5),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.primary.withAlpha(15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: colors.primary, size: 28),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: CommonText(
+                text: title,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                textColor: colors.textPrimary,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

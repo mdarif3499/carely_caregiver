@@ -91,10 +91,21 @@ class ClientBookingCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const CommonText(
-                  text: 'Total Amount Paid:',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                Row(
+                  children: [
+                    const CommonText(
+                      text: 'Total Amount :',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    const SizedBox(width: 6),
+                    CommonText(
+                      text: '(${booking.formattedPaymentStatus})',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      textColor: booking.paymentStatus == 'PAID' ? Colors.green : Colors.red,
+                    ),
+                  ],
                 ),
                 CommonText(
                   text: '\$${booking.amount.toStringAsFixed(2)}',
@@ -189,10 +200,10 @@ class _StatusBadge extends StatelessWidget {
         textColor = Colors.grey;
     }
 
-    String label = status.split('_').map((word) {
-      if (word.isEmpty) return "";
-      return word[0].toUpperCase() + word.substring(1).toLowerCase();
-    }).join(' ');
+    String label = status.replaceAll('_', ' ').toLowerCase();
+    if (label.isNotEmpty) {
+      label = label[0].toUpperCase() + label.substring(1);
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
