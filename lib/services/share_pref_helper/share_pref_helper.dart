@@ -26,55 +26,57 @@ class SharedPreferenceValue {
 }
 
 class SharePrefsHelper {
+  static SharedPreferences? _preferences;
+
+  static Future<void> init() async {
+    _preferences ??= await SharedPreferences.getInstance();
+  }
+
   //===========================Get Data From Shared Preference===================
   static Future<String> getString(String key) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    return preferences.getString(key) ?? "";
+    await init();
+    return _preferences!.getString(key) ?? "";
   }
 
   static Future<List<String>> getLisOfString(String key) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    final getListData = preferences.getStringList(key);
+    await init();
+    final getListData = _preferences!.getStringList(key);
 
     return getListData ?? [];
   }
 
   static Future<bool?> getBool(String key) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    return preferences.getBool(key);
+    await init();
+    return _preferences!.getBool(key);
   }
 
   static Future<int> getInt(String key) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    return preferences.getInt(key) ?? (-1);
+    await init();
+    return _preferences!.getInt(key) ?? (-1);
   }
 
   //===========================Save Data To Shared Preference===================
 
   static Future setString(String key, value) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setString(key, value);
+    await init();
+    await _preferences!.setString(key, value);
   }
 
   static Future<bool> setListOfString(String key, List<String> value) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    var setListData = await preferences.setStringList(key, value);
+    await init();
+    var setListData = await _preferences!.setStringList(key, value);
 
     return setListData;
   }
 
   static Future setBool(String key, bool value) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setBool(key, value);
+    await init();
+    await _preferences!.setBool(key, value);
   }
 
   static Future setInt(String key, int value) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setInt(key, value);
+    await init();
+    await _preferences!.setInt(key, value);
   }
 
   static clearData() async {

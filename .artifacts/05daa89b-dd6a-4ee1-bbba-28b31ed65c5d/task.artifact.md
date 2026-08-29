@@ -1,7 +1,4 @@
-- [x] Add `notifications` endpoint to `AppApiEndPoint`
-- [x] Create `NotificationRepository`
-- [x] Refactor `AppNotification` model to match backend response
-- [x] Implement `NotificationScreenController` with pagination and grouping logic
-- [x] Update `NotificationItem` widget with dynamic icons and professional styling
-- [x] Update `NotificationScreen` with `SmartListLoader` and `Skeletonizer`
-- [x] Verify functionality and UI grouping
+- [x] Initialize `SharedPreferences` in `main.dart` and `SharePrefsHelper`
+- [x] Refactor `ConnectivityService` to remove fragile initialization checks
+- [x] Refactor `SplashScreenController` for robust navigation logic
+- [x] Verify cold start and auto-login flow

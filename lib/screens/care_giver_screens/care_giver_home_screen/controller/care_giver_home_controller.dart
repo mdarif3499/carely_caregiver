@@ -236,8 +236,9 @@ class CareGiverHomeController extends GetxController {
     ]);
   }
 
-  void onViewDetails(TodayScheduleItem item) {
-    Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
+  void onViewDetails(TodayScheduleItem item) async {
+    await Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
+    _loadSchedule();
   }
 
   Future<void> onChat(TodayScheduleItem item) async {
