@@ -21,6 +21,8 @@ class ChatConversation {
   final bool isOnline;
   final bool isTyping;
   final String partnerId;
+  final String lastMessageStatus;
+  final String lastMessageSenderId;
 
   const ChatConversation({
     required this.id,
@@ -33,6 +35,8 @@ class ChatConversation {
     this.unreadCount = 0,
     this.isOnline = false,
     this.isTyping = false,
+    this.lastMessageStatus = 'SENT',
+    this.lastMessageSenderId = '',
   });
 
   ChatConversation copyWith({
@@ -46,6 +50,8 @@ class ChatConversation {
     bool? isOnline,
     bool? isTyping,
     String? partnerId,
+    String? lastMessageStatus,
+    String? lastMessageSenderId,
   }) {
     return ChatConversation(
       id: id ?? this.id,
@@ -58,6 +64,8 @@ class ChatConversation {
       isOnline: isOnline ?? this.isOnline,
       isTyping: isTyping ?? this.isTyping,
       partnerId: partnerId ?? this.partnerId,
+      lastMessageStatus: lastMessageStatus ?? this.lastMessageStatus,
+      lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
     );
   }
 
@@ -81,12 +89,32 @@ class ChatConversation {
     // Handle last message display text
     final lastMsgObj = json['lastMessage'];
     String displayMsg = "No messages yet";
+    String status = 'SENT';
+    String senderId = '';
+
     if (lastMsgObj != null) {
       if (lastMsgObj['contentType'] == "IMAGE") {
         displayMsg = "📷 Photo";
       } else {
         displayMsg = lastMsgObj['content'] ?? "";
       }
+
+      // ── Strict Status Logic based on API fields ──
+      final readAt = lastMsgObj['readAt'];
+      final deliveredAt = lastMsgObj['deliveredAt'];
+      final isRead = lastMsgObj['isRead'];
+
+      if (readAt != null && readAt.toString().isNotEmpty || isRead == true) {
+        status = 'SEEN';
+      } else if (deliveredAt != null && deliveredAt.toString().isNotEmpty) {
+        status = 'DELIVERED';
+      } else {
+        status = (lastMsgObj['status'] ?? 'SENT').toString().toUpperCase();
+      }
+
+      senderId = (lastMsgObj['sender'] is Map) 
+          ? (lastMsgObj['sender']['_id'] ?? lastMsgObj['sender']['id'] ?? '').toString()
+          : (lastMsgObj['sender'] ?? '').toString();
     }
 
     // Dynamic unread count based on role
@@ -107,6 +135,8 @@ class ChatConversation {
       unreadCount: unread,
       partnerId: partner['_id'] ?? partner['id'] ?? '',
       isOnline: json['isActive'] ?? false,
+      lastMessageStatus: status,
+      lastMessageSenderId: senderId,
     );
   }
 }
@@ -117,12 +147,22 @@ class ChatListController extends GetxController {
   final RxList<ChatConversation> conversations = <ChatConversation>[].obs;
   final RxBool isLoading = false.obs;
 
+  String currentUserId = '';
+  String currentUserRole = '';
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     _setPlaceholders();
-    fetchConversations();
+    
+    // Professional: Initialize identity BEFORE starting listeners
+    currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+    
+    appLog("🚀 CHAT LIST: Initialized for $currentUserRole ($currentUserId)", source: "CHAT");
+    
     _setupGlobalSocketListeners();
+    fetchConversations();
   }
 
   void _setPlaceholders() {
@@ -141,8 +181,8 @@ class ChatListController extends GetxController {
     SocketService.on('message:new', _onNewMessageList);
     SocketService.on('typing:start', _onPartnerTypingStartList);
     SocketService.on('typing:stop', _onPartnerTypingStopList);
-    SocketService.on('message:delivered', _onMessageStatusUpdateList);
-    SocketService.on('message:seen', _onMessageStatusUpdateList);
+    SocketService.on('message:delivered', _onMessageDeliveredList);
+    SocketService.on('message:seen', _onMessageSeenList);
     SocketService.on('conversation:updated', _onConversationUpdated);
   }
 
@@ -150,8 +190,11 @@ class ChatListController extends GetxController {
     if (data == null) return;
     appLog("CONVERSATION UPDATED RECEIVED: $data", source: "CHAT");
     
-    final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-    final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+    // Ensure identity is known
+    if (currentUserId.isEmpty) {
+      currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+      currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+    }
     
     final updatedConv = ChatConversation.fromJson(data, currentUserId, currentUserRole);
     
@@ -163,12 +206,58 @@ class ChatListController extends GetxController {
       conversations.insert(0, updatedConv);
     }
     conversations.refresh();
+
+    // ── Professional Delivery Confirmation ──
+    final lastMsg = data['lastMessage'];
+    if (lastMsg != null) {
+      final senderId = (lastMsg['sender'] is Map) 
+          ? (lastMsg['sender']['_id'] ?? lastMsg['sender']['id']) 
+          : lastMsg['sender'] ?? '';
+      
+      final String msgStatus = (lastMsg['status'] ?? 'SENT').toString().toUpperCase();
+      final String msgId = (lastMsg['_id'] ?? lastMsg['id'] ?? '').toString();
+
+      // Professional logic: Only confirm if partner sent it and it's strictly not delivered yet
+      final bool alreadyDelivered = lastMsg['deliveredAt'] != null || lastMsg['readAt'] != null || lastMsg['isRead'] == true || msgStatus == 'DELIVERED' || msgStatus == 'SEEN';
+
+      if (senderId != currentUserId && !alreadyDelivered && msgId.isNotEmpty) {
+        appLog("📤 CHAT LIST: Confirming delivery via UPDATE for message $msgId", source: "CHAT");
+        _emitDeliveredStatus(updatedConv.id, msgId, senderId);
+      }
+    }
   }
 
-  void _onMessageStatusUpdateList(data) {
-    // When a message is seen or delivered, we should refresh the inbox to update indicators if needed
-    // or just fetch conversations again for absolute accuracy.
-    fetchConversations();
+  void _onMessageDeliveredList(data) => _updateConversationStatus(data, 'DELIVERED');
+  void _onMessageSeenList(data) => _updateConversationStatus(data, 'SEEN');
+
+  void _updateConversationStatus(data, String fallbackStatus) {
+    if (data == null) return;
+    appLog("📩 CHAT LIST: Status update received: $data", source: "SOCKET");
+    
+    final String conversationId = data['conversationId'] ?? '';
+    
+    // Determine status strictly from API fields
+    String finalStatus = (data['status'] ?? fallbackStatus).toString().toUpperCase();
+    final readAt = data['readAt'];
+    final deliveredAt = data['deliveredAt'];
+    final isRead = data['isRead'];
+
+    if (readAt != null && readAt.toString().isNotEmpty || isRead == true) {
+      finalStatus = 'SEEN';
+    } else if (deliveredAt != null && deliveredAt.toString().isNotEmpty) {
+      finalStatus = 'DELIVERED';
+    }
+
+    final index = conversations.indexWhere((c) => c.id == conversationId);
+    if (index != -1) {
+      final conv = conversations[index];
+      // Only update if it's our message being confirmed
+      if (conv.lastMessageSenderId == currentUserId) {
+        appLog("✅ CHAT LIST: Updating status to $finalStatus for conversation $conversationId", source: "CHAT");
+        conversations[index] = conv.copyWith(lastMessageStatus: finalStatus);
+        conversations.refresh();
+      }
+    }
   }
 
   @override
@@ -176,8 +265,8 @@ class ChatListController extends GetxController {
     SocketService.off('message:new', _onNewMessageList);
     SocketService.off('typing:start', _onPartnerTypingStartList);
     SocketService.off('typing:stop', _onPartnerTypingStopList);
-    SocketService.off('message:delivered', _onMessageStatusUpdateList);
-    SocketService.off('message:seen', _onMessageStatusUpdateList);
+    SocketService.off('message:delivered', _onMessageDeliveredList);
+    SocketService.off('message:seen', _onMessageSeenList);
     SocketService.off('conversation:updated', _onConversationUpdated);
     super.onClose();
   }
@@ -211,7 +300,9 @@ class ChatListController extends GetxController {
     final String conversationId = data['conversationId'] ?? data['conversation'] ?? '';
     if (conversationId.isEmpty) return;
 
-    final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    if (currentUserId.isEmpty) {
+      currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+    }
 
     // Find the conversation in our list
     final index = conversations.indexWhere((c) => c.id == conversationId);
@@ -227,22 +318,33 @@ class ChatListController extends GetxController {
       }
 
       // Update unread count if it's not from us
-      final senderId = data['sender']?['_id'] ?? data['sender']?['id'] ?? '';
+      final senderId = (data['sender'] is Map) 
+          ? (data['sender']['_id'] ?? data['sender']['id'] ?? '').toString()
+          : (data['sender'] ?? '').toString();
+      
       int newUnread = oldConv.unreadCount;
       if (senderId != currentUserId) {
         newUnread++;
       }
 
-      final updatedConv = ChatConversation(
-        id: oldConv.id,
-        name: oldConv.name,
-        role: oldConv.role,
-        avatarUrl: oldConv.avatarUrl,
+      // Determine status strictly from API fields
+      String msgStatus = (data['status'] ?? 'SENT').toString().toUpperCase();
+      final readAt = data['readAt'];
+      final deliveredAt = data['deliveredAt'];
+      final isRead = data['isRead'];
+
+      if (readAt != null && readAt.toString().isNotEmpty || isRead == true) {
+        msgStatus = 'SEEN';
+      } else if (deliveredAt != null && deliveredAt.toString().isNotEmpty) {
+        msgStatus = 'DELIVERED';
+      }
+
+      final updatedConv = oldConv.copyWith(
         lastMessage: displayMsg,
         time: DateFormat('hh:mm a').format(DateTime.now()),
         unreadCount: newUnread,
-        isOnline: oldConv.isOnline,
-        partnerId: oldConv.partnerId,
+        lastMessageStatus: msgStatus,
+        lastMessageSenderId: senderId,
       );
 
       // Move to top
@@ -252,8 +354,11 @@ class ChatListController extends GetxController {
 
       // Emit Delivered Status globally if message is not from us
       if (senderId != currentUserId) {
-        final messageId = data['_id'] ?? data['id'] ?? '';
-        _emitDeliveredStatus(conversationId, messageId, currentUserId);
+        final messageId = (data['_id'] ?? data['id'] ?? '').toString();
+        if (messageId.isNotEmpty) {
+          appLog("📤 CHAT LIST: Confirming delivery via NEW MESSAGE event: $messageId", source: "CHAT");
+          _emitDeliveredStatus(conversationId, messageId, senderId);
+        }
       }
     } else {
       // It's a new conversation we don't have yet - Refresh list to be safe
@@ -261,11 +366,11 @@ class ChatListController extends GetxController {
     }
   }
 
-  void _emitDeliveredStatus(String convId, String msgId, String userId) {
-    if (convId.isEmpty || msgId.isEmpty) return;
+  void _emitDeliveredStatus(String convId, String msgId, String messageSenderId) {
+    if (convId.isEmpty || msgId.isEmpty || messageSenderId.isEmpty) return;
     SocketService.emit('message:delivered', {
       "messageId": msgId,
-      "senderId": userId,
+      "senderId": messageSenderId,
       "conversationId": convId,
     });
   }
@@ -277,13 +382,40 @@ class ChatListController extends GetxController {
       isLoading.value = true;
       update();
 
-      final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-      final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+      if (currentUserId.isEmpty) {
+        currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+        currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+      }
+      
       final response = await ChatRepository.instance.getConversations();
 
       if (response.isSuccess) {
         final List dataList = response.data['data']?['conversations'] ?? [];
         conversations.value = dataList.map((e) => ChatConversation.fromJson(e, currentUserId, currentUserRole)).toList();
+
+        // Mark as delivered for all unread messages in the list
+        for (var convJson in dataList) {
+          final lastMsg = convJson['lastMessage'];
+          if (lastMsg != null) {
+            final senderId = ((lastMsg['sender'] is Map) 
+                ? (lastMsg['sender']['_id'] ?? lastMsg['sender']['id']) 
+                : lastMsg['sender'] ?? '').toString();
+            
+            final String msgStatus = (lastMsg['status'] ?? '').toString().toUpperCase();
+            final String msgId = (lastMsg['_id'] ?? lastMsg['id'] ?? '').toString();
+
+            // Professional: Only confirm if partner sent it and it's strictly not delivered yet
+            final bool alreadyDelivered = lastMsg['deliveredAt'] != null || lastMsg['readAt'] != null || lastMsg['isRead'] == true || msgStatus == 'DELIVERED' || msgStatus == 'SEEN';
+
+            if (senderId.isNotEmpty && senderId != currentUserId && !alreadyDelivered && msgId.isNotEmpty) {
+              // Tiny delay to ensure socket is ready for this room/auth
+              Future.delayed(const Duration(milliseconds: 500), () {
+                appLog("📤 CHAT LIST: Confirming delivery for offline message: $msgId", source: "CHAT");
+                _emitDeliveredStatus(convJson['_id'].toString(), msgId, senderId);
+              });
+            }
+          }
+        }
       } else {
         conversations.clear();
       }
@@ -308,7 +440,8 @@ class ChatListController extends GetxController {
 
   void onSearchChanged(value) => searchQuery.value = value;
 
-  void onConversationTap(ChatConversation conversation) {
-   Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+  void onConversationTap(ChatConversation conversation) async {
+    await Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+    fetchConversations();
   }
 }

@@ -1,11 +1,13 @@
+import 'package:carely_caregiver/repositories/notification_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:core_kit/core_kit.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ─────────────────────────────────────────────────────
 //  Enums
 // ─────────────────────────────────────────────────────
-enum NotificationType { emergency, booking, message, payment, update }
-
-enum NotificationFilter { all, unread, bookings, payments }
+enum NotificationFilter { all, unread }
 
 // ─────────────────────────────────────────────────────
 //  Model
@@ -14,20 +16,48 @@ class AppNotification {
   final String id;
   final String title;
   final String body;
-  final String timeAgo;
-  final NotificationType type;
+  final String type;
   final bool isRead;
-  final String group;
+  final DateTime createdAt;
 
   const AppNotification({
     required this.id,
     required this.title,
     required this.body,
-    required this.timeAgo,
     required this.type,
-    required this.group,
+    required this.createdAt,
     this.isRead = false,
   });
+
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    return AppNotification(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      body: json['body'] ?? '',
+      type: json['type'] ?? '',
+      isRead: json['isRead'] ?? false,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+    );
+  }
+
+  String get timeAgo {
+    final now = DateTime.now();
+    final diff = now.difference(createdAt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
+  }
+
+  String get group {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final date = DateTime(createdAt.year, createdAt.month, createdAt.day);
+
+    if (date == today) return 'Today';
+    if (date == yesterday) return 'Yesterday';
+    return DateFormat('MMMM d, yyyy').format(createdAt);
+  }
 }
 
 // Flat list item: either a section label or a notification row
@@ -44,75 +74,75 @@ class NotifListItem {
 // ─────────────────────────────────────────────────────
 class NotificationScreenController extends GetxController {
   final Rx<NotificationFilter> activeFilter = NotificationFilter.all.obs;
+  final RxList<AppNotification> notifications = <AppNotification>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxBool isMoreLoading = false.obs;
+  final RxInt currentPage = 1.obs;
+  final RxBool hasMore = true.obs;
 
-  final List<AppNotification> _all = const [
-    AppNotification(
-      id: '1',
-      title: 'Emergency Alert',
-      body: 'Unusual activity detected during session.',
-      timeAgo: '2m ago',
-      type: NotificationType.emergency,
-      group: 'Today',
-    ),
-    AppNotification(
-      id: '2',
-      title: 'Booking Accepted',
-      body: 'Sarah Jenkins has accepted your request.',
-      timeAgo: '15m ago',
-      type: NotificationType.booking,
-      group: 'Today',
-    ),
-    AppNotification(
-      id: '3',
-      title: 'New Message',
-      body: 'Caregiver Sarah: "I\'ve arrived at the location."',
-      timeAgo: '1h ago',
-      type: NotificationType.message,
-      group: 'Today',
-      isRead: true,
-    ),
-    AppNotification(
-      id: '4',
-      title: 'Payment Successful',
-      body: 'Invoice #INV-88291 has been paid.',
-      timeAgo: '3h ago',
-      type: NotificationType.payment,
-      group: 'Today',
-      isRead: true,
-    ),
-    AppNotification(
-      id: '5',
-      title: 'App Update',
-      body: 'A new version of CareConnect is available.',
-      timeAgo: '1d ago',
-      type: NotificationType.update,
-      group: 'Yesterday',
-      isRead: true,
-    ),
-    AppNotification(
-      id: '6',
-      title: 'New Message',
-      body: 'Caregiver Sarah: "I\'ve arrived at the location."',
-      timeAgo: '1d ago',
-      type: NotificationType.message,
-      group: 'Yesterday',
-    ),
-  ];
+  @override
+  void onInit() {
+    super.onInit();
+    fetchNotifications();
+  }
 
-  List<AppNotification> get _filtered {
-    switch (activeFilter.value) {
-      case NotificationFilter.unread:
-        return _all.where((n) => !n.isRead).toList();
-      case NotificationFilter.bookings:
-        return _all.where((n) => n.type == NotificationType.booking).toList();
-      case NotificationFilter.payments:
-        return _all.where((n) => n.type == NotificationType.payment).toList();
-      case NotificationFilter.all:
-        return _all;
+  Future<void> fetchNotifications({bool isRefresh = false}) async {
+    if (isRefresh) {
+      currentPage.value = 1;
+      hasMore.value = true;
+    }
+
+    try {
+      if (currentPage.value == 1) {
+        isLoading.value = true;
+      } else {
+        isMoreLoading.value = true;
+      }
+      update();
+
+      final response = await NotificationRepository.instance.getMyNotifications(page: currentPage.value);
+
+      if (response.isSuccess) {
+        final List dataList = response.data['data'] ?? [];
+        final List<AppNotification> fetched = dataList.map((e) => AppNotification.fromJson(e)).toList();
+
+        if (currentPage.value == 1) {
+          notifications.assignAll(fetched);
+        } else {
+          notifications.addAll(fetched);
+        }
+
+        final meta = response.data['meta'] ?? {};
+        hasMore.value = fetched.length >= 10 && currentPage.value < (meta['totalPages'] ?? 1);
+      } else {
+        if (currentPage.value == 1) notifications.clear();
+      }
+    } catch (e) {
+      debugPrint("Error fetching notifications: $e");
+    } finally {
+      isLoading.value = false;
+      isMoreLoading.value = false;
+      update();
     }
   }
 
-  /// Flat list interleaving group labels + notification items for SmartListLoader
+  Future<void> loadMore() async {
+    if (!hasMore.value || isMoreLoading.value) return;
+    currentPage.value++;
+    await fetchNotifications();
+  }
+
+  List<AppNotification> get _filtered {
+    final List<AppNotification> base = notifications;
+    switch (activeFilter.value) {
+      case NotificationFilter.unread:
+        return base.where((n) => !n.isRead).toList();
+      case NotificationFilter.all:
+        return base;
+    }
+  }
+
+  /// Flat list interleaving group labels + notification items
   List<NotifListItem> get flatItems {
     final grouped = <String, List<AppNotification>>{};
     for (final n in _filtered) {
@@ -126,5 +156,60 @@ class NotificationScreenController extends GetxController {
     return result;
   }
 
-  void setFilter(NotificationFilter f) => activeFilter.value = f;
+  void setFilter(NotificationFilter f) {
+    activeFilter.value = f;
+    update();
+  }
+
+  Future<void> onNotificationTap(AppNotification n) async {
+    // Show full notification in a dialog
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          n.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            n.body,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text(
+              'Close',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!n.isRead) {
+      try {
+        await NotificationRepository.instance.markAsRead(n.id);
+        final index = notifications.indexWhere((element) => element.id == n.id);
+        if (index != -1) {
+          notifications[index] = AppNotification(
+            id: n.id,
+            title: n.title,
+            body: n.body,
+            type: n.type,
+            createdAt: n.createdAt,
+            isRead: true,
+          );
+          notifications.refresh();
+        }
+      } catch (e) {
+        debugPrint("Error marking notification as read: $e");
+      }
+    }
+  }
 }

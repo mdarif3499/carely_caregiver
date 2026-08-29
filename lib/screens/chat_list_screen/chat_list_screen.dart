@@ -104,6 +104,7 @@ class _ChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ChatListController>();
     final colors = AppColors.instance;
     final hasUnread = conversation.unreadCount > 0;
     final isTimeHighlighted = hasUnread;
@@ -145,16 +146,27 @@ class _ChatTile extends StatelessWidget {
                         preventScaling: true,
                       ),
                       SizedBox(height: 3.h),
-                      CommonText(
-                        text: conversation.isTyping ? 'typing...' : conversation.lastMessage,
-                        fontSize: 13.sp,
-                        fontWeight: conversation.isTyping ? FontWeight.w600 : FontWeight.w400,
-                        textColor: conversation.isTyping ? colors.primary : colors.secondaryText,
-                        textAlign: TextAlign.start,
-                        isDescription: true,
-                        preventScaling: true,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          if (conversation.lastMessageSenderId == controller.currentUserId && !conversation.isTyping && conversation.lastMessage != "No messages yet")
+                            Padding(
+                              padding: EdgeInsets.only(right: 4.w),
+                              child: _StatusTicks(status: conversation.lastMessageStatus),
+                            ),
+                          Expanded(
+                            child: CommonText(
+                              text: conversation.isTyping ? 'typing...' : conversation.lastMessage,
+                              fontSize: 13.sp,
+                              fontWeight: conversation.isTyping ? FontWeight.w600 : FontWeight.w400,
+                              textColor: conversation.isTyping ? colors.primary : colors.secondaryText,
+                              textAlign: TextAlign.start,
+                              isDescription: true,
+                              preventScaling: true,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -219,5 +231,26 @@ class _ChatTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _StatusTicks extends StatelessWidget {
+  final String status;
+  final bool isFailed;
+  const _StatusTicks({required this.status, this.isFailed = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if (isFailed) {
+      return Icon(Icons.error_outline_rounded, size: 14.sp, color: Colors.redAccent);
+    }
+    if (status == 'SENT') {
+      return Icon(Icons.done_rounded, size: 14.sp, color: Colors.grey);
+    } else if (status == 'DELIVERED') {
+      return Icon(Icons.done_all_rounded, size: 14.sp, color: Colors.grey);
+    } else if (status == 'SEEN') {
+      return Icon(Icons.done_all_rounded, size: 14.sp, color: const Color(0xFF34B7F1)); // WhatsApp blue for seen
+    }
+    return const SizedBox.shrink();
   }
 }

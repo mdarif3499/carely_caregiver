@@ -1,5 +1,7 @@
-- [x] Add `earnings` endpoint to `AppApiEndPoint`
-- [x] Add `getEarnings` to `CaregiverRepository`
-- [x] Update `EarningScreenController` to fetch and map earnings list
-- [x] Update `EarningScreen` UI to show real-time transactions
-- [x] Verify functionality
+- [x] Add `notifications` endpoint to `AppApiEndPoint`
+- [x] Create `NotificationRepository`
+- [x] Refactor `AppNotification` model to match backend response
+- [x] Implement `NotificationScreenController` with pagination and grouping logic
+- [x] Update `NotificationItem` widget with dynamic icons and professional styling
+- [x] Update `NotificationScreen` with `SmartListLoader` and `Skeletonizer`
+- [x] Verify functionality and UI grouping
