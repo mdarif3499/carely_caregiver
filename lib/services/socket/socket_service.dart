@@ -64,51 +64,59 @@ class SocketService {
     }
   }
 
-  static void _reRegisterListeners() {
-    if (_socket == null) return;
-    _handlers.forEach((event, handlers) {
-      _socket!.off(event);
-      _socket!.on(event, (data) {
-        appLog('📩 Socket: Event triggered [$event] WITH DATA: $data', source: 'SOCKET');
-        for (var h in List.from(handlers)) {
-          try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
-        }
-      });
-    });
-  }
-
   static void on(String event, void Function(dynamic data) handler) async {
     if (_socket == null) await connect();
     
     if (!_handlers.containsKey(event)) {
       _handlers[event] = [];
       
-      final handlerWrapper = (data) {
-        appLog('📩 Socket: Data received for [$event] WITH DATA: $data', source: 'SOCKET');
+      // Professional: Register core listener once. Use a fixed wrapper.
+      _socket?.on(event, (data) {
         final listeners = List.from(_handlers[event] ?? []);
+        appLog('📩 Socket: Event [$event] received by ${listeners.length} handlers', source: 'SOCKET');
         for (var h in listeners) {
-          try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
+          try { h(data); } catch (e) { appLog('❌ Handler Error on [$event]: $e'); }
         }
-      };
-
-      _socket?.on(event, handlerWrapper);
+      });
       appLog('👂 Socket: Registered core listener for [$event]', source: 'SOCKET');
     }
 
     if (!_handlers[event]!.contains(handler)) {
       _handlers[event]!.add(handler);
     }
-    appLog('👂 Socket: Registered listener for [$event]', source: 'SOCKET');
+  }
+
+  static void _reRegisterListeners() {
+    if (_socket == null) return;
+    // Core listeners are registered via 'on'. We just need to ensure the socket 
+    // knows about them after a reconnection if the instance was replaced.
+    // However, since we keep the same instance usually, we just ensure 
+    // 'on' calls happen on the fresh socket.
+    _handlers.forEach((event, _) {
+       _socket!.off(event); // Avoid duplicates
+       _socket!.on(event, (data) {
+          final listeners = List.from(_handlers[event] ?? []);
+          for (var h in listeners) {
+            try { h(data); } catch (e) { appLog('❌ Handler Error: $e'); }
+          }
+       });
+    });
   }
 
   static void off(String event, void Function(dynamic data) handler) {
     if (_handlers.containsKey(event)) {
-      _handlers[event]!.remove(handler);
-      if (_handlers[event]!.isEmpty) {
+      final removed = _handlers[event]!.remove(handler);
+      final remaining = _handlers[event]?.length ?? 0;
+      
+      if (removed) {
+        appLog('🔕 Socket: Removed one handler for [$event]. ($remaining handler(s) still active)', source: 'SOCKET');
+      }
+      
+      if (remaining == 0) {
         _socket?.off(event);
         _handlers.remove(event);
+        appLog('🚫 Socket: STOPPED listening to event [$event] entirely (No more handlers)', source: 'SOCKET');
       }
-      appLog('🔕 Socket: Removed listener for [$event]', source: 'SOCKET');
     }
   }
 

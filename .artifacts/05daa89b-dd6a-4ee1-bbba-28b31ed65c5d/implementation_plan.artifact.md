@@ -1,39 +1,49 @@
-# Implementation Plan - Caregiver Earnings List
+# Professional Notification System Implementation
 
-Integrate the real-time earnings list into the "Recent Transactions" section of the Earning screen.
+Implement a professional notification system using real-time API data, supporting dynamic icons, grouping by date, and pagination.
 
 ## Proposed Changes
 
-### [API Endpoints]
+### [Core]
 
 #### [MODIFY] [app_api_end_point.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart)
-- Add `static const String earnings = "/earnings/me";`
+- Add `static const String notifications = "/notification/my";`
 
 ### [Repository]
 
-#### [MODIFY] [caregiver_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/caregiver_repository.dart)
-- Add `getEarnings()` method to fetch the list of earnings.
+#### [NEW] [notification_repository.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/notification_repository.dart)
+- Implement `getMyNotifications({int page = 1})` to fetch data from the API.
 
-### [Earning Screen]
+### [Notification Screen]
 
-#### [MODIFY] [earning_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/earning_screen/controller/earning_screen_controller.dart)
-- Change `transactions` from a static list to `RxList<EarningTransaction>`.
-- Implement `fetchEarnings()` to call `CaregiverRepository.instance.getEarnings()`.
-- Map the API response to `EarningTransaction` objects:
-    - `title`: "Home Visit - [Client Name]"
-    - `subtitle`: "[Formatted Date] . [Duration]h [Service Name]"
-    - `amount`: The earning amount.
-    - `status`: The earning status (e.g., PENDING, PAID).
-- Implement date formatting and duration calculation (if possible from start/end times).
+#### [MODIFY] [notification_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/controller/notification_screen_controller.dart)
+- **Professional Model**: Refactor `AppNotification` to match the API response.
+- **State Management**:
+    - Add `isLoading`, `isMoreLoading`.
+    - Use `RxList<AppNotification>` for reactive updates.
+    - Implement pagination logic (`currentPage`, `hasMore`).
+- **Grouping Logic**: Dynamically group notifications into "Today", "Yesterday", and "Older" based on `createdAt`.
+- **Filtering**: Support filtering by "All", "Unread", "Bookings", and "Payments" using the `type` field.
 
-#### [MODIFY] [earning_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/earning_screen/earning_screen.dart)
-- Ensure the transaction list is wrapped in `Obx`.
-- Show a placeholder or empty state if no transactions are found.
+#### [MODIFY] [notification_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/widgets/notification_widgets.dart)
+- **Dynamic Icons**: Map `type` (e.g., `booking_completed`, `booking_confirmed`) to professional Material icons.
+- **Modern Item UI**:
+    - Show unread indicator.
+    - Professional color coding for different notification types.
+    - Improved typography and spacing.
+
+#### [MODIFY] [notification_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/notification_screen.dart)
+- Integrate `Skeletonizer` for loading states.
+- Support "Pull to Refresh".
+- Implement infinite scroll loading using `SmartListLoader`.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  Navigate to the "Earning" tab as a caregiver.
-2.  Verify that "Recent Transactions" displays the live data from the API.
-3.  Check if the title, date, duration, and service name are correctly formatted.
-4.  Verify that the transaction status (Pending/Completed) matches the API data.
+1.  Open the Notification screen.
+2.  Verify loading shimmer appears.
+3.  Verify notifications are fetched from the server.
+4.  Check that icons and colors match the notification type.
+5.  Verify grouping (Today/Yesterday/Older) is correct.
+6.  Test "Pull to Refresh".
+7.  Verify pagination works by scrolling to the bottom.

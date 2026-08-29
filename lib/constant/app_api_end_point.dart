@@ -28,6 +28,7 @@ class AppApiEndPoint {
   static const String caregiverBooking = "/booking/caregiver";
   static const String earningsSummary = "/earnings/me/summary";
   static const String earnings = "/earnings/me";
+  static const String notifications = "/notification/my";
   static const String conversation = "/conversation";
   static const String message = "/message";
   static const String cms = "/cms";

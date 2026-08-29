@@ -65,10 +65,13 @@ class MessageScreenController extends GetxController{
     userId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
     // Refresh placeholders with the actual userId to maintain correct alignment during shimmer
     _setPlaceholders(); 
-    await fetchConversationDetails();
-    await fetchMessages();
+
+    // Professional: Start listening and join room IMMEDIATELY before fetching data
     _setupSocketListeners();
     _joinConversation();
+
+    await fetchConversationDetails();
+    await fetchMessages();
     emitSeenStatus();
   }
 
@@ -113,7 +116,7 @@ class MessageScreenController extends GetxController{
             chats.insert(0, incomingMsg);
             
             // Emit Delivered instantly
-            emitDeliveredStatus(incomingMsg.messageId);
+            emitDeliveredStatus(incomingMsg.messageId, incomingMsg.userId);
             
             // Emit Seen after tiny delay (matching your manual Postman seen action)
             Future.delayed(const Duration(milliseconds: 300), () {
@@ -135,23 +138,21 @@ class MessageScreenController extends GetxController{
   }
 
   void _onMessageDelivered(data) {
-    appLog("SOCKET DELIVERED RECEIVED: $data", source: "CHAT");
+    appLog("📩 MESSAGE SCREEN: DELIVERY STATUS RECEIVED: $data", source: "SOCKET");
     if (data != null) {
       final String incomingChatId = (data['conversationId'] ?? data['conversation'] ?? '').toString();
       if (incomingChatId == chatId) {
-        final String senderOfStatus = (data['senderId'] ?? '').toString();
-        
-        // If my partner confirms delivery
-        if (senderOfStatus.isNotEmpty && senderOfStatus != userId) {
-          final String? msgId = data['messageId']?.toString();
-          if (msgId != null && msgId.isNotEmpty) {
-            final index = chats.indexWhere((m) => m.messageId == msgId);
-            if (index != -1 && chats[index].status == 'SENT') {
-              appLog("TICK UPDATE: Message $msgId is DELIVERED", source: "CHAT");
-              chats[index] = chats[index].copyWith(status: 'DELIVERED');
-              chats.refresh();
-              update();
-            }
+        final String? msgId = data['messageId']?.toString();
+        final bool isDelivered = data['deliveredAt'] != null;
+
+        if (msgId != null && msgId.isNotEmpty && isDelivered) {
+          final index = chats.indexWhere((m) => m.messageId == msgId);
+          // Update if found and not already in a higher status (like SEEN)
+          if (index != -1 && chats[index].status == 'SENT') {
+            appLog("✅ TICK UPDATE: Message $msgId is now DELIVERED (Double Grey) via deliveredAt", source: "CHAT");
+            chats[index] = chats[index].copyWith(status: 'DELIVERED');
+            chats.refresh();
+            update();
           }
         }
       }
@@ -159,14 +160,13 @@ class MessageScreenController extends GetxController{
   }
 
   void _onMessageSeen(data) {
-    appLog("SOCKET SEEN RECEIVED: $data", source: "CHAT");
+    appLog("📩 MESSAGE SCREEN: SEEN STATUS RECEIVED: $data", source: "SOCKET");
     if (data != null) {
       final String incomingChatId = (data['conversationId'] ?? data['conversation'] ?? '').toString();
       if (incomingChatId == chatId) {
-        // Who performed the 'seen' action (matching your seenBy log)
         final String seenBy = (data['seenBy'] ?? data['senderId'] ?? '').toString();
         
-        // Only update my sent ticks if the OTHER person saw them
+        // Only update MY sent ticks if the OTHER person saw them
         if (seenBy.isNotEmpty && seenBy != userId) {
           bool changed = false;
           final String? msgId = data['messageId']?.toString();
@@ -175,11 +175,13 @@ class MessageScreenController extends GetxController{
             // Partner saw a specific message
             final index = chats.indexWhere((m) => m.messageId == msgId);
             if (index != -1 && chats[index].status != 'SEEN') {
+              appLog("✅ TICK UPDATE: Message $msgId is now SEEN (Double Blue)", source: "CHAT");
               chats[index] = chats[index].copyWith(status: 'SEEN');
               changed = true;
             }
           } else {
             // Room-wide seen: mark all MY sent messages as SEEN
+            appLog("✅ TICK UPDATE: All my messages in room are now SEEN (Double Blue)", source: "CHAT");
             for (int i = 0; i < chats.length; i++) {
               if (chats[i].userId == userId && chats[i].status != 'SEEN') {
                 chats[i] = chats[i].copyWith(status: 'SEEN');
@@ -189,7 +191,6 @@ class MessageScreenController extends GetxController{
           }
 
           if (changed) {
-            appLog("TICK UPDATE: Messages are now BLUE (SEEN)", source: "CHAT");
             chats.refresh();
             update();
           }
@@ -231,12 +232,12 @@ class MessageScreenController extends GetxController{
     });
   }
 
-  void emitDeliveredStatus(String messageId) {
-    if (chatId.isEmpty || messageId.isEmpty) return;
+  void emitDeliveredStatus(String messageId, String messageSenderId) {
+    if (chatId.isEmpty || messageId.isEmpty || messageSenderId.isEmpty) return;
     // Matching 1st screenshot: messageId, senderId, conversationId
     SocketService.emit('message:delivered', {
       "messageId": messageId,
-      "senderId": userId,
+      "senderId": messageSenderId,
       "conversationId": chatId,
     });
   }
@@ -328,12 +329,22 @@ class MessageScreenController extends GetxController{
           chats.addAll(newMessages);
         } else {
           chats.assignAll(newMessages);
+
+          // Professional Upgrade: Confirm delivery for any offline messages received
+          for (var m in newMessages) {
+            if (m.userId != userId && m.status == 'SENT') {
+              emitDeliveredStatus(m.messageId, m.userId);
+            }
+          }
         }
 
         hasMore.value = dataList.length >= 20;
+      } else {
+        chats.clear();
       }
     } catch (e) {
       debugPrint("Error fetching messages: $e");
+      chats.clear();
     } finally {
       isLoading.value = false;
       update();

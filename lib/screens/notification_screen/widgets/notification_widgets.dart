@@ -46,8 +46,6 @@ class NotificationFilterRow extends StatelessWidget {
     switch (f) {
       case NotificationFilter.all: return 'All';
       case NotificationFilter.unread: return 'Unread';
-      case NotificationFilter.bookings: return 'Bookings';
-      case NotificationFilter.payments: return 'Payments';
     }
   }
 }
@@ -73,112 +71,119 @@ class NotificationGroupLabel extends StatelessWidget {
 
 class NotificationItem extends StatelessWidget {
   final AppNotification notification;
-  const NotificationItem({super.key, required this.notification});
+  final VoidCallback onTap;
+
+  const NotificationItem({super.key, required this.notification, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Type Icon
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _bgColor(notification.type, colors),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        color: Colors.transparent,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Type Icon
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _bgColor(notification.type, colors),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _icon(notification.type),
+                size: 22,
+                color: _iconColor(notification.type, colors),
+              ),
             ),
-            child: Icon(
-              _icon(notification.type),
-              size: 22,
-              color: _iconColor(notification.type, colors),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CommonText(
-                      text: notification.title,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      textColor: colors.textPrimary,
-                    ),
-                    Row(
-                      children: [
-                        CommonText(
-                          text: notification.timeAgo,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          textColor: colors.error.withAlpha(180),
+            const SizedBox(width: 16),
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: CommonText(
+                          text: notification.title,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          textColor: colors.textPrimary,
+                          textAlign: TextAlign.start,
                         ),
-                        if (!notification.isRead) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: notification.type == NotificationType.emergency ? colors.error : colors.primary,
-                              shape: BoxShape.circle,
-                            ),
+                      ),
+                      Row(
+                        children: [
+                          CommonText(
+                            text: notification.timeAgo,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            textColor: colors.secondaryText.withAlpha(150),
                           ),
-                        ]
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                CommonText(
-                  text: notification.body,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  textColor: colors.secondaryText,
-                  textAlign: TextAlign.start,
-                  maxLines: 2,
-                ),
-              ],
+                          if (!notification.isRead) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: colors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ]
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  CommonText(
+                    text: notification.body,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    textColor: colors.secondaryText,
+                    textAlign: TextAlign.start,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Color _bgColor(NotificationType type, AppColors colors) {
-    switch (type) {
-      case NotificationType.emergency: return colors.error.withAlpha(15);
-      case NotificationType.booking: return colors.primary.withAlpha(15);
-      case NotificationType.message: return colors.orange.withAlpha(15);
-      case NotificationType.payment: return colors.success.withAlpha(15);
-      case NotificationType.update: return colors.textGrey.withAlpha(15);
-    }
+  Color _bgColor(String type, AppColors colors) {
+    if (type.contains('emergency')) return colors.error.withAlpha(15);
+    if (type.contains('booking')) return colors.primary.withAlpha(15);
+    if (type.contains('message')) return colors.orange.withAlpha(15);
+    if (type.contains('payment')) return colors.success.withAlpha(15);
+    return colors.textGrey.withAlpha(15);
   }
 
-  Color _iconColor(NotificationType type, AppColors colors) {
-    switch (type) {
-      case NotificationType.emergency: return colors.error;
-      case NotificationType.booking: return colors.primary;
-      case NotificationType.message: return colors.orange;
-      case NotificationType.payment: return colors.success;
-      case NotificationType.update: return colors.textGrey;
-    }
+  Color _iconColor(String type, AppColors colors) {
+    if (type.contains('emergency')) return colors.error;
+    if (type.contains('booking')) return colors.primary;
+    if (type.contains('message')) return colors.orange;
+    if (type.contains('payment')) return colors.success;
+    return colors.textGrey;
   }
 
-  IconData _icon(NotificationType type) {
-    switch (type) {
-      case NotificationType.emergency: return Icons.remove_circle_outline_rounded;
-      case NotificationType.booking: return Icons.check_circle_outline_rounded;
-      case NotificationType.message: return Icons.chat_bubble_outline_rounded;
-      case NotificationType.payment: return Icons.check_circle_outline_rounded;
-      case NotificationType.update: return Icons.check_circle_outline_rounded;
-    }
+  IconData _icon(String type) {
+    if (type.contains('emergency')) return Icons.report_problem_outlined;
+    if (type.contains('booking_completed')) return Icons.task_alt_rounded;
+    if (type.contains('booking_confirmed')) return Icons.check_circle_outline_rounded;
+    if (type.contains('booking_auto_released')) return Icons.timer_off_outlined;
+    if (type.contains('booking')) return Icons.calendar_today_outlined;
+    if (type.contains('message')) return Icons.chat_bubble_outline_rounded;
+    if (type.contains('payment')) return Icons.payments_outlined;
+    return Icons.notifications_none_rounded;
   }
 }

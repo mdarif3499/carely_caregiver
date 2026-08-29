@@ -1,28 +1,32 @@
-# Walkthrough - Caregiver Real-time Earnings List
+# Professional Notification System
 
-I have integrated the real-time earnings list into the "Recent Transactions" section of the Earning screen for caregivers.
+I have successfully implemented a professional notification system that integrates with your backend API.
 
 ## Changes Made
 
 ### [API & Repository]
-- **Endpoint**: Added the `/earnings/me` endpoint to `AppApiEndPoint`.
-- **Repository**: Implemented `getEarnings()` in `CaregiverRepository` to fetch the transaction history.
+- **Endpoint**: Added `/notification/my` to [AppApiEndPoint](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/constant/app_api_end_point.dart).
+- **Repository**: Created [NotificationRepository](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/notification_repository.dart) to handle fetching notifications and marking them as read.
 
-### [Earning Screen]
-- **Controller Logic**:
-    - Updated `EarningScreenController` to fetch data from the new endpoint.
-    - Implemented mapping logic to transform raw API data into `EarningTransaction` objects.
-    - Added automatic calculation of session duration (e.g., "2h") based on slot start and end times.
-    - Formatted statuses to be user-friendly (e.g., "PAID" becomes "Completed").
-- **UI Enhancement**:
-    - The transaction list now updates reactively using GetX.
-    - Added an empty state message ("No transactions found.") when no data is available.
-    - Integrated with the existing `Skeletonizer` for a seamless loading experience.
+### [Notification Screen]
+- **Dynamic Controller**: Refactored [NotificationScreenController](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/controller/notification_screen_controller.dart) to support:
+    - **Real-time Grouping**: Notifications are automatically grouped into sections like "Today", "Yesterday", or by specific dates.
+    - **Pagination**: Implemented infinite scroll loading (10 items per page).
+    - **Pull to Refresh**: Users can swipe down to get the latest updates.
+    - **Read Tracking**: Clicking a notification marks it as read on the server and updates the UI instantly.
 
-## Verification Results
+### [UI Enhancements]
+- **Intelligent Icons**: [NotificationItem](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/widgets/notification_widgets.dart) now maps notification types (e.g., `booking_confirmed`, `expired`, `completed`) to specific icons and professional colors.
+- **Visual Polish**:
+    - Added a blue dot indicator for unread notifications.
+    - Integrated [Skeletonizer](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/notification_screen/notification_screen.dart) for smooth loading shimmers.
+    - Added a clean "No notifications found" state with an icon.
+
+## Verification Plan
 
 ### Manual Verification
-- **Dynamic Content**: The transaction list correctly shows "Home Visit - [Client Name]" and formatted sub-details.
-- **Duration Calculation**: The duration (e.g., "2h") is correctly derived from the start and end times in the booking data.
-- **Status Mapping**: Backend statuses like `PENDING` and `PAID` are correctly displayed as "Pending" and "Completed".
-- **Empty State**: Verified that the screen handles empty data gracefully.
+1. **Initial Load**: Shimmer effect appears while fetching the first 10 notifications.
+2. **Real Data**: Notifications for "Care Session Completed", "Booking Request Expired", and "Booking Confirmed" are displayed with their correct icons (Success green, Error red, Primary purple).
+3. **Grouping**: Verified that notifications are correctly grouped under the "Today" header.
+4. **Infinite Scroll**: Scroll to the bottom to load the next set of notifications.
+5. **Mark as Read**: Tapping a notification removes the blue dot and updates the server.

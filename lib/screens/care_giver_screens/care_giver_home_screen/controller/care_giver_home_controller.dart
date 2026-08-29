@@ -254,7 +254,10 @@ class CareGiverHomeController extends GetxController {
         final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
         final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
 
-        Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+        await Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+        try {
+           Get.find<ChatListController>().fetchConversations();
+        } catch (_) {}
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }
