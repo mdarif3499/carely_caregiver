@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/services/socket/socket_service.dart';
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 
 import '../../../routes/app_routes.dart';
@@ -13,32 +15,29 @@ class SplashScreenController extends GetxController {
 
   Future<void> onInitialDataLoadScreen() async {
     try {
-      Future.delayed(Durations.medium1, () {
+      // Start animations immediately
+      Future.delayed(const Duration(milliseconds: 100), () {
         animation.value = 1.0;
         animation2.value = 1.0;
       });
 
-      // Professional login check "from main"
-      String token = await SharePrefsHelper.getString(SharedPreferenceValue.token);
-      String role = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+      // Parallel tasks: Check auth + Socket (Socket is already inited in main, but ensuring here)
+      final results = await Future.wait([
+        SharePrefsHelper.getString(SharedPreferenceValue.token),
+        Future.delayed(const Duration(seconds: 2)), // Minimum splash duration
+      ]);
 
-      Future.delayed(const Duration(seconds: 3), () {
-        if (token.isNotEmpty) {
-          // Connect to WebSocket
-          SocketService.connect();
-          
-          // Auto-login: Navigate to dashboard. AppNavigationScreenController will handle the role from storage.
-          Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
-        } else {
-          // No token: Navigate to login
-          Get.offAllNamed(AppRoutes.instance.loginScreen);
-        }
-      });
+      final String token = results[0] as String;
+
+      if (token.isNotEmpty) {
+        unawaited(SocketService.connect());
+        Get.offAllNamed(AppRoutes.instance.appNavigationScreen);
+      } else {
+        Get.offAllNamed(AppRoutes.instance.loginScreen);
+      }
     } catch (e) {
       errorLog("onInitialDataLoadScreen", e);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.offAllNamed(AppRoutes.instance.loginScreen);
-      });
+      Get.offAllNamed(AppRoutes.instance.loginScreen);
     }
   }
 

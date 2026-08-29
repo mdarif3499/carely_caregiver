@@ -71,11 +71,12 @@ class AllScheduleController extends GetxController {
 
   void onRefresh() => fetchSchedules();
 
-  void onViewDetails(CareGiverScheduleModel item) {
+  void onViewDetails(CareGiverScheduleModel item) async {
     if (selectedAppUserType == AppUserType.caregiver) {
-      Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
+      await Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
     } else {
-      Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: item.id);
+      await Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: item.id);
     }
+    fetchSchedules();
   }
 }

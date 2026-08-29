@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:carely_caregiver/services/connectivity_service/connectivity_service.dart';
 import 'package:carely_caregiver/services/socket/socket_service.dart';
 import 'constant/app_colors.dart';
 import 'main_entry_app.dart';
@@ -13,10 +13,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
 
-  ///////////// internet connectivity status check
-  // ConnectivityService is initialized via InitialBinding in GetMaterialApp,
-  // we don't need to await it here to avoid blocking the app launch.
-  ConnectivityService(); 
+  // Initialize Storage once at start
+  await SharePrefsHelper.init();
 
   ///////////// devices orientation set
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
@@ -29,7 +27,6 @@ Future<void> main() async {
   unawaited(SocketService.connect());
 
   /////////  flutter main widget call
-
   runApp(const MainEntryApp());
 }
 

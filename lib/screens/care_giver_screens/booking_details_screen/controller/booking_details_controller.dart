@@ -206,7 +206,7 @@ class BookingDetailsController extends GetxController {
 
       if (response.isSuccess) {
         showCustomSnackbar(message: "Booking declined.", isError: false);
-        fetchBookingDetails(id); // Refresh to hide buttons
+        fetchBookingDetails(id);
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }

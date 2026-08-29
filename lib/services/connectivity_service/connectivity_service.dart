@@ -29,9 +29,7 @@ class ConnectivityService extends GetxController {
       connectionStatus.refresh();
       if (result.contains(ConnectivityResult.none)) {
         Future.microtask(() {
-          if (Get.isRegistered<GetMaterialApp>()) {
-            Get.offAllNamed(AppRoutes.instance.errorScreen);
-          }
+          Get.offAllNamed(AppRoutes.instance.errorScreen);
         });
       }
     } catch (e) {

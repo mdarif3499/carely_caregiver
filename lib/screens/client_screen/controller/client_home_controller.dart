@@ -98,8 +98,9 @@ class ClientHomeController extends GetxController {
     }
   }
 
-  void onViewDetails(String bookingId) {
-    Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: bookingId);
+  void onViewDetails(String bookingId) async {
+    await Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: bookingId);
+    fetchUpcomingBookings();
   }
 
   void onSeeAllBookings() {
