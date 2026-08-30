@@ -65,10 +65,8 @@ class MessageScreenController extends GetxController{
 
   Future<void> _initUserIdAndData() async {
     userId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-    // Refresh placeholders with the actual userId to maintain correct alignment during shimmer
-    _setPlaceholders(); 
+    _setPlaceholders();
 
-    // Professional: Start listening and join room IMMEDIATELY before fetching data
     _setupSocketListeners();
     _joinConversation();
 
@@ -80,7 +78,6 @@ class MessageScreenController extends GetxController{
   void _joinConversation() {
     if (chatId.isNotEmpty) {
       appLog("JOINING CONVERSATION ROOM: $chatId", source: "CHAT");
-      // Emitting as a direct string, matching Postman
       SocketService.emit('conversation:join', chatId);
     }
   }
@@ -113,20 +110,16 @@ class MessageScreenController extends GetxController{
         final incomingMsg = ChatMessage.fromJson(data);
         
         if (incomingMsg.userId != userId) {
-          // 1. PARTNER MESSAGE: Add to list and confirm receipt
           if (!chats.any((m) => m.messageId == incomingMsg.messageId)) {
             chats.insert(0, incomingMsg);
             
-            // Emit Delivered instantly
             emitDeliveredStatus(incomingMsg.messageId, incomingMsg.userId);
             
-            // Emit Seen after tiny delay (matching your manual Postman seen action)
             Future.delayed(const Duration(milliseconds: 300), () {
               emitSeenStatus();
             });
           }
         } else {
-          // 2. MY MESSAGE BROADCAST: Sync local placeholder with Server ID
           final index = chats.indexWhere((m) => m.userId == userId && (m.isSending || m.messageId.contains('local') || m.messageId.length >= 13));
           if (index != -1) {
             appLog("SYNCING SENT MESSAGE DATA: $data", source: "CHAT");
@@ -149,7 +142,6 @@ class MessageScreenController extends GetxController{
 
         if (msgId != null && msgId.isNotEmpty && isDelivered) {
           final index = chats.indexWhere((m) => m.messageId == msgId);
-          // Update if found and not already in a higher status (like SEEN)
           if (index != -1 && chats[index].status == 'SENT') {
             appLog("✅ TICK UPDATE: Message $msgId is now DELIVERED (Double Grey) via deliveredAt", source: "CHAT");
             chats[index] = chats[index].copyWith(status: 'DELIVERED');
@@ -168,13 +160,11 @@ class MessageScreenController extends GetxController{
       if (incomingChatId == chatId) {
         final String seenBy = (data['seenBy'] ?? data['senderId'] ?? '').toString();
         
-        // Only update MY sent ticks if the OTHER person saw them
         if (seenBy.isNotEmpty && seenBy != userId) {
           bool changed = false;
           final String? msgId = data['messageId']?.toString();
           
           if (msgId != null && msgId.isNotEmpty) {
-            // Partner saw a specific message
             final index = chats.indexWhere((m) => m.messageId == msgId);
             if (index != -1 && chats[index].status != 'SEEN') {
               appLog("✅ TICK UPDATE: Message $msgId is now SEEN (Double Blue)", source: "CHAT");
@@ -182,7 +172,6 @@ class MessageScreenController extends GetxController{
               changed = true;
             }
           } else {
-            // Room-wide seen: mark all MY sent messages as SEEN
             appLog("✅ TICK UPDATE: All my messages in room are now SEEN (Double Blue)", source: "CHAT");
             for (int i = 0; i < chats.length; i++) {
               if (chats[i].userId == userId && chats[i].status != 'SEEN') {
@@ -224,7 +213,6 @@ class MessageScreenController extends GetxController{
 
   void emitSeenStatus() {
     if (chatId.isEmpty) return;
-    // The 'senderId' here is the person who originally sent the messages we just saw
     final partnerId = selectedConversation.value?.partnerId ?? '';
     if (partnerId.isEmpty) return;
 
