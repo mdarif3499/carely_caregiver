@@ -47,8 +47,10 @@ class MessageScreenController extends GetxController{
     chats.value = List.generate(10, (index) => ChatMessage(
       messageId: 'placeholder_$index',
       content: index % 2 == 0 
-          ? 'Short placeholder.' 
-          : 'This is a longer placeholder message to simulate a conversation flow with shimmer effect.',
+          ? '                   '
+          : '                                            ',
+
+
       userId: index % 2 == 0 ? userId : 'other',
       userName: index % 2 == 0 ? 'Me' : 'Partner',
       userImage: '',
