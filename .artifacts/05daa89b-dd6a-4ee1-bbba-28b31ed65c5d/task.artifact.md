@@ -1,4 +1,4 @@
-- [x] Update `declineBooking` in `CaregiverRepository`
-- [x] Add `declineReasonController` and `showDeclineDialog` to `BookingDetailsController`
-- [x] Update `BookingDetailActions` visibility and action
-- [x] Verify functionality
+- [x] Restore `_setPlaceholders()` in `MessageScreenController`
+- [x] Call `_setPlaceholders()` in `onInit()` and `_initUserIdAndData()`
+- [x] Ensure `Skeletonizer` is correctly used in `MessageScreen`
+- [x] Verify shimmer effect on load
