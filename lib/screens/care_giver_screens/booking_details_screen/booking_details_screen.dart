@@ -47,7 +47,7 @@ class BookingDetailsScreen extends StatelessWidget {
                         isLoading: ctrl.isActionLoading.value,
                         booking: b,
                         onAccept: ctrl.accept,
-                        onDecline: ctrl.decline,
+                        onDecline: ctrl.showDeclineDialog,
                         onComplete: ctrl.complete,
                       ),
                     ),

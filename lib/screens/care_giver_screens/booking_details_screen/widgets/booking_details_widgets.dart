@@ -303,10 +303,11 @@ class BookingDetailActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppColors.instance;
     final status = booking.status;
+    final isUnpaid = booking.paymentStatus.toUpperCase() == 'UNPAID';
 
-    if (status == 'PENDING') {
-      return Column(
-        children: [
+    return Column(
+      children: [
+        if (status == 'PENDING') ...[
           SizedBox(
             width: double.infinity,
             child: CommonButton(
@@ -318,6 +319,33 @@ class BookingDetailActions extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12.h),
+        ],
+        if (status == 'CONFIRMED' && booking.canBeCompleted) ...[
+          SizedBox(
+            width: double.infinity,
+            child: CommonButton(
+              titleText: 'Complete Booking',
+              buttonColor: colors.secondaryColor,
+              titleColor: colors.white,
+              isLoading: isLoading,
+              onTap: isLoading ? null : onComplete,
+            ),
+          ),
+          SizedBox(height: 12.h),
+        ] else if (status == 'CONFIRMED' && !booking.canBeCompleted) ...[
+          SizedBox(
+            width: double.infinity,
+            child: CommonButton(
+              titleText: 'Complete Booking',
+              buttonColor: colors.secondaryColor.withAlpha(100),
+              titleColor: colors.white,
+              isLoading: isLoading,
+              onTap: null,
+            ),
+          ),
+          SizedBox(height: 12.h),
+        ],
+        if (isUnpaid && (status == 'PENDING' || status == 'CONFIRMED'))
           SizedBox(
             width: double.infinity,
             child: CommonButton(
@@ -327,25 +355,7 @@ class BookingDetailActions extends StatelessWidget {
               onTap: isLoading ? null : onDecline,
             ),
           ),
-        ],
-      );
-    }
-
-    if (status == 'CONFIRMED') {
-      final canComplete = booking.canBeCompleted;
-      
-      return SizedBox(
-        width: double.infinity,
-        child: CommonButton(
-          titleText: 'Complete Booking',
-          buttonColor: canComplete ? colors.secondaryColor : colors.secondaryColor.withAlpha(100),
-          titleColor: colors.white,
-          isLoading: isLoading,
-          onTap: (isLoading || !canComplete) ? null : onComplete,
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+      ],
+    );
   }
 }
