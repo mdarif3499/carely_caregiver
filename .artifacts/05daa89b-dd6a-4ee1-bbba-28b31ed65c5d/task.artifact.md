@@ -1,4 +1,9 @@
-- [x] Restore `_setPlaceholders()` in `MessageScreenController`
-- [x] Call `_setPlaceholders()` in `onInit()` and `_initUserIdAndData()`
-- [x] Ensure `Skeletonizer` is correctly used in `MessageScreen`
-- [x] Verify shimmer effect on load
+- [x] Refactor `SignUpController` to align with API fields
+    - [x] Remove `locationTextEditingController`
+    - [x] Update `role` mapping to `CLIENT` and `CAREGIVER`
+- [x] Refactor `SignUpScreen` UI
+    - [x] Update radio button labels
+    - [x] Remove Location field
+- [x] Update `BookingDetailActions` visibility logic
+    - [x] Show "Decline" button whenever payment is "Unpaid" (including "Auto released" status)
+- [x] Verify registration flow and booking decline functionality

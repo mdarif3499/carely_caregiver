@@ -54,7 +54,7 @@ class SignUpScreen extends StatelessWidget {
                                   },
                                 ),
                                 CommonText(
-                                    text: "User",
+                                    text: "Client",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.sp),
                               ],
@@ -70,7 +70,7 @@ class SignUpScreen extends StatelessWidget {
                                   },
                                 ),
                                 CommonText(
-                                    text: "Agency",
+                                    text: "Caregiver",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20.sp),
                                 SizedBox(width: 30.w),
@@ -119,20 +119,6 @@ class SignUpScreen extends StatelessWidget {
                           validation: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return "Phone number is required";
-                            }
-                            return null;
-                          },
-                        ),
-                        20.height,
-                        CommonTextField(
-                          controller: controller.locationTextEditingController,
-                          borderColor: AppColors.instance.boxBg,
-                          labelText: "Location",
-                          hintText: "Enter your location",
-                          validationType: ValidationType.validateRequired,
-                          validation: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Location is required";
                             }
                             return null;
                           },

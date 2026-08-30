@@ -202,7 +202,7 @@ class LoginScreen extends StatelessWidget {
                                           ),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () {
-                                              controller.isSignInPage.value = !controller.isSignInPage.value;
+                                              Get.toNamed(AppRoutes.instance.signUpScreen);
                                             },
                                         ),
                                       ],

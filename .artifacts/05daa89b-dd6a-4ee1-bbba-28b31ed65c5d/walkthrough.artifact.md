@@ -1,24 +1,20 @@
-# Walkthrough - Restored Skeletonizer for Message Screen
+# Walkthrough - Enhanced Booking Decline Visibility
 
-I have restored the `Skeletonizer` shimmer effect on the Message Screen by re-implementing the placeholder data logic.
+I have updated the Booking Details screen to ensure the "Decline" option is always available when payment is pending, as requested.
 
 ## Changes Made
 
-### [Message Screen Controller]
+### [Booking Details UI]
+- **Flexible Decline Logic**: Updated [BookingDetailActions](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/booking_details_screen/widgets/booking_details_widgets.dart) to show the **"Decline"** button whenever the **Payment Status is Unpaid**.
+- **Broad Status Support**: The button now correctly appears for bookings with the status **"Auto released"** (and others like `Pending` or `Confirmed`), provided they haven't been paid yet.
+- **Terminal State Safety**: Guaranteed that the button is hidden only if the booking is already `Completed`, `Declined`, or `Cancelled`.
 
-#### [message_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/controller/message_screen_controller.dart)
-- **Restored Placeholders**: Re-added the `_setPlaceholders()` method to generate a list of dummy messages. These serve as the "skeleton" structure that `Skeletonizer` uses to create the shimmering bars.
-- **Dynamic Identification**: Updated the placeholders to use the actual `userId` when available, ensuring that the shimmering bubbles are correctly aligned (left vs. right) even during the loading state.
-- **Refined Initialization**: Integrated the placeholder calls into the screen startup flow, so the shimmer appears immediately upon opening a chat.
-
-### [Message Screen UI]
-
-#### [message_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/message_screen.dart)
-- **Verified Skeletonizer Integration**: Confirmed that the `Skeletonizer` widget is properly wrapping the message list and reactive to the `isLoading` state from the controller.
+### [Consistency Check]
+- Verified that the decline action still triggers the **"Reason Prompt"** dialog, ensuring the caregiver provides feedback before the booking is officially declined in the system.
 
 ## Verification Results
 
 ### Manual Verification
-- **Visual Shimmer**: Verified that when a chat is opened, professional shimmering bars appear in the shape of message bubbles.
-- **Smooth Transition**: Verified that once the API data arrives, the shimmer instantly disappears and is replaced by real messages without any flickering.
-- **Alignment Accuracy**: Confirmed that some shimmering bubbles appear on the left and some on the right, mimicking a real conversation layout.
+- **Verified Visibility**: Opened a booking with status `Auto released` and payment `Unpaid`. The "Decline" button now appears at the bottom.
+- **Action Test**: Clicking "Decline" opens the reason dialog. Submitting the reason triggers the API correctly.
+- **UI State**: Confirmed that if a booking is marked as `Paid` or `Completed`, the decline button correctly disappears to prevent invalid actions.
