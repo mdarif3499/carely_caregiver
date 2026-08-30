@@ -8,7 +8,6 @@ import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../../../services/socket/socket_service.dart';
 import '../model/chat_model.dart';
 
@@ -224,7 +223,7 @@ class MessageScreenController extends GetxController{
 
   void emitDeliveredStatus(String messageId, String messageSenderId) {
     if (chatId.isEmpty || messageId.isEmpty || messageSenderId.isEmpty) return;
-    // Matching 1st screenshot: messageId, senderId, conversationId
+
     SocketService.emit('message:delivered', {
       "messageId": messageId,
       "senderId": messageSenderId,

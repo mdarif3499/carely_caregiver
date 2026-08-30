@@ -13,7 +13,6 @@ class SignUpController extends GetxController {
   late final TextEditingController fullNameTextEditingController;
   late final TextEditingController emailTextEditingController;
   late final TextEditingController phoneTextEditingController;
-  late final TextEditingController locationTextEditingController;
   late final TextEditingController passwordTextEditingController;
   late final TextEditingController confirmPasswordTextEditingController;
 
@@ -23,7 +22,6 @@ class SignUpController extends GetxController {
     fullNameTextEditingController = TextEditingController();
     emailTextEditingController = TextEditingController();
     phoneTextEditingController = TextEditingController();
-    locationTextEditingController = TextEditingController();
     passwordTextEditingController = TextEditingController();
     confirmPasswordTextEditingController = TextEditingController();
   }
@@ -61,7 +59,7 @@ class SignUpController extends GetxController {
         "name": fullNameTextEditingController.text.trim(),
         "email": emailTextEditingController.text.trim(),
         "password": passwordTextEditingController.text,
-        "role": userTypes.value ? "CLIENT" : "AGENCY",
+        "role": userTypes.value ? "CLIENT" : "CAREGIVER",
         "phone": phoneTextEditingController.text.trim(),
       };
 

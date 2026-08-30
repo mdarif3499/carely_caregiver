@@ -345,7 +345,7 @@ class BookingDetailActions extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
         ],
-        if (isUnpaid && (status == 'PENDING' || status == 'CONFIRMED'))
+        if (isUnpaid && status != 'COMPLETED' && status != 'DECLINED' && status != 'CANCELLED')
           SizedBox(
             width: double.infinity,
             child: CommonButton(

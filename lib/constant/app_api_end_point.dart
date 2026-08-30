@@ -42,11 +42,11 @@ class AppApiEndPoint {
 }
 
 String _getDomain() {
-  // const String liveServer = "https://rahad5000.naimulhassan.me";
-  // const String localServer = "https://rahad5000.naimulhassan.me";
+  const String liveServer = "https://rahad5000.naimulhassan.me";
+  const String localServer = "https://rahad5000.naimulhassan.me";
 
-  const String liveServer =  "http://10.10.26.188:5000";
-  const String localServer = "http://10.10.26.188:5000";
+  // const String liveServer =  "http://10.10.26.188:5000";
+  // const String localServer = "http://10.10.26.188:5000";
 
   return kDebugMode ? localServer : liveServer;
 }
