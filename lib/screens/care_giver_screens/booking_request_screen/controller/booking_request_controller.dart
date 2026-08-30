@@ -1,6 +1,6 @@
 import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/repositories/caregiver_repository.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -150,12 +150,63 @@ class BookingRequestController extends GetxController {
     }
   }
 
-  Future<void> declineRequest(String id) async {
+  void showDeclineDialog(String id) {
+    final TextEditingController reasonC = TextEditingController();
+
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Decline Booking',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Please provide a reason for declining this booking request.',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonC,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'e.g. I have a prior family commitment...',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final reason = reasonC.text.trim();
+              if (reason.isEmpty) {
+                showCustomSnackbar(message: "Please enter a reason", isError: true);
+                return;
+              }
+              Get.back();
+              declineRequest(id, reason);
+            },
+            child: const Text('Decline'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> declineRequest(String id, String reason) async {
     try {
       isLoading.value = true;
       update();
 
-      final response = await CaregiverRepository.instance.declineBooking(id);
+      final response = await CaregiverRepository.instance.declineBooking(id, reason);
 
       if (response.isSuccess) {
         showCustomSnackbar(message: "Booking request declined.", isError: false);
