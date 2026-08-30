@@ -1,4 +1,4 @@
-- [x] Initialize `SharedPreferences` in `main.dart` and `SharePrefsHelper`
-- [x] Refactor `ConnectivityService` to remove fragile initialization checks
-- [x] Refactor `SplashScreenController` for robust navigation logic
-- [x] Verify cold start and auto-login flow
+- [x] Update `declineBooking` in `CaregiverRepository`
+- [x] Add `declineReasonController` and `showDeclineDialog` to `BookingDetailsController`
+- [x] Update `BookingDetailActions` visibility and action
+- [x] Verify functionality

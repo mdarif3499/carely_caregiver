@@ -102,8 +102,11 @@ class CaregiverRepository {
     return await _apiClient.patch("${AppApiEndPoint.booking}/$id/accept");
   }
 
-  Future<ApiResponseModel> declineBooking(String id) async {
-    return await _apiClient.patch("${AppApiEndPoint.booking}/$id/decline");
+  Future<ApiResponseModel> declineBooking(String id, String reason) async {
+    return await _apiClient.patch(
+      "${AppApiEndPoint.booking}/$id/decline",
+      body: {"declineReason": reason},
+    );
   }
 
   Future<ApiResponseModel> completeBooking(String id) async {

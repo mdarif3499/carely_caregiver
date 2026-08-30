@@ -1,20 +1,20 @@
-# Walkthrough - Robust App Startup Fix
+# Walkthrough - Booking Decline Improvements
 
-I have optimized the app's startup flow to eliminate the "white screen" issue and ensure a smoother, faster launch.
+I have updated the booking decline flow to require a reason and ensured the "Decline" button is available for unpaid bookings.
 
 ## Changes Made
 
-### ⚡ Optimization
-- **Persistent Storage**: Now initializing `SharedPreferences` once at the very start of `main()`. This makes all subsequent token and setting checks instantaneous instead of triggering slow asynchronous file reads every time.
-- **Background Parallelism**: The splash screen now runs its animations and background data checks (like auth and socket connection) in parallel. This prevents the UI from "hanging" while waiting for background tasks.
+### [Repository]
+- Updated [CaregiverRepository](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/repositories/caregiver_repository.dart) to send the `declineReason` to the backend when a booking is declined.
 
-### 🛡️ Reliability
-- **Robust Splash Logic**: Refactored the `SplashScreenController` to use a guaranteed navigation path. Even if a background task takes too long, the app will now always move to either the Dashboard or Login screen after a fixed 2-second animation window.
-- **Connectivity Cleanup**: Removed fragile code in the `ConnectivityService` that was trying to check for `GetMaterialApp` before it was fully ready, which sometimes caused internal errors during early launch.
+### [Booking Details Screen]
+- **Dialog Prompt**: Added a new [showDeclineDialog](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/booking_details_screen/controller/booking_details_controller.dart) method in the controller. This opens a professional dialog asking for a reason when the caregiver clicks "Decline".
+- **Validation**: The app now ensures a reason is provided before calling the decline API.
+- **Dynamic Action Button**: Updated [BookingDetailActions](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/booking_details_screen/widgets/booking_details_widgets.dart) to show the "Decline" button whenever the payment status is `Unpaid`, regardless of whether the booking is `Pending` or `Confirmed`.
 
 ## Verification Results
 
 ### Manual Verification
-- **Snappy Launch**: The splash screen appears immediately with smooth animations.
-- **Auto-Login**: Successfully verified that the app correctly reads the stored token and navigates directly to the dashboard.
-- **No Internet Handling**: Verified that the connectivity monitor starts up silently and correctly redirects to the error screen only if a real failure occurs.
+- Verified that clicking "Decline" on an unpaid booking opens a dialog.
+- Verified that trying to submit without a reason shows an error message.
+- Verified that submitting a reason successfully calls the API and refreshes the screen.
