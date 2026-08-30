@@ -75,7 +75,7 @@ class BookingRequestScreen extends StatelessWidget {
               request: req,
               isNew: c.selectedTab.value == 0,
               onAccept: () => c.acceptRequest(req.id),
-              onDecline: () => c.declineRequest(req.id),
+              onDecline: () => c.showDeclineDialog(req.id),
             );
           },
         );
