@@ -1,51 +1,36 @@
-# Implementation Plan - Fix Hero Tag Collisions
+# Implementation Plan - Disable Past Dates in Calendar
 
-Resolve the `multiple heroes that share the same tag` error by ensuring every Hero widget in the app has a unique identifier, even if multiple widgets display the same image.
+Prevent users from selecting dates before the current date on the "Book Caregiver" screen and improve the calendar's visual feedback for disabled dates.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> - All profile and chat images will now use context-specific Hero tags (e.g., `header_`, `chat_`, `details_`).
-> - This fix ensures the app doesn't crash when navigating between screens that show the same user's profile photo.
+> [!NOTE]
+> Past dates will be greyed out and non-clickable in the calendar to prevent invalid booking attempts.
 
 ## Proposed Changes
 
-### [Core]
+### [Widgets]
 
-#### [MODIFY] [full_screen_image_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/full_screen_image_screen.dart)
-- Update `build` to handle `Get.arguments` as a `Map<String, String>` containing both `imageUrl` and `heroTag`.
-- Use the passed `heroTag` for the `Hero` widget.
+#### [MODIFY] [app_calendar_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/widgets/app_calendar_controller.dart)
+- Add `bool isPast(DateTime d)` method to the `AppCalendarController` mixin.
+- Implementation: Check if the given date is before today (ignoring time).
 
-### [UI Components]
+#### [MODIFY] [app_calendar.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/widgets/app_calendar.dart)
+- Update the `itemBuilder` in the days grid:
+    - Check if the date `isPast` using the controller.
+    - Disable `onTap` if the date is in the past.
+    - Style past dates with a lighter/greyed-out color (`colors.textGrey.withAlpha(50)`).
 
-#### [MODIFY] [care_giver_home_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/care_giver_home_screen/widgets/care_giver_home_widgets.dart)
-- Update `CareGiverHeader` to use `tag: 'header_${avatarUrl}'`.
-- Update navigation to pass `{ "url": avatarUrl, "tag": 'header_${avatarUrl}' }`.
+### [Controllers]
 
-#### [MODIFY] [client_home_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/widgets/client_home_widgets.dart)
-- Update `ClientHomeHeader` to use `tag: 'client_home_header_${avatarUrl}'`.
-- Update navigation to pass `{ "url": avatarUrl, "tag": 'client_home_header_${avatarUrl}' }`.
-
-#### [MODIFY] [profile_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_screen/widgets/profile_widgets.dart)
-- Update `ProfileAvatarHeader` to use `tag: 'profile_screen_${avatarUrl}'`.
-- Update navigation to pass `{ "url": avatarUrl, "tag": 'profile_screen_${avatarUrl}' }`.
-
-#### [MODIFY] [booking_details_widgets.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/booking_details_screen/widgets/booking_details_widgets.dart)
-- Update `ClientProfileHeader` to use `tag: 'booking_details_${booking.id}_${booking.avatarUrl}'`.
-- Update navigation to pass context-specific tag.
-
-#### [MODIFY] [care_giver_details_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/care_giver_details_screen/care_giver_details_screen.dart)
-- Update Hero tag to `tag: 'caregiver_profile_details_${profile?.id}_${profile?.profileImage}'`.
-
-#### [MODIFY] [message_screen.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/message_screen.dart)
-- Update Header Hero to `tag: 'chat_header_${chatId}'`.
-- Update Message Bubbles to use `tag: 'chat_msg_${chat.messageId}'` for image attachments.
+#### [MODIFY] [book_caregiver_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/book_caregiver_screen/controller/book_caregiver_controller.dart)
+- Add a safety check in `selectDay` to ignore past dates if they are somehow triggered.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  Open the Home Screen.
-2.  Tap your own profile photo (Header). Verify it expands and returns correctly.
-3.  Navigate to a Caregiver's Profile. Verify the transition is smooth.
-4.  Open a Chat. Tap a received image. Verify the Hero transition works without crashing.
-5.  Check the debug console for any "Hero" related warnings or assertions.
+1.  Open the "Book Caregiver" screen.
+2.  Navigate to the calendar.
+3.  Verify that all dates before today are greyed out.
+4.  Try tapping a past date and verify that nothing happens (no API call, no selection change).
+5.  Verify that today and future dates are still selectable.

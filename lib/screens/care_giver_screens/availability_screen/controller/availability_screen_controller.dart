@@ -74,6 +74,13 @@ class AvailabilityScreenController extends GetxController
     return d.year == n.year && d.month == n.month && d.day == n.day;
   }
 
+  @override
+  bool isPast(DateTime d) {
+    final n = DateTime.now();
+    final today = DateTime(n.year, n.month, n.day);
+    return d.isBefore(today);
+  }
+
   List<DateTime> get calendarDays {
     final first = DateTime(
       focusedMonth.value.year,

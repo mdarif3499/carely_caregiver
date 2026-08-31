@@ -10,4 +10,5 @@ mixin AppCalendarController {
   void selectDay(DateTime day);
   bool isSelected(DateTime d);
   bool isToday(DateTime d);
+  bool isPast(DateTime d);
 }
