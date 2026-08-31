@@ -2,6 +2,9 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/care_giver_screens/booking_details_screen/controller/booking_details_controller.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../../routes/app_routes.dart';
 
 class ClientProfileHeader extends StatelessWidget {
   final BookingDetails booking;
@@ -15,17 +18,30 @@ class ClientProfileHeader extends StatelessWidget {
       children: [
         Stack(
           children: [
-            Container(
-              width: 80.w,
-              height: 80.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: colors.primary.withAlpha(50), width: 2.w),
-              ),
-              child: ClipOval(
-                child: CommonImage(
-                  src: booking.avatarUrl,
-                  fill: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                if (booking.avatarUrl.isNotEmpty) {
+                  Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                    "url": booking.avatarUrl,
+                    "tag": 'booking_details_${booking.id}',
+                  });
+                }
+              },
+              child: Hero(
+                tag: 'booking_details_${booking.id}',
+                child: Container(
+                  width: 80.w,
+                  height: 80.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: colors.primary.withAlpha(50), width: 2.w),
+                  ),
+                  child: ClipOval(
+                    child: CommonImage(
+                      src: booking.avatarUrl,
+                      fill: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -30,11 +30,25 @@ class MessageScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            ProfileAvatar(
-              size: 48.h,
-              imageUrl: conversation?.avatarUrl ??
-                  'https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg?semt=ais_user_personalization&w=740&q=80',
-              borderColor: AppColors.instance.transparent,
+            GestureDetector(
+              onTap: () {
+                final url = conversation?.avatarUrl;
+                if (url != null && url.isNotEmpty) {
+                  Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                    "url": url,
+                    "tag": 'chat_header_${controller.chatId}',
+                  });
+                }
+              },
+              child: Hero(
+                tag: 'chat_header_${controller.chatId}',
+                child: ProfileAvatar(
+                  size: 48.h,
+                  imageUrl: conversation?.avatarUrl ??
+                      'https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg?semt=ais_user_personalization&w=740&q=80',
+                  borderColor: AppColors.instance.transparent,
+                ),
+              ),
             ),
             2.width,
             Column(
@@ -245,9 +259,12 @@ class MessageScreen extends StatelessWidget {
             Stack(
               children: [
                 GestureDetector(
-                  onTap: () => Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: chat.files.first),
+                  onTap: () => Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                    "url": chat.files.first,
+                    "tag": 'chat_msg_${chat.messageId}',
+                  }),
                   child: Hero(
-                    tag: chat.files.first,
+                    tag: 'chat_msg_${chat.messageId}',
                     child: CommonImage(
                       src: chat.files.first,
                       width: 240.w,

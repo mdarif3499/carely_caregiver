@@ -37,7 +37,7 @@ class ClientHomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ── Hero Banner ──
-            ProfessionalCareBanner(onTap: controller.onLearnMore),
+            const ProfessionalCareBanner(),
             const SizedBox(height: 32),
 
             // ── Upcoming Booking ──

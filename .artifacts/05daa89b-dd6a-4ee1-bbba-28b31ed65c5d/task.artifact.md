@@ -1,9 +1,8 @@
-- [x] Refactor `SignUpController` to align with API fields
-    - [x] Remove `locationTextEditingController`
-    - [x] Update `role` mapping to `CLIENT` and `CAREGIVER`
-- [x] Refactor `SignUpScreen` UI
-    - [x] Update radio button labels
-    - [x] Remove Location field
-- [x] Update `BookingDetailActions` visibility logic
-    - [x] Show "Decline" button whenever payment is "Unpaid" (including "Auto released" status)
-- [x] Verify registration flow and booking decline functionality
+- [x] Refactor `FullScreenImageScreen` to support dynamic Hero tags
+- [x] Implement unique Hero tags in `CareGiverHeader`
+- [x] Implement unique Hero tags in `ClientHomeHeader`
+- [x] Implement unique Hero tags in `ProfileAvatarHeader`
+- [x] Implement unique Hero tags in `BookingDetails` widgets
+- [x] Implement unique Hero tags in `CareGiverDetailsScreen`
+- [x] Implement unique Hero tags in `MessageScreen` (Header & Attachments)
+- [x] Verify Hero stability and remove duplicate tag crashes

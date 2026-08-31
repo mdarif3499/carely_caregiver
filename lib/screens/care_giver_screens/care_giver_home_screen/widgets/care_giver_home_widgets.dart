@@ -25,13 +25,26 @@ class CareGiverHeader extends StatelessWidget {
       padding: const EdgeInsets.only(right: 30),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: colors.boxBg,
-            backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-            child: avatarUrl.isEmpty
-                ? Icon(Icons.person, color: colors.primary, size: 26)
-                : null,
+          GestureDetector(
+            onTap: () {
+              if (avatarUrl.isNotEmpty) {
+                Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                  "url": avatarUrl,
+                  "tag": 'home_header_$avatarUrl',
+                });
+              }
+            },
+            child: Hero(
+              tag: avatarUrl.isEmpty ? 'home_header_default' : 'home_header_$avatarUrl',
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: colors.boxBg,
+                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                child: avatarUrl.isEmpty
+                    ? Icon(Icons.person, color: colors.primary, size: 26)
+                    : null,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -152,12 +165,6 @@ class CareGiverBannerCard extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   textColor: Colors.white.withAlpha(220),
                   textAlign: TextAlign.start,
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                  child: CommonText(text: 'Learn More', fontSize: 14, fontWeight: FontWeight.w700, textColor: colors.textPrimary),
                 ),
               ],
             ),

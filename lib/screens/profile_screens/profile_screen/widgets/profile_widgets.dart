@@ -2,6 +2,9 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/gen/assets.gen.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../../routes/app_routes.dart';
 
 // ── Menu Item Model ──────────────────────────────────────
 class ProfileMenuItem {
@@ -33,17 +36,30 @@ class ProfileAvatarHeader extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Container(
-            width: 120.w,
-            height: 120.h,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: colors.border, width: 4.w),
-            ),
-            child: ClipOval(
-              child: CommonImage(
-                src: avatarUrl.isEmpty ? Assets.icons.profile : avatarUrl,
-                fill: BoxFit.cover,
+          GestureDetector(
+            onTap: () {
+              if (avatarUrl.isNotEmpty) {
+                Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                  "url": avatarUrl,
+                  "tag": 'profile_main_$avatarUrl',
+                });
+              }
+            },
+            child: Hero(
+              tag: avatarUrl.isEmpty ? 'profile_main_default' : 'profile_main_$avatarUrl',
+              child: Container(
+                width: 120.w,
+                height: 120.h,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colors.border, width: 4.w),
+                ),
+                child: ClipOval(
+                  child: CommonImage(
+                    src: avatarUrl.isEmpty ? Assets.icons.profile : avatarUrl,
+                    fill: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
           ),

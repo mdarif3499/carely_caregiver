@@ -31,14 +31,24 @@ class FullScreenImageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String imageUrl = Get.arguments ?? '';
+    final args = Get.arguments;
+    String imageUrl = '';
+    String heroTag = '';
+
+    if (args is Map) {
+      imageUrl = args['url'] ?? '';
+      heroTag = args['tag'] ?? imageUrl;
+    } else if (args is String) {
+      imageUrl = args;
+      heroTag = imageUrl;
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -52,7 +62,7 @@ class FullScreenImageScreen extends StatelessWidget {
       ),
       body: Center(
         child: Hero(
-          tag: imageUrl,
+          tag: heroTag,
           child: InteractiveViewer(
             panEnabled: true,
             minScale: 0.5,

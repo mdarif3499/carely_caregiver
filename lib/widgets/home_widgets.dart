@@ -199,15 +199,11 @@ class HomeSearchBar extends StatelessWidget {
 class HomeBannerCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String buttonLabel;
-  final VoidCallback? onButtonTap;
 
   const HomeBannerCard({
     super.key,
     this.title = 'Professional Care at\nYour Doorstep',
     this.subtitle = 'Compassionate home healthcare for your loved ones.',
-    this.buttonLabel = 'Learn More',
-    this.onButtonTap,
   });
 
   @override
@@ -275,28 +271,6 @@ class HomeBannerCard extends StatelessWidget {
                   textAlign: TextAlign.start,
                   isDescription: true,
                   preventScaling: true,
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: onButtonTap,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 9,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: CommonText(
-                      text: buttonLabel,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      textColor: AppColors.instance.textPrimary,
-                      isDescription: true,
-                      preventScaling: true,
-                    ),
-                  ),
                 ),
               ],
             ),
