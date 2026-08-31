@@ -78,10 +78,11 @@ class AppCalendar extends StatelessWidget {
               final date = days[index];
               final isSelected = controller.isSelected(date);
               final isToday = controller.isToday(date);
+              final isPast = controller.isPast(date);
               final isCurrentMonth = date.month == focusedMonth;
 
               return GestureDetector(
-                onTap: () => controller.selectDay(date),
+                onTap: isPast ? null : () => controller.selectDay(date),
                 behavior: HitTestBehavior.opaque,
                 child: Center(
                   child: Container(
@@ -103,9 +104,11 @@ class AppCalendar extends StatelessWidget {
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       textColor: isSelected
                           ? colors.white
-                          : (isCurrentMonth
-                              ? colors.textPrimary
-                              : colors.textGrey.withAlpha(100)),
+                          : (isPast 
+                              ? colors.textGrey.withAlpha(50) 
+                              : (isCurrentMonth
+                                  ? colors.textPrimary
+                                  : colors.textGrey.withAlpha(100))),
                     ),
                   ),
                 ),

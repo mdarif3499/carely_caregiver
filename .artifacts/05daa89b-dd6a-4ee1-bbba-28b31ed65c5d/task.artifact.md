@@ -1,8 +1,7 @@
-- [x] Refactor `FullScreenImageScreen` to support dynamic Hero tags
-- [x] Implement unique Hero tags in `CareGiverHeader`
-- [x] Implement unique Hero tags in `ClientHomeHeader`
-- [x] Implement unique Hero tags in `ProfileAvatarHeader`
-- [x] Implement unique Hero tags in `BookingDetails` widgets
-- [x] Implement unique Hero tags in `CareGiverDetailsScreen`
-- [x] Implement unique Hero tags in `MessageScreen` (Header & Attachments)
-- [x] Verify Hero stability and remove duplicate tag crashes
+- [x] Add `isPast(DateTime d)` to `AppCalendarController` mixin
+- [x] Implement `isPast` in `BookCaregiverController`
+- [x] Implement `isPast` in `AvailabilityScreenController`
+- [x] Update `AppCalendar` widget UI and logic
+    - [x] Disable `onTap` for past dates
+    - [x] Style past dates with grey color
+- [x] Verify functionality on "Book Caregiver" screen

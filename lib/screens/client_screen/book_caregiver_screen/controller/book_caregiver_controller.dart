@@ -277,6 +277,13 @@ class BookCaregiverController extends GetxController
   }
 
   @override
+  bool isPast(DateTime day) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return day.isBefore(today);
+  }
+
+  @override
   List<DateTime> get calendarDays {
     final first = DateTime(
       focusedMonth.value.year,
