@@ -34,12 +34,26 @@ class CareGiverDetailsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        ProfileAvatar(
-                          size: 160.r,
-                          imageUrl: profile?.profileImage ?? "",
-                          borderColor: colors.secondaryColor,
-                          badgeIcon: profile?.verifiedBadge == true ? Assets.icons.verify : null,
-                          badgeSize: 40.sp,
+                        GestureDetector(
+                          onTap: () {
+                            final url = profile?.profileImage;
+                            if (url != null && url.isNotEmpty) {
+                              Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                                "url": url,
+                                "tag": 'caregiver_details_${profile?.id}',
+                              });
+                            }
+                          },
+                          child: Hero(
+                            tag: 'caregiver_details_${profile?.id}',
+                            child: ProfileAvatar(
+                              size: 160.r,
+                              imageUrl: profile?.profileImage ?? "",
+                              borderColor: colors.secondaryColor,
+                              badgeIcon: profile?.verifiedBadge == true ? Assets.icons.verify : null,
+                              badgeSize: 40.sp,
+                            ),
+                          ),
                         ),
                         12.height,
                         CommonText(

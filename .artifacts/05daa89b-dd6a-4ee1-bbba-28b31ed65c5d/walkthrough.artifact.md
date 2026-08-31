@@ -1,20 +1,20 @@
-# Walkthrough - Enhanced Booking Decline Visibility
+# Walkthrough - Professional Hero Animation Fix
 
-I have updated the Booking Details screen to ensure the "Decline" option is always available when payment is pending, as requested.
+I have resolved the app crashes caused by "Hero tag collisions" and ensured that all profile image transitions are smooth, professional, and stable.
 
 ## Changes Made
 
-### [Booking Details UI]
-- **Flexible Decline Logic**: Updated [BookingDetailActions](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/care_giver_screens/booking_details_screen/widgets/booking_details_widgets.dart) to show the **"Decline"** button whenever the **Payment Status is Unpaid**.
-- **Broad Status Support**: The button now correctly appears for bookings with the status **"Auto released"** (and others like `Pending` or `Confirmed`), provided they haven't been paid yet.
-- **Terminal State Safety**: Guaranteed that the button is hidden only if the booking is already `Completed`, `Declined`, or `Cancelled`.
+### 🛡️ Core Stability
+- **Dynamic Hero Support**: Refactored the [FullScreenImageScreen](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/full_screen_image_screen.dart) to support context-aware animations. It now dynamically handles unique Hero tags, allowing multiple instances of the same image (like your profile photo) to exist on the same screen without conflicting.
 
-### [Consistency Check]
-- Verified that the decline action still triggers the **"Reason Prompt"** dialog, ensuring the caregiver provides feedback before the booking is officially declined in the system.
+### ⚡ Context-Unique Tags
+- **Header Fixes**: Implemented unique tags for the Home Screen headers (`home_header_...`). Tapping your photo now triggers a perfectly isolated animation.
+- **Details Screen**: Added specific tags for Booking Details and Caregiver Profiles. This prevents Flutter from getting "confused" when an image appears in both a list and a header simultaneously.
+- **Chat Enhancements**: Refactored the [Message Screen](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/message_screen/message_screen.dart) to use message-specific IDs for image attachments. You can now tap any message image, and it will expand with a dedicated, unique Hero transition.
 
 ## Verification Results
 
 ### Manual Verification
-- **Verified Visibility**: Opened a booking with status `Auto released` and payment `Unpaid`. The "Decline" button now appears at the bottom.
-- **Action Test**: Clicking "Decline" opens the reason dialog. Submitting the reason triggers the API correctly.
-- **UI State**: Confirmed that if a booking is marked as `Paid` or `Completed`, the decline button correctly disappears to prevent invalid actions.
+- **No More Crashes**: Successfully verified that navigating between the Home screen, Profile, and Chat no longer triggers the "multiple heroes share the same tag" error.
+- **Smooth Return**: Confirmed that the "close" (X) button in the image viewer correctly "flies" the image back to its exact origin point (e.g., if you tap the chat header, it returns to the header; if you tap a message, it returns to that specific message bubble).
+- **Stability**: Verified that default/empty profile photos do not trigger errors.

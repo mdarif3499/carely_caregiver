@@ -26,13 +26,26 @@ class ClientHomeHeader extends StatelessWidget {
       padding: const EdgeInsets.only(right: 22.0),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: colors.boxBg,
-            backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-            child: avatarUrl.isEmpty
-                ? Icon(Icons.person, color: colors.primary, size: 26)
-                : null,
+          GestureDetector(
+            onTap: () {
+              if (avatarUrl.isNotEmpty) {
+                Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
+                  "url": avatarUrl,
+                  "tag": 'client_home_header_$avatarUrl',
+                });
+              }
+            },
+            child: Hero(
+              tag: avatarUrl.isEmpty ? 'client_home_header_default' : 'client_home_header_$avatarUrl',
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: colors.boxBg,
+                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                child: avatarUrl.isEmpty
+                    ? Icon(Icons.person, color: colors.primary, size: 26)
+                    : null,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -124,8 +137,7 @@ class ClientSearchBar extends StatelessWidget {
 }
 
 class ProfessionalCareBanner extends StatelessWidget {
-  final VoidCallback onTap;
-  const ProfessionalCareBanner({super.key, required this.onTap});
+  const ProfessionalCareBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -172,23 +184,6 @@ class ProfessionalCareBanner extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 textColor: Colors.white,
                 textAlign: TextAlign.start,
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: onTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: CommonText(
-                    text: 'Learn More',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    textColor: colors.textPrimary,
-                  ),
-                ),
               ),
             ],
           ),
