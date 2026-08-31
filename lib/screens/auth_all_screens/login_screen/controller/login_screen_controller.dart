@@ -9,7 +9,6 @@ import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
 
 class LoginScreenController extends GetxController {
-  ////////// object
   late final TextEditingController emailTextEditingController;
   late final TextEditingController fullNameTextEditingController;
   late final TextEditingController phoneTextEditingController;
@@ -59,7 +58,6 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
 
-          // Connect to WebSocket
           SocketService.connect();
 
           showCustomSnackbar(message: response.message, isError: false);
