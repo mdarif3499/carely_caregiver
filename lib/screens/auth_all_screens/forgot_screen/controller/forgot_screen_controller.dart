@@ -151,7 +151,6 @@ class ForgotScreenController extends GetxController {
           
           FocusManager.instance.primaryFocus?.unfocus();
 
-    ///     3,737 86 64
 
           Future.delayed(const Duration(milliseconds: 500), () {
              Get.offAllNamed(AppRoutes.instance.loginScreen);
@@ -227,8 +226,7 @@ class ForgotScreenController extends GetxController {
   void onAppClose() {
     try {
       _timer?.cancel();
-      // Manual disposal of controllers removed to prevent "used after disposed" crash 
-      // during stack-wipe transitions (Get.offAllNamed).
+
     } catch (e) {
       errorLog("onAppClose", e);
     }
