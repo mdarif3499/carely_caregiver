@@ -1,7 +1,6 @@
-- [x] Add `isPast(DateTime d)` to `AppCalendarController` mixin
-- [x] Implement `isPast` in `BookCaregiverController`
-- [x] Implement `isPast` in `AvailabilityScreenController`
-- [x] Update `AppCalendar` widget UI and logic
-    - [x] Disable `onTap` for past dates
-    - [x] Style past dates with grey color
-- [x] Verify functionality on "Book Caregiver" screen
+- `[x]` Enhance `AuthInterceptor` for robust session expiry detection
+    - `[x]` Check for 401 Unauthorized status code
+    - `[x]` Implement case-insensitive "Session Expired" message matching
+    - `[x]` Add synchronized logout and navigation logic
+- `[x]` Review and finalize `SharePrefsHelper.clearData()`
+- `[x]` Verify automatic logout behavior
