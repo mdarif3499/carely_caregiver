@@ -212,17 +212,18 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                     ),
 
                     // ── Chat Button ──
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 30.h),
-                      child: CommonButton(
-                        titleText: 'Chat with Caregiver',
-                        onTap: c.onChat,
-                        prefix: Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 20.sp),
-                        buttonWidth: double.infinity,
-                        buttonHeight: 56.h,
-                        buttonRadius: 16.r,
+                    if ((b?.paymentStatus ?? "").toUpperCase() != 'UNPAID')
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 30.h),
+                        child: CommonButton(
+                          titleText: 'Chat with Caregiver',
+                          onTap: c.onChat,
+                          prefix: Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 20.sp),
+                          buttonWidth: double.infinity,
+                          buttonHeight: 56.h,
+                          buttonRadius: 16.r,
+                        ),
                       ),
-                    ),
                   ],
                 ),
         );

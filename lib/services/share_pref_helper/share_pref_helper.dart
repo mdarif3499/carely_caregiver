@@ -86,6 +86,8 @@ class SharePrefsHelper {
     SharePrefsHelper.remove(SharedPreferenceValue.userId);
     SharePrefsHelper.remove(SharedPreferenceValue.role);
     SharePrefsHelper.remove(SharedPreferenceValue.email);
+    SharePrefsHelper.remove(SharedPreferenceValue.phone);
+    SharePrefsHelper.remove(SharedPreferenceValue.searchHistory);
 
     // Disconnect WebSocket on logout
     SocketService.disconnect();
