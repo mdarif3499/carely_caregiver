@@ -222,7 +222,6 @@ class ForgotScreenController extends GetxController {
       errorLog("startTimer", e);
     }
   }
-
   void onAppClose() {
     try {
       _timer?.cancel();
