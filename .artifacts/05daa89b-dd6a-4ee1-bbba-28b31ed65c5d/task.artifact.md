@@ -1,6 +1,5 @@
-- `[x]` Enhance `AuthInterceptor` for robust session expiry detection
-    - `[x]` Check for 401 Unauthorized status code
-    - `[x]` Implement case-insensitive "Session Expired" message matching
-    - `[x]` Add synchronized logout and navigation logic
-- `[x]` Review and finalize `SharePrefsHelper.clearData()`
-- `[x]` Verify automatic logout behavior
+- [x] Modernize "Cancel Booking" dialog
+    - [x] Update `showCancelDialog` in `ClientBookingDetailsController`
+    - [x] Use `Dialog` with custom styling
+    - [x] Improve TextField and Button aesthetics
+- [x] Verify UI and functionality

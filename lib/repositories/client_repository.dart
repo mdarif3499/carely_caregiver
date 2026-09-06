@@ -90,4 +90,11 @@ class ClientRepository {
   Future<ApiResponseModel> getBookingDetails(String id) async {
     return await _apiClient.get("${AppApiEndPoint.booking}/$id");
   }
+
+  Future<ApiResponseModel> cancelBooking(String id, String reason) async {
+    return await _apiClient.patch(
+      "${AppApiEndPoint.booking}/$id/cancel",
+      body: {"cancelReason": reason},
+    );
+  }
 }

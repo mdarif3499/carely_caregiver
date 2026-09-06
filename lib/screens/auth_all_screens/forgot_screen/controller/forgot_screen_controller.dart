@@ -223,6 +223,8 @@ class ForgotScreenController extends GetxController {
     }
   }
 
+
+
   void onAppClose() {
     try {
       _timer?.cancel();
@@ -231,6 +233,9 @@ class ForgotScreenController extends GetxController {
       errorLog("onAppClose", e);
     }
   }
+
+
+
 
   @override
   void onClose() {

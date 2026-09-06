@@ -220,7 +220,6 @@ class OtpVerificationScreen extends StatelessWidget {
       ],
     );
   }
-
   void _showSuccessDialog(BuildContext context, OtpVerificationController controller) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(

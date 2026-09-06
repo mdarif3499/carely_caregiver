@@ -101,6 +101,14 @@ class CareGiverDetailsController extends GetxController {
       ));
     }
     weekAvailability.value = availability;
+
+    // Auto-select the first available date
+    if (selectedDate.value == null) {
+      final firstAvailable = availability.firstWhereOrNull((a) => a.isAvailable);
+      if (firstAvailable != null) {
+        selectedDate.value = firstAvailable.date;
+      }
+    }
   }
 
   void selectDate(DateTime date) {

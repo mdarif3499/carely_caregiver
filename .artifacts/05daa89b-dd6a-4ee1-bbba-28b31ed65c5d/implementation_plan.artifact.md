@@ -1,32 +1,28 @@
-# Implementation Plan - Professional Automatic Logout on Session Expired
+# Modernized Booking Cancellation Dialog
 
-The goal is to implement a professional and robust automatic logout mechanism when the API returns a "Session Expired" error or a 401 Unauthorized status code.
-
-## User Review Required
-
-> [!IMPORTANT]
-> The app will now automatically redirect the user to the Login screen if their session expires or if the server rejects their token (401 Unauthorized). All local user data will be cleared securely during this process.
+The goal is to modernize the "Cancel Booking" dialog to match the high-quality design of the rest of the app, using custom shapes, better spacing, and improved typography.
 
 ## Proposed Changes
 
-### [Network Service]
+### [Client Booking Details]
 
-#### [MODIFY] [auth_interceptor.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/api/auth_interceptor.dart)
-- Enhance the logout detection logic in both `onResponse` and `onError`.
-- **Check for 401 Status Code**: Standard professional behavior is to logout on any 401 error.
-- **Robust Message Matching**: Check for "Session Expired" in a case-insensitive manner to handle slight variations from the backend.
-- **Synchronized Logout**: Ensure `SharePrefsHelper.clearData()` is fully awaited before navigating.
-- **Improved User Feedback**: Use a slight delay before navigation so the "Session Expired" snackbar is actually visible to the user.
-
-### [Data Persistence]
-
-#### [MODIFY] [share_pref_helper.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/services/share_pref_helper/share_pref_helper.dart)
-- Ensure `clearData()` properly handles all keys that should be wiped on logout to prevent state leakage between sessions.
+#### [MODIFY] [client_booking_details_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/my_booking_screen/controller/client_booking_details_controller.dart)
+- Replace the standard `AlertDialog` with a custom `Dialog` widget.
+- **Design Specifications**:
+    - `borderRadius: 28.r` for a modern, rounded look.
+    - White background with professional padding (`24.r`).
+    - Use `CommonText` for consistent typography.
+    - **Modern TextField**:
+        - Use `fillColor: AppColors.instance.boxBg.withAlpha(30)`
+        - `borderRadius: 16.r`
+        - Remove harsh borders.
+    - **Action Buttons**:
+        - Use a "Cancel" style for the main action (e.g., secondary color or subtle red).
+        - Improve button size and touch targets.
 
 ## Verification Plan
 
 ### Manual Verification
-1. **Mock Session Expiry**: Temporarily modify the interceptor to trigger logout on a specific response or status code.
-2. **Verify Navigation**: Ensure the app navigates to `LoginScreen` and clears the navigation stack (`offAllNamed`).
-3. **Verify Data Wipe**: Check that `SharedPreferences` are empty after the automatic logout.
-4. **Verify Connectivity**: Ensure the Socket is disconnected (handled in `clearData`).
+1.  Open the "Cancel Booking" dialog.
+2.  Verify the design looks modern and matches the provided feedback (rounded corners, clean inputs, professional spacing).
+3.  Ensure functionality (validation, API call) remains intact.
