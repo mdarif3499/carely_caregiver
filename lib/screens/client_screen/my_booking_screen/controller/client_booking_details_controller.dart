@@ -179,6 +179,7 @@ class ClientBookingDetailsController extends GetxController {
 
       final response = await ClientRepository.instance.cancelBooking(id, reason);
 
+
       if (response.isSuccess) {
         showCustomSnackbar(message: "Booking cancelled successfully.", isError: false);
         await fetchBookingDetails(id);
