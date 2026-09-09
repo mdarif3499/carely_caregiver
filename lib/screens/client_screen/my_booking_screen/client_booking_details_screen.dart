@@ -211,19 +211,36 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // ── Chat Button ──
-                    if ((b?.paymentStatus ?? "").toUpperCase() != 'UNPAID')
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 30.h),
-                        child: CommonButton(
-                          titleText: 'Chat with Caregiver',
-                          onTap: c.onChat,
-                          prefix: Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 20.sp),
-                          buttonWidth: double.infinity,
-                          buttonHeight: 56.h,
-                          buttonRadius: 16.r,
-                        ),
+                    // ── Action Buttons ──
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 30.h),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if ((b?.status ?? "").toUpperCase() == 'PENDING') ...[
+                            CommonButton(
+                              titleText: 'Cancel Booking',
+                              onTap: c.showCancelDialog,
+                              buttonColor: colors.boxBg,
+                              titleColor: colors.textPrimary,
+                              buttonWidth: double.infinity,
+                              buttonHeight: 56.h,
+                              buttonRadius: 16.r,
+                            ),
+                            SizedBox(height: 12.h),
+                          ],
+                          if ((b?.paymentStatus ?? "").toUpperCase() != 'UNPAID')
+                            CommonButton(
+                              titleText: 'Chat with Caregiver',
+                              onTap: c.onChat,
+                              prefix: Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 20.sp),
+                              buttonWidth: double.infinity,
+                              buttonHeight: 56.h,
+                              buttonRadius: 16.r,
+                            ),
+                        ],
                       ),
+                    ),
                   ],
                 ),
         );
