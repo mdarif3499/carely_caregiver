@@ -169,7 +169,6 @@ class ClientBookingDetailsController extends GetxController {
       ),
     );
   }
-
   Future<void> cancelRequest(String reason) async {
     final id = booking.value?.id;
     if (id == null || id == 'placeholder') return;
