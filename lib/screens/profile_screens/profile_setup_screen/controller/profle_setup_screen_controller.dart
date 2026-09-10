@@ -143,12 +143,17 @@ class ProfileSetupScreenController extends GetxController {
 
       if (response.isSuccess) {
         final uploadedData = response.data['data'];
+        final String? checkoutUrl = uploadedData?['checkoutUrl'];
         
         certifications.add({
           'title': fileName,
           'subtitle': 'Uploaded successfully',
           'data': uploadedData,
         });
+
+        if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
+          Get.toNamed(AppRoutes.instance.stripePaymentWebView, arguments: checkoutUrl);
+        }
         
         showCustomSnackbar(message: "File uploaded successfully", isError: false);
       } else {

@@ -8,8 +8,6 @@ import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:core_kit/button/common_button.dart';
 import 'package:core_kit/text/common_text.dart';
 import 'package:core_kit/utils/core_screen_utils.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -210,9 +208,13 @@ class ClientBookingDetailsController extends GetxController {
         final data = response.data['data'] ?? {};
         final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
         final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
-        final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
 
+
+        final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
         await Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+
+
+
         try {
            Get.find<ChatListController>().fetchConversations();
         } catch (_) {}

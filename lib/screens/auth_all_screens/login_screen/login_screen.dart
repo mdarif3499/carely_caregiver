@@ -234,7 +234,7 @@ Widget _googleSignIn() {
         children: [
           Expanded(child: Divider()),
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16),
+            padding:  EdgeInsets.only(left: 16.0, right: 16),
             child: CommonText(text: 'Or'),
           ),
           Expanded(child: Divider()),

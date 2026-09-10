@@ -1,28 +1,28 @@
-# Modernized Booking Cancellation Dialog
+# Handling Checkout URL on Document Upload
 
-The goal is to modernize the "Cancel Booking" dialog to match the high-quality design of the rest of the app, using custom shapes, better spacing, and improved typography.
+The goal is to automatically dismiss the upload popup and navigate the user to a WebView if the document upload response contains a `checkoutUrl`.
 
 ## Proposed Changes
 
-### [Client Booking Details]
+### [Caregiver Documents]
 
-#### [MODIFY] [client_booking_details_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/client_screen/my_booking_screen/controller/client_booking_details_controller.dart)
-- Replace the standard `AlertDialog` with a custom `Dialog` widget.
-- **Design Specifications**:
-    - `borderRadius: 28.r` for a modern, rounded look.
-    - White background with professional padding (`24.r`).
-    - Use `CommonText` for consistent typography.
-    - **Modern TextField**:
-        - Use `fillColor: AppColors.instance.boxBg.withAlpha(30)`
-        - `borderRadius: 16.r`
-        - Remove harsh borders.
-    - **Action Buttons**:
-        - Use a "Cancel" style for the main action (e.g., secondary color or subtle red).
-        - Improve button size and touch targets.
+#### [MODIFY] [caregiver_documents_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/caregiver_documents_screen/controller/caregiver_documents_controller.dart)
+- Update `uploadDocument()` to:
+    - Extract `checkoutUrl` from `response.data['data']`.
+    - If `checkoutUrl` is present:
+        - Call `Get.back()` to dismiss the bottom sheet.
+        - Use `Get.toNamed(AppRoutes.instance.stripePaymentWebView, arguments: checkoutUrl)` to open the WebView.
+    - If `checkoutUrl` is NOT present, proceed with the existing logic (dismiss and refresh).
+
+### [Profile Setup]
+
+#### [MODIFY] [profle_setup_screen_controller.dart](file:///C:/Users/mdyou/StudioProjects/carely_caregiver/lib/screens/profile_screens/profile_setup_screen/controller/profle_setup_screen_controller.dart)
+- Update `uploadFile()` to handle the `checkoutUrl` in the same way, ensuring consistency across all document upload points.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  Open the "Cancel Booking" dialog.
-2.  Verify the design looks modern and matches the provided feedback (rounded corners, clean inputs, professional spacing).
-3.  Ensure functionality (validation, API call) remains intact.
+1.  Upload a document from the "Documents & Verification" screen.
+2.  If the backend returns a `checkoutUrl`, verify that the upload popup closes and the Stripe WebView opens automatically.
+3.  Upload a document during the "Profile Setup" flow.
+4.  Verify the same behavior.

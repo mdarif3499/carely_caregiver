@@ -143,11 +143,12 @@ class _AppMultilineTextFieldState extends State<AppMultilineTextField> {
   }
 
   void _onSave(String? value) {
-    if (widget.validationType == ValidationType.validateConfirmPassword)
+    if (widget.validationType == ValidationType.validateConfirmPassword) {
       assert(
         widget.originalPassword != null,
         'Original Password can not be null for Confirm password field',
       );
+    }
     if (widget.onSaved == null) return;
     widget.onSaved!(value?.trim() ?? '', _controller);
   }

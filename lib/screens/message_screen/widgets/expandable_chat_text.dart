@@ -31,7 +31,7 @@ class _ExpandableChatTextState extends State<ExpandableChatText> {
             // We use a TextPainter to determine if the text exceeds our limit
             final span = TextSpan(
               text: widget.text,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style:const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             );
             final tp = TextPainter(
               text: span,
@@ -48,7 +48,7 @@ class _ExpandableChatTextState extends State<ExpandableChatText> {
                 children: [
                   Text(
                     widget.text,
-                    style: TextStyle(
+                    style:const TextStyle(
                       fontSize: 14, 
                       fontWeight: FontWeight.w500, 
                       color: textColor,
@@ -77,7 +77,7 @@ class _ExpandableChatTextState extends State<ExpandableChatText> {
             } else {
               return Text(
                 widget.text,
-                style: TextStyle(
+                style:const TextStyle(
                   fontSize: 14, 
                   fontWeight: FontWeight.w500, 
                   color: textColor,

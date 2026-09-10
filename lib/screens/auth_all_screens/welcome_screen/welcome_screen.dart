@@ -27,11 +27,11 @@ class WelcomeScreen extends StatelessWidget {
                   padding: EdgeInsets.all(16.0.r),
                   child: Column(
                     children: [
-                      AuthScreenHeader(text: 'Choose your role'),
+                      const AuthScreenHeader(text: 'Choose your role'),
                       8.height,
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.w),
-                        child: AppSecondaryText(
+                        child: const AppSecondaryText(
                           textAlign: TextAlign.center,
                           text:
                               "Let's get started by selecting how you want to use the app.",

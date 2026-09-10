@@ -6,6 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
+import '../../../../routes/app_routes.dart';
+
 class CaregiverDocumentsController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isUploading = false.obs;
@@ -71,6 +73,7 @@ class CaregiverDocumentsController extends GetxController {
     }
 
     try {
+      Get.back(); // Close bottom sheet immediately on click
       isUploading.value = true;
       update();
 
@@ -81,7 +84,13 @@ class CaregiverDocumentsController extends GetxController {
 
       if (response.isSuccess) {
         showCustomSnackbar(message: "Document uploaded successfully", isError: false);
-        Get.back(); // Close bottom sheet
+        
+        final String? checkoutUrl = response.data['data']?['checkoutUrl'];
+        
+        if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
+          Get.toNamed(AppRoutes.instance.stripePaymentWebView, arguments: checkoutUrl);
+        }
+
         selectedFile.value = null;
         fetchMyDocuments(); // Refresh list
       } else {

@@ -27,13 +27,13 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                   padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
                   child: Column(
                     children: [
-                      AuthScreenHeader(
+                      const AuthScreenHeader(
                         text: 'Who are you seeking care for?',
                       ),
                       SizedBox(height: 8.h),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: AppSecondaryText(
+                        child:const AppSecondaryText(
                           textAlign: TextAlign.center,
                           text:
                               'Provide details about the family member or person needing assistance to help us find the best match.',
@@ -44,7 +44,7 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppContentHeader(text: 'Recipient Full Name'),
+                          const AppContentHeader(text: 'Recipient Full Name'),
                           SizedBox(height: 12.h),
                           CommonTextField(
                             controller: controller.nameController,
@@ -55,7 +55,7 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                             validationType: ValidationType.notRequired,
                           ),
                           SizedBox(height: 20.h),
-                          AppContentHeader(text: 'Your Relationship'),
+                          const AppContentHeader(text: 'Your Relationship'),
                           SizedBox(height: 12.h),
                           CommonDropDown<String>(
                             hint: 'Select relationship',
@@ -69,7 +69,7 @@ class NewRecipientProfileScreen extends GetView<HealthProfileController> {
                             nameBuilder: (val) => val,
                           ),
                           SizedBox(height: 20.h),
-                          AppContentHeader(
+                          const AppContentHeader(
                               text: 'Health Considerations & Care Needs'),
                           SizedBox(height: 12.h),
                           AppMultilineTextField(

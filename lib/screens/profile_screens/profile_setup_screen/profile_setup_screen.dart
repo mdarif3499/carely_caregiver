@@ -144,11 +144,11 @@ class ProfileSetupScreen extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          AuthScreenHeader(text: 'Professional Details'),
+         const AuthScreenHeader(text: 'Professional Details'),
           SizedBox(height: 8.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: AppSecondaryText(
+            child:const AppSecondaryText(
               textAlign: TextAlign.center,
               text:
                   'Tell us about your expertise and credentials\nto help families find the perfect match.',
