@@ -4,7 +4,6 @@ import 'package:carely_caregiver/repositories/caregiver_repository.dart';
 import 'package:carely_caregiver/repositories/client_repository.dart';
 import 'package:carely_caregiver/widgets/bottom_shit_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 // ── Data Model ──────────────────────────────────────────
@@ -66,7 +65,7 @@ class FindCaregiverController extends GetxController {
       selectedFilterId.value = 'All';
       searchQuery.value = '';
       searchController.clear();
-      filterState.value = FilterState();
+      filterState.value = const FilterState();
     } else {
       final category = categories.firstWhere((element) => element.name == name);
       selectedFilterId.value = category.id;
@@ -74,7 +73,7 @@ class FindCaregiverController extends GetxController {
     fetchCaregivers();
   }
 
-  final Rx<FilterState> filterState = FilterState().obs;
+  final Rx<FilterState> filterState = const FilterState().obs;
 
   void onFilterTap() async {
     final context = Get.context;

@@ -1,6 +1,5 @@
 import 'package:carely_caregiver/repositories/notification_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:core_kit/core_kit.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 

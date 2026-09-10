@@ -41,11 +41,11 @@ class BookingRequestScreen extends StatelessWidget {
               const SizedBox(height: 80),
               Icon(Icons.inbox_outlined, size: 60, color: Colors.grey.shade300),
               const SizedBox(height: 12),
-              CommonText(
+              const CommonText(
                 text: 'No requests found',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                textColor: const Color(0xff7F8C8D),
+                textColor:  Color(0xff7F8C8D),
                 isDescription: true,
                 preventScaling: true,
               ),

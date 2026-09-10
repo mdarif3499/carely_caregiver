@@ -164,12 +164,12 @@ class ProfessionalCareBanner extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: const Padding(
+          padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CommonText(
+              CommonText(
                 text: 'Professional Care at\nYour Doorstep',
                 fontSize: 32,
                 fontWeight: FontWeight.w700,
@@ -177,8 +177,8 @@ class ProfessionalCareBanner extends StatelessWidget {
                 textAlign: TextAlign.start,
                 maxLines: 2,
               ),
-              const SizedBox(height: 8),
-            const  CommonText(
+               SizedBox(height: 8),
+              CommonText(
                 text: 'Compassionate home healthcare for your loved ones.',
                 fontSize: 17,
                 fontWeight: FontWeight.w500,

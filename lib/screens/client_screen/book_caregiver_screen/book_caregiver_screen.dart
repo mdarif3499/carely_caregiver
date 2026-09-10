@@ -211,11 +211,11 @@ class BookCaregiverScreen extends StatelessWidget {
     final colors = AppColors.instance;
     switch (type.toUpperCase()) {
       case 'MORNING':
-        return Icon(Icons.wb_sunny_rounded, color: Colors.amber, size: 24);
+        return const Icon(Icons.wb_sunny_rounded, color: Colors.amber, size: 24);
       case 'AFTERNOON':
         return Icon(Icons.wb_twilight_rounded, color: colors.primary, size: 24);
       case 'EVENING':
-        return Icon(Icons.nightlight_round, color: Colors.amber, size: 22);
+        return const Icon(Icons.nightlight_round, color: Colors.amber, size: 22);
       case 'NIGHT':
         return Icon(Icons.dark_mode_rounded, color: colors.secondaryColor, size: 22);
       default:

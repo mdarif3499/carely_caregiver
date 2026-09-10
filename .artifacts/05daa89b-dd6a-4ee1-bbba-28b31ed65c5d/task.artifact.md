@@ -1,5 +1,3 @@
-- [x] Modernize "Cancel Booking" dialog
-    - [x] Update `showCancelDialog` in `ClientBookingDetailsController`
-    - [x] Use `Dialog` with custom styling
-    - [x] Improve TextField and Button aesthetics
-- [x] Verify UI and functionality
+- [x] Handle `checkoutUrl` in `CaregiverDocumentsController`
+- [x] Handle `checkoutUrl` in `ProfileSetupScreenController`
+- [x] Verify automatic navigation to WebView on successful upload with payment link
