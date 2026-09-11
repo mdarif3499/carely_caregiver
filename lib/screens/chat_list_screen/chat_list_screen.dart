@@ -239,6 +239,7 @@ class _ChatTile extends StatelessWidget {
     ///   I/flutter ( 8688): ║  https://rahad5000.naimulhassan.me/api/v1/earnings/me/summary
    ///  I/flutter ( 8688): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
 
+
 class _StatusTicks extends StatelessWidget {
   final String status;
   final bool isFailed;
