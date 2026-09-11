@@ -58,6 +58,7 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
 
+
           SocketService.connect();
 
           showCustomSnackbar(message: response.message, isError: false);
@@ -96,6 +97,9 @@ class LoginScreenController extends GetxController {
       }
     }
   }
+
+
+  // YeasiN@#704
 
   void checkValidation() {
     try {
