@@ -18,7 +18,6 @@ class ChangePasswordScreenController extends GetxController {
     newPasswordTextEditingController = TextEditingController();
     confirmPasswordTextEditingController = TextEditingController();
   }
-
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void checkData() {
