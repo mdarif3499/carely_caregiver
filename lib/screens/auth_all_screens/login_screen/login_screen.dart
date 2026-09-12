@@ -211,6 +211,7 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
+
                           ],
                         ),
                       ),
@@ -225,6 +226,13 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+
+
+// ╔ Headers
+
+
+
+
 
 Widget _googleSignIn() {
   return Column(
