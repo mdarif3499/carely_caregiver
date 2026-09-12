@@ -188,7 +188,6 @@ class ForgotScreenController extends GetxController {
       appLog("Request Body: $body", source: "RESEND_OTP_FORGOT_API");
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
       appLog("Response Body: ${response.data}", source: "RESEND_OTP_FORGOT_API");
-
       if (response.isSuccess) {
         secondsRemaining.value = 240;
         startTimer();

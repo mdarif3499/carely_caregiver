@@ -2,7 +2,6 @@ import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-
 import '../../../constant/app_colors.dart';
 import 'controller/change_password_screen_controller.dart';
 
