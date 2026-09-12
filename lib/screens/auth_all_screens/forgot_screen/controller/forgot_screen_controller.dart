@@ -159,6 +159,7 @@ class ForgotScreenController extends GetxController {
           showCustomSnackbar(message: response.message, isError: true);
         }
       }
+
     } catch (e) {
       errorLog("checkCreateFunction", e);
       showCustomSnackbar(message: "Failed to reset password", isError: true);
