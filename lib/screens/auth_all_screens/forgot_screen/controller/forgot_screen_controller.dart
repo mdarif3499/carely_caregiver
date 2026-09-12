@@ -180,20 +180,24 @@ class ForgotScreenController extends GetxController {
       isResending.value = true;
       update();
 
+
       Map<String, dynamic> body = {
         'email': emailController.text.trim(),
         'isResetPassword': true,
       };
       
-      appLog("Request Body: $body", source: "RESEND_OTP_FORGOT_API");
+
       final response = await _apiClient.post(AppApiEndPoint.sendOtp, body: body);
       appLog("Response Body: ${response.data}", source: "RESEND_OTP_FORGOT_API");
+
       if (response.isSuccess) {
         secondsRemaining.value = 240;
+
         startTimer();
         showCustomSnackbar(message: response.message, isError: false);
       } else {
         showCustomSnackbar(message: response.message, isError: true);
+
       }
     } catch (e) {
       errorLog("reSendOtp", e);
@@ -202,7 +206,7 @@ class ForgotScreenController extends GetxController {
       if (!isClosed) {
         isResending.value = false;
         update();
-      }
+                }
     }
   }
 
