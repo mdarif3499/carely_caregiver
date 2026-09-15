@@ -15,7 +15,6 @@ import 'controller/login_screen_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
@@ -189,7 +188,8 @@ class LoginScreen extends StatelessWidget {
                                           ? "Don't have an account?"
                                           : "Already have an account?",
                                       style: TextStyle(
-                                        fontSize: 16.sp,
+                                        fontSize: 16
+                                            .sp,
                                         color: AppColors.instance.textPrimary,
                                       ),
                                       children: [
