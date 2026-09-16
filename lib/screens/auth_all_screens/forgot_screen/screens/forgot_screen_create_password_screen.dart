@@ -26,9 +26,7 @@ class ForgotScreenCreatePasswordScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CommonImage(
-                          src: AppAssertImage.instance.forgotCreatePassword,
-                          width: AppSize.size.width * 0.6),
+                      30.height,
                       Column(
                         children: [
                           10.height,

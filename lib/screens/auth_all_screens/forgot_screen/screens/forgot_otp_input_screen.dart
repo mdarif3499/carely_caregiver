@@ -28,7 +28,7 @@ class ForgotOtpInputScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CommonImage(src: AppAssertImage.instance.otpVerification, width: AppSize.size.width * 0.8),
+                      30.height,
                       Column(
                         children: [
                           CommonText(text: "Verify your account", fontSize: 25.sp, fontWeight: FontWeight.w600, textColor: const Color(0xFF333333)),

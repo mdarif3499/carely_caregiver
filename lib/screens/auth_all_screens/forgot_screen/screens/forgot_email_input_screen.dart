@@ -26,10 +26,7 @@ class ForgotEmailInputScreen extends StatelessWidget {
                   key: controller.formKey1,
                   child: Column(
                     children: [
-                      CommonImage(
-                          src: AppAssertImage.instance.forgotEmailInput,
-                          width: AppSize.size.width * 0.6),
-                      10.height,
+                      30.height,
                       CommonText(
                           text: "Forgot password",
                           fontSize: 25.sp,
