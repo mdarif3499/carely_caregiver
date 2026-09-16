@@ -17,6 +17,9 @@ class SignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AppSize.size = MediaQuery.of(context).size;
 
+
+
+
     return GetBuilder<SignUpController>(
       builder: (controller) {
         return Scaffold(
