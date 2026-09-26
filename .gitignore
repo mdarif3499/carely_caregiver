@@ -13,7 +13,8 @@ local.properties
 *.dex
 *.class
 bin/
-gen/
+android/gen/
+!lib/gen/
 out/
 build/
 
