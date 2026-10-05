@@ -1,6 +1,7 @@
 import 'package:carely_caregiver/constant/app_api_end_point.dart';
 import 'package:carely_caregiver/services/api/api_client.dart';
 import 'package:carely_caregiver/services/api/api_service.dart';
+import 'package:carely_caregiver/services/connectivity_service/connectivity_service.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,6 @@ import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
 
 class SignUpController extends GetxController {
-  ///////////object
   late final TextEditingController fullNameTextEditingController;
   late final TextEditingController emailTextEditingController;
   late final TextEditingController phoneTextEditingController;
@@ -31,7 +31,6 @@ class SignUpController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
 
-  //////////. user types
   RxBool userTypes = true.obs;
   void changeUserType(bool value) {
     try {
@@ -51,6 +50,20 @@ class SignUpController extends GetxController {
 
   Future<void> signUpUser() async {
     if (isLoading.value) return;
+
+    final connectivityService = Get.isRegistered<ConnectivityService>()
+        ? Get.find<ConnectivityService>()
+        : Get.put<ConnectivityService>(ConnectivityService());
+
+    final isConnected = await connectivityService.checkConnection();
+    if (!isConnected) {
+      showCustomSnackbar(
+        title: "No Internet",
+        message: "Please check your internet connection and try again.",
+        isError: true,
+      );
+      return;
+    }
 
     try {
       isLoading.value = true;
@@ -81,9 +94,6 @@ class SignUpController extends GetxController {
     }
   }
 
-
-
-  //////////// terms and conditions
   RxBool termsAndConditions = false.obs;
   void changeTermsAndConditions(bool value) {
     termsAndConditions.value = value;
@@ -91,8 +101,6 @@ class SignUpController extends GetxController {
 
   void onAppClose() {
     try {
-      // Manual disposal removed to prevent race conditions during route transitions.
-      // Garbage Collector will handle the cleanup safely.
     } catch (e) {
       errorLog("onAppClose", e);
     }

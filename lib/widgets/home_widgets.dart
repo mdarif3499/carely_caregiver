@@ -412,7 +412,7 @@ class UpcomingBookingCard extends StatelessWidget {
               ),
             ],
           ),
-
+    /// 11:45:15   ///
           const SizedBox(height: 12),
 
           Row(
@@ -499,6 +499,7 @@ class ActivityItemWidget extends StatelessWidget {
                   : AppColors.instance.boxBg,
               borderRadius: BorderRadius.circular(18),
             ),
+
             child: Icon(
               isMessage
                   ? Icons.chat_bubble_outline_rounded
@@ -508,6 +509,7 @@ class ActivityItemWidget extends StatelessWidget {
                   : AppColors.instance.primary,
               size: 20,
             ),
+
           ),
           const SizedBox(width: 12),
 

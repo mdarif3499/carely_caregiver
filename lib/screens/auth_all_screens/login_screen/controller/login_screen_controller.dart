@@ -1,4 +1,5 @@
 import 'package:carely_caregiver/repositories/auth_repository.dart';
+import 'package:carely_caregiver/services/connectivity_service/connectivity_service.dart';
 import 'package:carely_caregiver/services/share_pref_helper/share_pref_helper.dart';
 import 'package:carely_caregiver/services/socket/socket_service.dart';
 import 'package:carely_caregiver/widgets/show_custom_snackbar.dart';
@@ -31,6 +32,20 @@ class LoginScreenController extends GetxController {
   Future<void> loginUser() async {
     if (isLoading.value) return;
 
+    final connectivityService = Get.isRegistered<ConnectivityService>()
+        ? Get.find<ConnectivityService>()
+        : Get.put<ConnectivityService>(ConnectivityService());
+
+    final isConnected = await connectivityService.checkConnection();
+    if (!isConnected) {
+      showCustomSnackbar(
+        title: "No Internet",
+        message: "Please check your internet connection and try again.",
+        isError: true,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
       update();
@@ -57,7 +72,6 @@ class LoginScreenController extends GetxController {
           await SharePrefsHelper.setString(SharedPreferenceValue.email, user['email'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.role, user['role'] ?? "");
           await SharePrefsHelper.setString(SharedPreferenceValue.phone, user['phone'] ?? "");
-
 
           SocketService.connect();
 
@@ -89,7 +103,7 @@ class LoginScreenController extends GetxController {
       }
     } catch (e) {
       errorLog("loginUser", e);
-      showCustomSnackbar(message: "Login failed. Please check your connection.", isError: true);
+      showCustomSnackbar(message: "Login failed. Please check your connection and try again.", isError: true);
     } finally {
       if (!isClosed) {
         isLoading.value = false;
@@ -97,9 +111,6 @@ class LoginScreenController extends GetxController {
       }
     }
   }
-
-
-  // YeasiN@#704
 
   void checkValidation() {
     try {
@@ -116,7 +127,6 @@ class LoginScreenController extends GetxController {
   void appOnClose() {
     if (_isDisposed) return;
     try {
-
       _isDisposed = true;
     } catch (e) {
       errorLog("appOnClose", e);
