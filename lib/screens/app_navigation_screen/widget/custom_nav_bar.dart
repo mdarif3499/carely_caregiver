@@ -50,16 +50,13 @@ class CustomBottomNavBar extends StatelessWidget {
       {Assets.icons.sEarning: 'Earning'},
       {Assets.icons.sProfile: 'Profile'},
     ];
-   ///    ║║
+   ///    ║║ error I/flutter (23687): code: 502 ║
     return Container(
       decoration:const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.05),
-
-
-
 
             blurRadius: 10,
             offset:  Offset(0, -5),
