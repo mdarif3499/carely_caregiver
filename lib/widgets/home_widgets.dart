@@ -328,8 +328,7 @@ class HomeSectionHeader extends StatelessWidget {
 }
 
 
-///    I/FlutterActivityAndFragmentDelegate( 6077): If you are attempting to set --start-paused via Intent extras to launch a Flutter component outside of using the Flutter CLI, note that support for setting engine flags on Android via Intent will soon be dropped; see https://github.com/flutter/flutter/issues/180686 for more information on this breaking change. To migrate, set --start-paused or any other flags specified via Intent extras on the command line instead or see https://github.com/flutter/flutter/blob/main/docs/engine/Flutter-Android-Engine-Flags.md for alternative methods.
-
+/// ❌
 
 class UpcomingBookingCard extends StatelessWidget {
   final BookingModel booking;

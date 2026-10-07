@@ -15,6 +15,8 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
+  ///  Sunday	Md. Arif Bhuiyan	20643	00:00		00:00	Monday	Md. Arif Bhuiyan	20643 Monday	Md. Arif Bhuiyan	20643	09:07	Aqua tower 8th IN
+
   @override
   Widget build(BuildContext context) {
     final List<Map<String,String>> clientIcons = [
@@ -48,13 +50,17 @@ class CustomBottomNavBar extends StatelessWidget {
       {Assets.icons.sEarning: 'Earning'},
       {Assets.icons.sProfile: 'Profile'},
     ];
-
+   ///    ║║
     return Container(
       decoration:const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.05),
+
+
+
+
             blurRadius: 10,
             offset:  Offset(0, -5),
           ),
