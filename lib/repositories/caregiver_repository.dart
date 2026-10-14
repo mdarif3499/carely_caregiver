@@ -47,6 +47,10 @@ class CaregiverRepository {
     return await _apiClient.patch(AppApiEndPoint.updateCaregiverProfile, body: profileData);
   }
 
+  Future<ApiResponseModel> getMyCaregiverProfile() async {
+    return await _apiClient.get(AppApiEndPoint.getMyCaregiverProfile);
+  }
+
   Future<ApiResponseModel> addAvailability({
     required Map<String, dynamic> data,
   }) async {

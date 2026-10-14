@@ -16,7 +16,8 @@ class ClientHomeController extends GetxController {
   void onSearchChanged(String val) => searchQuery.value = val;
 
   // Upcoming bookings
-  final RxList<CareGiverScheduleModel> upcomingBookings = <CareGiverScheduleModel>[].obs;
+  final RxList<CareGiverScheduleModel> upcomingBookings =
+      <CareGiverScheduleModel>[].obs;
   final RxBool isBookingsLoading = false.obs;
 
   // Service Categories
@@ -32,26 +33,28 @@ class ClientHomeController extends GetxController {
   }
 
   void _setPlaceholders() {
-    upcomingBookings.value = List.generate(2, (index) => CareGiverScheduleModel(
-      id: 'placeholder_$index',
-      clientId: '',
-      clientName: 'Loading Name',
-      clientAvatar: '',
-      caregiverId: '',
-      caregiverName: 'Caregiver Name',
-      caregiverAvatar: '',
-      recipientName: 'Recipient',
-      relationship: 'Family',
-      serviceName: 'General Care',
-      date: '2026-08-27',
-      shift: 'MORNING',
-      startTime: '09:00',
-      endTime: '11:00',
-      status: 'PENDING',
-      paymentStatus: 'UNPAID',
-      amount: 0.0,
-      instructions: '',
-    ));
+    upcomingBookings.value = List.generate(
+        2,
+        (index) => CareGiverScheduleModel(
+              id: 'placeholder_$index',
+              clientId: '',
+              clientName: 'Loading Name',
+              clientAvatar: '',
+              caregiverId: '',
+              caregiverName: 'Caregiver Name',
+              caregiverAvatar: '',
+              recipientName: 'Recipient',
+              relationship: 'Family',
+              serviceName: 'General Care',
+              date: '2026-08-27',
+              shift: 'MORNING',
+              startTime: '09:00',
+              endTime: '11:00',
+              status: 'PENDING',
+              paymentStatus: 'UNPAID',
+              amount: 0.0,
+              instructions: '',
+            ));
   }
 
   Future<void> fetchUpcomingBookings() async {
@@ -60,11 +63,13 @@ class ClientHomeController extends GetxController {
       update();
 
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final response = await ClientRepository.instance.getClientBookings(date: today);
+      final response =
+          await ClientRepository.instance.getClientBookings(date: today);
 
       if (response.isSuccess) {
         final List dataList = response.data['data']?['data'] ?? [];
-        upcomingBookings.value = dataList.map((e) => CareGiverScheduleModel.fromJson(e)).toList();
+        upcomingBookings.value =
+            dataList.map((e) => CareGiverScheduleModel.fromJson(e)).toList();
       } else {
         upcomingBookings.clear();
       }
@@ -98,8 +103,13 @@ class ClientHomeController extends GetxController {
     }
   }
 
+  Future<void> onRefresh() async {
+    await Future.wait([fetchUpcomingBookings(), fetchCategories()]);
+  }
+
   void onViewDetails(String bookingId) async {
-    await Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: bookingId);
+    await Get.toNamed(AppRoutes.instance.clientBookingDetails,
+        arguments: bookingId);
     fetchUpcomingBookings();
   }
 
@@ -111,7 +121,7 @@ class ClientHomeController extends GetxController {
     try {
       final navC = Get.find<AppNavigationScreenController>();
       final findC = Get.find<FindCaregiverController>();
-      
+
       navC.changeIndex(1); // Switch to FindCaregiver tab
       findC.applyCategoryFilter(category.id, category.name);
     } catch (e) {

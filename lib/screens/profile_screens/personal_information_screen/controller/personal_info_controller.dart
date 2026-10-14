@@ -69,10 +69,10 @@ class PersonalInfoController extends GetxController {
 
   @override
   void onClose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    medicalController.dispose();
+    try { nameController.dispose(); } catch (_) {}
+    try { emailController.dispose(); } catch (_) {}
+    try { phoneController.dispose(); } catch (_) {}
+    try { medicalController.dispose(); } catch (_) {}
     super.onClose();
   }
 }

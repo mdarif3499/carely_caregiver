@@ -23,179 +23,217 @@ class CareGiverDetailsScreen extends StatelessWidget {
       appBarTitle: 'Caregiver Profile',
       child: Obx(() {
         final profile = controller.caregiverProfile.value;
-        
+
         return Skeletonizer(
           enabled: controller.isLoading.value,
           child: profile == null && !controller.isLoading.value
               ? const Center(child: CommonText(text: "Failed to load profile"))
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.r),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            final url = profile?.profileImage;
-                            if (url != null && url.isNotEmpty) {
-                              Get.toNamed(AppRoutes.instance.fullScreenImage, arguments: {
-                                "url": url,
-                                "tag": 'caregiver_details_${profile?.id}',
-                              });
-                            }
-                          },
-                          child: Hero(
-                            tag: 'caregiver_details_${profile?.id}',
-                            child: ProfileAvatar(
-                              size: 160.r,
-                              imageUrl: profile?.profileImage ?? "",
-                              borderColor: colors.secondaryColor,
-                              badgeIcon: profile?.verifiedBadge == true ? Assets.icons.verify : null,
-                              badgeSize: 40.sp,
+              : RefreshIndicator(
+                  onRefresh: controller.onRefresh,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: EdgeInsets.all(20.r),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              final url = profile?.profileImage;
+                              if (url != null && url.isNotEmpty) {
+                                Get.toNamed(AppRoutes.instance.fullScreenImage,
+                                    arguments: {
+                                      "url": url,
+                                      "tag": 'caregiver_details_${profile?.id}',
+                                    });
+                              }
+                            },
+                            child: Hero(
+                              tag: 'caregiver_details_${profile?.id}',
+                              child: ProfileAvatar(
+                                size: 160.r,
+                                imageUrl: profile?.profileImage ?? "",
+                                borderColor: colors.secondaryColor,
+                                badgeIcon: profile?.verifiedBadge == true
+                                    ? Assets.icons.verify
+                                    : null,
+                                badgeSize: 40.sp,
+                              ),
                             ),
                           ),
-                        ),
-                        12.height,
-                        CommonText(
-                          text: profile?.name ?? '...',
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w700,
-                          textColor: colors.textPrimary,
-                        ),
-                        8.height,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.star_rounded, color: Colors.amber, size: 22.sp),
-                            4.width,
-                            CommonText(
-                              text: '${profile?.averageRating.toStringAsFixed(1) ?? "0.0"} ',
-                              fontSize: 18.sp,
+                          12.height,
+                          CommonText(
+                            text: profile?.name ?? '...',
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.w700,
+                            textColor: colors.textPrimary,
+                          ),
+                          8.height,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.star_rounded,
+                                  color: Colors.amber, size: 22.sp),
+                              4.width,
+                              CommonText(
+                                text:
+                                    '${profile?.averageRating.toStringAsFixed(1) ?? "0.0"} ',
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                textColor: colors.textPrimary,
+                              ),
+                              CommonText(
+                                text: '(${profile?.totalReviews ?? 0} reviews)',
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                                textColor: colors.secondaryText,
+                              ),
+                            ],
+                          ),
+                          TextButton.icon(
+                            onPressed: () => Get.toNamed(
+                              AppRoutes.instance.caregiverReviews,
+                              arguments: profile?.id ?? controller.caregiverId,
+                            ),
+                            icon: Icon(Icons.rate_review_outlined, size: 16.sp),
+                            label: CommonText(
+                              text: 'See Reviews',
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              textColor: colors.primary,
+                            ),
+                          ),
+                          8.height,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 20.sp, color: colors.secondaryText),
+                              4.width,
+                              CommonText(
+                                text: profile?.location ?? '...',
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                                textColor: colors.secondaryText,
+                              ),
+                            ],
+                          ),
+                          32.height,
+
+                          // ── Stats Cards ──
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _statCard(
+                                  title: 'Jobs',
+                                  value: '${profile?.totalReviews ?? 0}+'),
+                              _statCard(
+                                  title: 'EXP.',
+                                  value: '${profile?.experience ?? 0} Yrs'),
+                              _statCard(title: 'RESPONSE', value: '<10m'),
+                            ],
+                          ),
+                          32.height,
+
+                          // ── Bio ──
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CommonText(
+                              text: 'Bio',
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.w700,
                               textColor: colors.textPrimary,
                             ),
-                            CommonText(
-                              text: '(${profile?.totalReviews ?? 0} reviews)',
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              textColor: colors.secondaryText,
+                          ),
+                          12.height,
+                          CommonText(
+                            text: controller.bioDisplay,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w400,
+                            textColor: colors.textPrimary,
+                            textAlign: TextAlign.start,
+                            height: 1.5,
+                            isDescription: true,
+                            maxLines: 10,
+                          ),
+                          32.height,
+
+                          // ── Specialties ──
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CommonText(
+                              text: 'Specialties',
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w700,
+                              textColor: colors.textPrimary,
                             ),
-                          ],
-                        ),
-                        8.height,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.location_on_outlined, size: 20.sp, color: colors.secondaryText),
-                            4.width,
-                            CommonText(
-                              text: profile?.location ?? '...',
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              textColor: colors.secondaryText,
+                          ),
+                          12.height,
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Wrap(
+                              spacing: 10.w,
+                              runSpacing: 10.h,
+                              children: (profile?.specialties ?? ['Specialty'])
+                                  .map((s) => _specialtyChip(title: s))
+                                  .toList(),
                             ),
-                          ],
-                        ),
-                        32.height,
-
-                        // ── Stats Cards ──
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _statCard(title: 'Jobs', value: '${profile?.totalReviews ?? 0}+'),
-                            _statCard(title: 'EXP.', value: '${profile?.experience ?? 0} Yrs'),
-                            _statCard(title: 'RESPONSE', value: '<10m'),
-                          ],
-                        ),
-                        32.height,
-
-                        // ── Bio ──
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: CommonText(
-                            text: 'Bio',
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w700,
-                            textColor: colors.textPrimary,
                           ),
-                        ),
-                        12.height,
-                        CommonText(
-                          text: controller.bioDisplay,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w400,
-                          textColor: colors.textPrimary,
-                          textAlign: TextAlign.start,
-                          height: 1.5,
-                          isDescription: true,
-                          maxLines: 10,
-                        ),
-                        32.height,
+                          32.height,
 
-                        // ── Specialties ──
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: CommonText(
-                            text: 'Specialties',
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w700,
-                            textColor: colors.textPrimary,
+                          // ── Availability ──
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CommonText(
+                              text: 'Upcoming Availability',
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w700,
+                              textColor: colors.textPrimary,
+                            ),
                           ),
-                        ),
-                        12.height,
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Wrap(
-                            spacing: 10.w,
-                            runSpacing: 10.h,
-                            children: (profile?.specialties ?? ['Specialty'])
-                                .map((s) => _specialtyChip(title: s))
-                                .toList(),
+                          12.height,
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: controller.weekAvailability
+                                  .map((a) => _availabilityCard(
+                                        model: a,
+                                        isSelected:
+                                            controller.selectedDate.value ==
+                                                a.date,
+                                        onTap: a.isAvailable
+                                            ? () =>
+                                                controller.selectDate(a.date)
+                                            : null,
+                                      ))
+                                  .toList(),
+                            ),
                           ),
-                        ),
-                        32.height,
+                          48.height,
 
-                        // ── Availability ──
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: CommonText(
-                            text: 'Upcoming Availability',
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w700,
-                            textColor: colors.textPrimary,
+                          // ── Action ──
+                          CommonButton(
+                            titleText: 'Book Appointment',
+                            onTap: controller.selectedDate.value != null
+                                ? () {
+                                    Get.toNamed(
+                                        AppRoutes.instance.bookCareGiverScreen,
+                                        arguments: {
+                                          "profile": profile,
+                                          "selectedDate":
+                                              controller.selectedDate.value,
+                                          "serviceCategoryId":
+                                              profile?.serviceCategoryId,
+                                        });
+                                  }
+                                : null,
+                            buttonWidth: double.infinity,
+                            buttonHeight: 54.h,
+                            buttonRadius: 14.r,
                           ),
-                        ),
-                        12.height,
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: controller.weekAvailability
-                                .map((a) => _availabilityCard(
-                                      model: a,
-                                      isSelected: controller.selectedDate.value == a.date,
-                                      onTap: a.isAvailable ? () => controller.selectDate(a.date) : null,
-                                    ))
-                                .toList(),
-                          ),
-                        ),
-                        48.height,
-
-                        // ── Action ──
-                        CommonButton(
-                          titleText: 'Book Appointment',
-                          onTap: controller.selectedDate.value != null ? () {
-                            Get.toNamed(AppRoutes.instance.bookCareGiverScreen, arguments: {
-                              "profile": profile,
-                              "selectedDate": controller.selectedDate.value,
-                              "serviceCategoryId": profile?.serviceCategoryId,
-                            });
-                          } : null,
-                          buttonWidth: double.infinity,
-                          buttonHeight: 54.h,
-                          buttonRadius: 14.r,
-                        ),
-                        20.height,
-                      ],
+                          20.height,
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -212,7 +250,8 @@ class CareGiverDetailsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.boxBg.withAlpha(50),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.secondaryColor.withAlpha(80), width: 1.5),
+        border:
+            Border.all(color: colors.secondaryColor.withAlpha(80), width: 1.5),
       ),
       child: Column(
         children: [
@@ -258,7 +297,7 @@ class CareGiverDetailsScreen extends StatelessWidget {
   }) {
     final colors = AppColors.instance;
     final isAvailable = model.isAvailable;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -266,21 +305,23 @@ class CareGiverDetailsScreen extends StatelessWidget {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? colors.primary 
+          color: isSelected
+              ? colors.primary
               : (isAvailable ? colors.white : colors.boxBg.withAlpha(50)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? colors.primary : colors.boxBg,
             width: 1.5,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: colors.primary.withAlpha(40),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: colors.primary.withAlpha(40),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           children: [
@@ -288,21 +329,27 @@ class CareGiverDetailsScreen extends StatelessWidget {
               text: model.day,
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              textColor: isSelected ? Colors.white.withAlpha(180) : colors.secondaryText,
+              textColor: isSelected
+                  ? Colors.white.withAlpha(180)
+                  : colors.secondaryText,
             ),
             4.height,
             CommonText(
               text: model.dateLabel,
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              textColor: isSelected ? Colors.white : (isAvailable ? colors.textPrimary : colors.textGrey),
+              textColor: isSelected
+                  ? Colors.white
+                  : (isAvailable ? colors.textPrimary : colors.textGrey),
             ),
             8.height,
             CommonText(
               text: model.status,
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              textColor: isSelected ? Colors.white : (isAvailable ? colors.primary : colors.textGrey),
+              textColor: isSelected
+                  ? Colors.white
+                  : (isAvailable ? colors.primary : colors.textGrey),
             ),
           ],
         ),

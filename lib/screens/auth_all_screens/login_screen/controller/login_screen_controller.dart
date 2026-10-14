@@ -10,18 +10,38 @@ import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
 
 class LoginScreenController extends GetxController {
-  late final TextEditingController emailTextEditingController;
-  late final TextEditingController fullNameTextEditingController;
-  late final TextEditingController phoneTextEditingController;
-  late final TextEditingController passwordTextEditingController;
+  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController fullNameTextEditingController = TextEditingController();
+  TextEditingController phoneTextEditingController = TextEditingController();
+  TextEditingController passwordTextEditingController = TextEditingController();
+
+  void ensureControllersValid() {
+    try {
+      emailTextEditingController.text;
+    } catch (_) {
+      emailTextEditingController = TextEditingController();
+    }
+    try {
+      fullNameTextEditingController.text;
+    } catch (_) {
+      fullNameTextEditingController = TextEditingController();
+    }
+    try {
+      phoneTextEditingController.text;
+    } catch (_) {
+      phoneTextEditingController = TextEditingController();
+    }
+    try {
+      passwordTextEditingController.text;
+    } catch (_) {
+      passwordTextEditingController = TextEditingController();
+    }
+  }
 
   @override
   void onInit() {
     super.onInit();
-    emailTextEditingController = TextEditingController();
-    fullNameTextEditingController = TextEditingController();
-    phoneTextEditingController = TextEditingController();
-    passwordTextEditingController = TextEditingController();
+    ensureControllersValid();
   }
 
   RxBool isSignInPage = true.obs;
@@ -78,6 +98,8 @@ class LoginScreenController extends GetxController {
           showCustomSnackbar(message: response.message, isError: false);
 
           FocusManager.instance.primaryFocus?.unfocus();
+
+          Get.delete<LoginScreenController>(force: true);
 
           if (user['intakeCompleted'] == true) {
             Get.offAllNamed(

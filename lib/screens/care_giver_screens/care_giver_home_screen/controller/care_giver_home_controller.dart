@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../constant/app_api_end_point.dart';
 
-
 // ── Models ─────────────────────────────────────────────
 class WeeklyBarData {
   final String day;
@@ -75,9 +74,11 @@ class CareGiverHomeController extends GetxController {
   void onNotificationTap() {
     Get.toNamed(AppRoutes.instance.notificationScreen);
   }
+
   void onSeeAllSchedule() {
     Get.toNamed(AppRoutes.instance.allScheduleScreen);
   }
+
   void onFilterTap() {}
 
   // Weekly earnings
@@ -102,23 +103,28 @@ class CareGiverHomeController extends GetxController {
   }
 
   void _setPlaceholders() {
-    todaySchedule.value = List.generate(2, (index) => TodayScheduleItem(
-      id: 'placeholder_$index',
-      clientId: '',
-      startTime: '09:00',
-      endTime: '11:00',
-      clientName: 'Client Name',
-      clientRole: 'Client',
-      address: 'Client Address',
-      status: 'PENDING',
-      avatarUrl: '',
-      tags: ['General Care'],
-    ));
-    
-    weeklyBars.value = List.generate(7, (index) => WeeklyBarData(
-      day: DateFormat('EEE').format(DateTime.now().add(Duration(days: index))),
-      value: 0.5,
-    ));
+    todaySchedule.value = List.generate(
+        2,
+        (index) => TodayScheduleItem(
+              id: 'placeholder_$index',
+              clientId: '',
+              startTime: '09:00',
+              endTime: '11:00',
+              clientName: 'Client Name',
+              clientRole: 'Client',
+              address: 'Client Address',
+              status: 'PENDING',
+              avatarUrl: '',
+              tags: ['General Care'],
+            ));
+
+    weeklyBars.value = List.generate(
+        7,
+        (index) => WeeklyBarData(
+              day: DateFormat('EEE')
+                  .format(DateTime.now().add(Duration(days: index))),
+              value: 0.5,
+            ));
   }
 
   Future<void> fetchEarningsSummary() async {
@@ -129,8 +135,9 @@ class CareGiverHomeController extends GetxController {
       final response = await CaregiverRepository.instance.getEarningsSummary();
 
       if (response.isSuccess) {
-        final model = CaregiverEarningsModel.fromJson(response.data['data'] ?? {});
-        
+        final model =
+            CaregiverEarningsModel.fromJson(response.data['data'] ?? {});
+
         // Use paidTotal as requested
         totalWeeklyEarnings.value = model.paidTotal;
 
@@ -161,13 +168,18 @@ class CareGiverHomeController extends GetxController {
     }
   }
 
+  Future<void> onRefresh() async {
+    await Future.wait([fetchEarningsSummary(), _loadSchedule()]);
+  }
+
   Future<void> _loadSchedule() async {
     try {
       isLoading.value = true;
       update();
 
       final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      final response = await CaregiverRepository.instance.getCaregiverBookings(date: today);
+      final response =
+          await CaregiverRepository.instance.getCaregiverBookings(date: today);
 
       if (response.isSuccess) {
         final List dataList = response.data['data']?['data'] ?? [];
@@ -175,21 +187,23 @@ class CareGiverHomeController extends GetxController {
           final client = json['client'] ?? {};
           final recipient = json['careRecipient'] ?? {};
           final service = json['serviceCategory'] ?? {};
-          
+
           return TodayScheduleItem(
             id: json['_id'] ?? '',
-            clientId: (client is Map) ? (client['_id'] ?? client['id'] ?? '') : '',
+            clientId:
+                (client is Map) ? (client['_id'] ?? client['id'] ?? '') : '',
             startTime: _formatTime(json['slotStartTime'] ?? '00:00'),
             endTime: _formatTime(json['slotEndTime'] ?? '00:00'),
             clientName: client['name'] ?? 'Unknown',
             clientRole: 'Client',
-            address: 'Contact for Address', // Address usually sensitive, placeholder
+            address:
+                'Contact for Address', // Address usually sensitive, placeholder
             status: json['status'] ?? 'PENDING',
             avatarUrl: AppApiEndPoint.imageUrl(client['profileImage']),
             tags: [service['name'] ?? 'General Care'],
           );
         }).toList();
-        
+
         todaySchedule.assignAll(items);
       } else {
         todaySchedule.clear();
@@ -237,7 +251,8 @@ class CareGiverHomeController extends GetxController {
   }
 
   void onViewDetails(TodayScheduleItem item) async {
-    await Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: item.id);
+    await Get.toNamed(AppRoutes.instance.bookingDetailsScreen,
+        arguments: item.id);
     _loadSchedule();
   }
 
@@ -247,17 +262,22 @@ class CareGiverHomeController extends GetxController {
       update();
 
       // For caregivers, the receiverId is the client's ID
-      final response = await ChatRepository.instance.getOrCreateConversation(item.clientId);
+      final response =
+          await ChatRepository.instance.getOrCreateConversation(item.clientId);
 
       if (response.isSuccess) {
         final data = response.data['data'] ?? {};
-        final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-        final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
-        final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
+        final currentUserId =
+            await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+        final currentUserRole =
+            await SharePrefsHelper.getString(SharedPreferenceValue.role);
+        final conversation =
+            ChatConversation.fromJson(data, currentUserId, currentUserRole);
 
-        await Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
+        await Get.toNamed(AppRoutes.instance.messageScreen,
+            arguments: conversation);
         try {
-           Get.find<ChatListController>().fetchConversations();
+          Get.find<ChatListController>().fetchConversations();
         } catch (_) {}
       } else {
         showCustomSnackbar(message: response.message, isError: true);

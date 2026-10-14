@@ -28,82 +28,87 @@ class CareGiverHomeScreen extends StatelessWidget {
         ),
       ),
       hideBackButton: true,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Weekly Earnings Chart Card ───────────────
-            Obx(
-              () => Skeletonizer(
-                enabled: c.isEarningsLoading.value,
-                child: WeeklyEarningsChartCard(
-                  totalEarnings: c.totalWeeklyEarnings.value,
-                  bars: c.weeklyBars.toList(),
-                ),
-              ),
-            ),
-            SizedBox(height: 32.h),
-
-            // ── Today's Schedule Section ────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CommonText(
-                  text: "Today's Schedule",
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w700,
-                  textColor: colors.textPrimary,
-                ),
-                GestureDetector(
-                  onTap: c.onSeeAllSchedule,
-                  child: CommonText(
-                    text: 'See All',
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    textColor: colors.secondaryColor,
+      child: RefreshIndicator(
+        onRefresh: c.onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Weekly Earnings Chart Card ───────────────
+              Obx(
+                () => Skeletonizer(
+                  enabled: c.isEarningsLoading.value,
+                  child: WeeklyEarningsChartCard(
+                    totalEarnings: c.totalWeeklyEarnings.value,
+                    bars: c.weeklyBars.toList(),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            Obx(
-              () => Skeletonizer(
-                enabled: c.isLoading.value,
-                child: c.todaySchedule.isEmpty && !c.isLoading.value
-                    ? Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(vertical: 32.h),
-                        decoration: BoxDecoration(
-                          color: colors.white,
-                          borderRadius: BorderRadius.circular(16.r),
-                          border: Border.all(color: colors.boxBg),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.calendar_today_outlined, size: 40.sp, color: Colors.grey.shade300),
-                            SizedBox(height: 12.h),
-                            CommonText(
-                              text: 'No schedule for today.',
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              textColor: Colors.grey,
-                            ),
-                          ],
-                        ),
-                      )
-                    : Column(
-                        children: c.todaySchedule
-                            .map((item) => CareGiverScheduleCard(
-                                  item: item,
-                                  onTap: () => c.onViewDetails(item),
-                                ))
-                            .toList(),
-                      ),
               ),
-            ),
-            SizedBox(height: 24.h),
-          ],
+              SizedBox(height: 32.h),
+
+              // ── Today's Schedule Section ────────────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CommonText(
+                    text: "Today's Schedule",
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w700,
+                    textColor: colors.textPrimary,
+                  ),
+                  GestureDetector(
+                    onTap: c.onSeeAllSchedule,
+                    child: CommonText(
+                      text: 'See All',
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      textColor: colors.secondaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Obx(
+                () => Skeletonizer(
+                  enabled: c.isLoading.value,
+                  child: c.todaySchedule.isEmpty && !c.isLoading.value
+                      ? Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 32.h),
+                          decoration: BoxDecoration(
+                            color: colors.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                            border: Border.all(color: colors.boxBg),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.calendar_today_outlined,
+                                  size: 40.sp, color: Colors.grey.shade300),
+                              SizedBox(height: 12.h),
+                              CommonText(
+                                text: 'No schedule for today.',
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                textColor: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        )
+                      : Column(
+                          children: c.todaySchedule
+                              .map((item) => CareGiverScheduleCard(
+                                    item: item,
+                                    onTap: () => c.onViewDetails(item),
+                                  ))
+                              .toList(),
+                        ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+            ],
+          ),
         ),
       ),
     );

@@ -21,6 +21,7 @@ class LoginScreen extends StatelessWidget {
 
     return GetBuilder<LoginScreenController>(
       builder: (controller) {
+        controller.ensureControllersValid();
         return Scaffold(
           backgroundColor: AppColors.instance.screenBg,
           body: Obx(
@@ -153,31 +154,52 @@ class LoginScreen extends StatelessWidget {
                                     ),
                                   ),
                                 32.height,
-                                CommonButton(
-                                  isLoading: controller.isLoading.value,
-                                  onTap: controller.isLoading.value 
-                                    ? null 
-                                    : () {
-                                    if (formKey.currentState!.validate()) {
-                                      if (controller.isSignInPage.value) {
-                                        controller.loginUser();
-                                      } else {
-                                        Get.toNamed(
-                                          AppRoutes.instance.welcomeScreen,
-                                          arguments: {
-                                            "name": controller.fullNameTextEditingController.text.trim(),
-                                            "email": controller.emailTextEditingController.text.trim(),
-                                            "phone": controller.phoneTextEditingController.text.trim(),
-                                            "password": controller.passwordTextEditingController.text,
-                                          },
-                                        );
-                                      }
-                                    }
-                                  },
-                                  titleText: controller.isSignInPage.value ? 'Login' : 'Continue',
-                                  buttonWidth: double.infinity,
-                                  buttonHeight: 54.h,
-                                  buttonRadius: 16.r,
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    CommonButton(
+                                      // core_kit nests Positioned widgets when its loader is enabled.
+                                      isLoading: false,
+                                      onTap: controller.isLoading.value
+                                          ? null
+                                          : () {
+                                              if (formKey.currentState!.validate()) {
+                                                if (controller.isSignInPage.value) {
+                                                  controller.loginUser();
+                                                } else {
+                                                  Get.toNamed(
+                                                    AppRoutes.instance.welcomeScreen,
+                                                    arguments: {
+                                                      "name": controller.fullNameTextEditingController.text.trim(),
+                                                      "email": controller.emailTextEditingController.text.trim(),
+                                                      "phone": controller.phoneTextEditingController.text.trim(),
+                                                      "password": controller.passwordTextEditingController.text,
+                                                    },
+                                                  );
+                                                }
+                                              }
+                                            },
+                                      titleText: controller.isSignInPage.value ? 'Login' : 'Continue',
+                                      buttonWidth: double.infinity,
+                                      buttonHeight: 54.h,
+                                      buttonRadius: 16.r,
+                                    ),
+                                    if (controller.isLoading.value)
+                                      Positioned.fill(
+                                        child: IgnorePointer(
+                                          child: Center(
+                                            child: SizedBox(
+                                              height: 22.h,
+                                              width: 22.w,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                color: AppColors.instance.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 48.height,
                                 Align(

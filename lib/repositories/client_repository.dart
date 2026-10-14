@@ -5,7 +5,8 @@ import '../services/api/api_service.dart';
 
 class ClientRepository {
   ClientRepository._privateConstructor();
-  static final ClientRepository _instance = ClientRepository._privateConstructor();
+  static final ClientRepository _instance =
+      ClientRepository._privateConstructor();
   static ClientRepository get instance => _instance;
 
   final ApiClient _apiClient = DioApiClient();
@@ -21,7 +22,8 @@ class ClientRepository {
       "medicalConditions": medicalConditions,
     };
 
-    return await _apiClient.post(AppApiEndPoint.createCareRecipient, body: body);
+    return await _apiClient.post(AppApiEndPoint.createCareRecipient,
+        body: body);
   }
 
   Future<ApiResponseModel> getCareRecipients() async {
@@ -37,12 +39,16 @@ class ClientRepository {
     String? sortOrder,
   }) async {
     final Map<String, dynamic> queryParams = {};
-    if (searchTerm != null && searchTerm.isNotEmpty) queryParams['searchTerm'] = searchTerm;
-    if (specialty != null && specialty.isNotEmpty) queryParams['specialty'] = specialty;
+    if (searchTerm != null && searchTerm.isNotEmpty)
+      queryParams['searchTerm'] = searchTerm;
+    if (specialty != null && specialty.isNotEmpty)
+      queryParams['specialty'] = specialty;
     if (skills != null && skills.isNotEmpty) queryParams['skills'] = skills;
-    if (language != null && language.isNotEmpty) queryParams['language'] = language;
+    if (language != null && language.isNotEmpty)
+      queryParams['language'] = language;
     if (sortBy != null && sortBy.isNotEmpty) queryParams['sortBy'] = sortBy;
-    if (sortOrder != null && sortOrder.isNotEmpty) queryParams['sortOrder'] = sortOrder;
+    if (sortOrder != null && sortOrder.isNotEmpty)
+      queryParams['sortOrder'] = sortOrder;
 
     String endpoint = AppApiEndPoint.caregiverProfiles;
     if (queryParams.isNotEmpty) {
@@ -60,15 +66,18 @@ class ClientRepository {
     required String startDate,
     required String endDate,
   }) async {
-    final endpoint = "${AppApiEndPoint.availability}/$caregiverId?startDate=$startDate&endDate=$endDate";
+    final endpoint =
+        "${AppApiEndPoint.availability}/$caregiverId?startDate=$startDate&endDate=$endDate";
     return await _apiClient.get(endpoint);
   }
 
-  Future<ApiResponseModel> createBooking({required Map<String, dynamic> data}) async {
+  Future<ApiResponseModel> createBooking(
+      {required Map<String, dynamic> data}) async {
     return await _apiClient.post(AppApiEndPoint.booking, body: data);
   }
 
-  Future<ApiResponseModel> getClientBookings({String? date, String? status}) async {
+  Future<ApiResponseModel> getClientBookings(
+      {String? date, String? status}) async {
     final Map<String, dynamic> queryParams = {};
     if (date != null) queryParams['date'] = date;
     if (status != null) queryParams['status'] = status;
@@ -87,6 +96,17 @@ class ClientRepository {
     return await _apiClient.get("${AppApiEndPoint.caregiverProfiles}/$id");
   }
 
+  Future<ApiResponseModel> getCaregiverReviews(
+    String caregiverId, {
+    required int page,
+    required int limit,
+  }) async {
+    return await _apiClient.get(
+      "${AppApiEndPoint.review}/$caregiverId",
+      query: {"page": page, "limit": limit},
+    );
+  }
+
   Future<ApiResponseModel> getBookingDetails(String id) async {
     return await _apiClient.get("${AppApiEndPoint.booking}/$id");
   }
@@ -95,6 +115,22 @@ class ClientRepository {
     return await _apiClient.patch(
       "${AppApiEndPoint.booking}/$id/cancel",
       body: {"cancelReason": reason},
+    );
+  }
+
+  Future<ApiResponseModel> submitReview({
+    String? caregiverId,
+    required String bookingId,
+    required int rating,
+    required String comment,
+  }) async {
+    return await _apiClient.post(
+      AppApiEndPoint.review,
+      body: {
+        "bookingId": bookingId,
+        "rating": rating,
+        "comment": comment,
+      },
     );
   }
 }

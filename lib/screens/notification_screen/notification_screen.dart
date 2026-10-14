@@ -32,21 +32,27 @@ class NotificationScreen extends StatelessWidget {
               header,
               Expanded(
                 child: items.isEmpty && !c.isLoading.value
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    ? RefreshIndicator(
+                        onRefresh: () => c.fetchNotifications(isRefresh: true),
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: [
-                            Icon(
-                              Icons.notifications_off_outlined,
-                              size: 64,
-                              color: Colors.grey.shade300,
-                            ),
-                            const SizedBox(height: 16),
-                            const CommonText(
-                              text: 'No notifications found',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              textColor: Colors.grey,
+                            const SizedBox(height: 100),
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.notifications_off_outlined,
+                                  size: 64,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(height: 16),
+                                const CommonText(
+                                  text: 'No notifications found',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  textColor: Colors.grey,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -61,11 +67,13 @@ class NotificationScreen extends StatelessWidget {
                           itemBuilder: (_, index) {
                             final item = items[index];
                             if (item.isLabel) {
-                              return NotificationGroupLabel(label: item.groupLabel!);
+                              return NotificationGroupLabel(
+                                  label: item.groupLabel!);
                             }
                             return NotificationItem(
                               notification: item.notification!,
-                              onTap: () => c.onNotificationTap(item.notification!),
+                              onTap: () =>
+                                  c.onNotificationTap(item.notification!),
                             );
                           },
                         ),

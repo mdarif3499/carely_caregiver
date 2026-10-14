@@ -127,7 +127,7 @@ class _AppMultilineTextFieldState extends State<AppMultilineTextField> {
   void dispose() {
     _focusNode.dispose();
     if (_isLocalController) {
-      _controller.dispose();
+      try { _controller.dispose(); } catch (_) {}
     }
     super.dispose();
   }

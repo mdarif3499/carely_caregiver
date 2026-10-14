@@ -151,7 +151,7 @@ class BookCaregiverController extends GetxController
 
   @override
   void onClose() {
-    instructionsController.dispose();
+    try { instructionsController.dispose(); } catch (_) {}
     super.onClose();
   }
 

@@ -9,10 +9,10 @@ import 'package:intl/intl.dart';
 class CMSContentScreen extends StatelessWidget {
   final String title;
   final String slug;
-  
+
   const CMSContentScreen({
-    super.key, 
-    required this.title, 
+    super.key,
+    required this.title,
     required this.slug,
   });
 
@@ -39,28 +39,32 @@ class CMSContentScreen extends StatelessWidget {
           );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Last Updated Banner ──
-              _LastUpdatedBanner(date: data.updatedAt),
-              const SizedBox(height: 24),
+        return RefreshIndicator(
+          onRefresh: c.fetchCMSPage,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Last Updated Banner ──
+                _LastUpdatedBanner(date: data.updatedAt),
+                const SizedBox(height: 24),
 
-              // ── HTML Content ──
-              // CommonText already handles HTML content internally
-              CommonText(
-                text: data.content,
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-                textColor: colors.textPrimary,
-                textAlign: TextAlign.start,
-                height: 1.5,
-                isDescription: true,
-              ),
-              const SizedBox(height: 32),
-            ],
+                // ── HTML Content ──
+                // CommonText already handles HTML content internally
+                CommonText(
+                  text: data.content,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  textColor: colors.textPrimary,
+                  textAlign: TextAlign.start,
+                  height: 1.5,
+                  isDescription: true,
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         );
       }),

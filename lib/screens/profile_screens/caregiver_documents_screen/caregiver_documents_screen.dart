@@ -2,6 +2,7 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/models/caregiver_document_model.dart';
 import 'package:carely_caregiver/screens/profile_screens/caregiver_documents_screen/controller/caregiver_documents_controller.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
+import 'package:carely_caregiver/widgets/app_button.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,17 +26,24 @@ class CaregiverDocumentsScreen extends StatelessWidget {
             }
 
             if (c.documents.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              return RefreshIndicator(
+                onRefresh: c.fetchMyDocuments,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    Icon(Icons.description_outlined, size: 64, color: colors.border),
-                    const SizedBox(height: 16),
-                    CommonText(
-                      text: "No documents uploaded yet",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      textColor: colors.secondaryText,
+                    const SizedBox(height: 140),
+                    Column(
+                      children: [
+                        Icon(Icons.description_outlined,
+                            size: 64, color: colors.border),
+                        const SizedBox(height: 16),
+                        CommonText(
+                          text: "No documents uploaded yet",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          textColor: colors.secondaryText,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -45,6 +53,7 @@ class CaregiverDocumentsScreen extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: c.fetchMyDocuments,
               child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(20),
                 itemCount: c.documents.length,
                 itemBuilder: (context, index) {
@@ -53,7 +62,7 @@ class CaregiverDocumentsScreen extends StatelessWidget {
               ),
             );
           }),
-          
+
           // Floating Upload Button
           Positioned(
             bottom: 24,
@@ -62,7 +71,10 @@ class CaregiverDocumentsScreen extends StatelessWidget {
               onPressed: () => _showUploadBottomSheet(context, c),
               backgroundColor: colors.primary,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const CommonText(text: "Upload", textColor: Colors.white, fontWeight: FontWeight.w700),
+              label: const CommonText(
+                  text: "Upload",
+                  textColor: Colors.white,
+                  fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -70,7 +82,8 @@ class CaregiverDocumentsScreen extends StatelessWidget {
     );
   }
 
-  void _showUploadBottomSheet(BuildContext context, CaregiverDocumentsController c) {
+  void _showUploadBottomSheet(
+      BuildContext context, CaregiverDocumentsController c) {
     final colors = AppColors.instance;
 
     Get.bottomSheet(
@@ -100,83 +113,93 @@ class CaregiverDocumentsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Document Type Dropdown
-            const CommonText(text: 'Document Type', fontSize: 14, fontWeight: FontWeight.w600),
+            const CommonText(
+                text: 'Document Type',
+                fontSize: 14,
+                fontWeight: FontWeight.w600),
             const SizedBox(height: 10),
             Obx(() => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: colors.boxBg.withAlpha(50),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: colors.border),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: c.selectedDocType.value,
-                  isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                  items: c.documentTypes.map((type) {
-                    return DropdownMenuItem(
-                      value: type['value'],
-                      child: CommonText(text: type['label']!, textAlign: TextAlign.start),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) c.selectedDocType.value = val;
-                  },
-                ),
-              ),
-            )),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: colors.boxBg.withAlpha(50),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: c.selectedDocType.value,
+                      isExpanded: true,
+                      icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                      items: c.documentTypes.map((type) {
+                        return DropdownMenuItem(
+                          value: type['value'],
+                          child: CommonText(
+                              text: type['label']!, textAlign: TextAlign.start),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) c.selectedDocType.value = val;
+                      },
+                    ),
+                  ),
+                )),
             const SizedBox(height: 20),
 
             // File Picker Area
             GestureDetector(
               onTap: c.pickDocument,
               child: Obx(() => Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 30),
-                decoration: BoxDecoration(
-                  color: colors.primary.withAlpha(5),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: colors.primary.withAlpha(30), style: BorderStyle.solid),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      c.selectedFile.value != null ? Icons.check_circle_rounded : Icons.cloud_upload_outlined,
-                      size: 48,
-                      color: c.selectedFile.value != null ? Colors.green : colors.primary,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 30),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withAlpha(5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: colors.primary.withAlpha(30),
+                          style: BorderStyle.solid),
                     ),
-                    const SizedBox(height: 12),
-                    CommonText(
-                      text: c.selectedFile.value != null 
-                          ? c.selectedFile.value!.path.split('/').last 
-                          : 'Tap to select document',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      textColor: colors.textPrimary,
+                    child: Column(
+                      children: [
+                        Icon(
+                          c.selectedFile.value != null
+                              ? Icons.check_circle_rounded
+                              : Icons.cloud_upload_outlined,
+                          size: 48,
+                          color: c.selectedFile.value != null
+                              ? Colors.green
+                              : colors.primary,
+                        ),
+                        const SizedBox(height: 12),
+                        CommonText(
+                          text: c.selectedFile.value != null
+                              ? c.selectedFile.value!.path.split('/').last
+                              : 'Tap to select document',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          textColor: colors.textPrimary,
+                        ),
+                        const SizedBox(height: 4),
+                        CommonText(
+                          text: 'Supported: JPG, PNG, PDF (Max 5MB)',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          textColor: colors.textGrey,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    CommonText(
-                      text: 'Supported: JPG, PNG, PDF (Max 5MB)',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      textColor: colors.textGrey,
-                    ),
-                  ],
-                ),
-              )),
+                  )),
             ),
             const SizedBox(height: 32),
 
             // Submit Button
-            Obx(() => CommonButton(
-              titleText: 'Submit for Verification',
-              onTap: c.isUploading.value ? null : c.uploadDocument,
-              isLoading: c.isUploading.value,
-              buttonWidth: double.infinity,
-              buttonHeight: 56,
-              buttonRadius: 16,
-            )),
+            Obx(() => AppButton(
+                  titleText: 'Submit for Verification',
+                  onTap: c.isUploading.value ? null : c.uploadDocument,
+                  isLoading: c.isUploading.value,
+                  buttonWidth: double.infinity,
+                  buttonHeight: 56,
+                  buttonRadius: 16,
+                )),
             const SizedBox(height: 10),
           ],
         ),
@@ -220,7 +243,8 @@ class _DocumentCard extends StatelessWidget {
                   color: colors.primary.withAlpha(10),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.article_outlined, color: colors.primary, size: 24),
+                child: Icon(Icons.article_outlined,
+                    color: colors.primary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -254,7 +278,8 @@ class _DocumentCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CommonText(
-                text: "Uploaded on ${DateFormat('MMM dd, yyyy').format(doc.createdAt)}",
+                text:
+                    "Uploaded on ${DateFormat('MMM dd, yyyy').format(doc.createdAt)}",
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 textColor: colors.textGrey,
@@ -299,10 +324,14 @@ class _DocumentCard extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
-      case 'VERIFIED': return Colors.green;
-      case 'PENDING': return Colors.orange;
-      case 'REJECTED': return Colors.red;
-      default: return Colors.grey;
+      case 'VERIFIED':
+        return Colors.green;
+      case 'PENDING':
+        return Colors.orange;
+      case 'REJECTED':
+        return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 }

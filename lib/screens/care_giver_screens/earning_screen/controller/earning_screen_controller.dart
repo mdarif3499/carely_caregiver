@@ -42,11 +42,14 @@ class EarningScreenController extends GetxController {
   }
 
   void _setPlaceholders() {
-    weeklyBars.value = List.generate(7, (index) => WeeklyBarData(
-      day: DateFormat('EEE').format(DateTime.now().add(Duration(days: index))),
-      value: 0.5,
-    ));
-    
+    weeklyBars.value = List.generate(
+        7,
+        (index) => WeeklyBarData(
+              day: DateFormat('EEE')
+                  .format(DateTime.now().add(Duration(days: index))),
+              value: 0.5,
+            ));
+
     transactions.assignAll([
       const EarningTransaction(
         title: 'Home Visit - Sarah J.',
@@ -79,13 +82,16 @@ class EarningScreenController extends GetxController {
     }
   }
 
+  Future<void> onRefresh() => _loadAllData();
+
   Future<void> fetchEarningsSummary() async {
     try {
       final response = await CaregiverRepository.instance.getEarningsSummary();
 
       if (response.isSuccess) {
-        final model = CaregiverEarningsModel.fromJson(response.data['data'] ?? {});
-        
+        final model =
+            CaregiverEarningsModel.fromJson(response.data['data'] ?? {});
+
         totalWeeklyEarnings.value = model.paidTotal;
         pendingEarnings.value = model.pendingTotal;
         payoutMethod.value = model.payoutMethod ?? "Not set";
@@ -128,10 +134,10 @@ class EarningScreenController extends GetxController {
 
           String formattedDate = "";
           try {
-             final dt = DateTime.parse(booking['date']);
-             formattedDate = DateFormat('MMM d').format(dt);
+            final dt = DateTime.parse(booking['date']);
+            formattedDate = DateFormat('MMM d').format(dt);
           } catch (_) {
-             formattedDate = booking['date']?.toString().split('T')[0] ?? "";
+            formattedDate = booking['date']?.toString().split('T')[0] ?? "";
           }
 
           int duration = 0;
@@ -143,9 +149,11 @@ class EarningScreenController extends GetxController {
 
           items.add(EarningTransaction(
             title: 'Home Visit - ${client['name'] ?? 'Unknown'}',
-            subtitle: '$formattedDate . ${duration}h ${service['name'] ?? 'General Care'}',
+            subtitle:
+                '$formattedDate . ${duration}h ${service['name'] ?? 'General Care'}',
             amount: (json['amount'] ?? 0.0).toDouble(),
-            status: _formatStatus(json['status'] ?? 'PENDING', booking['status'] ?? ""),
+            status: _formatStatus(
+                json['status'] ?? 'PENDING', booking['status'] ?? ""),
           ));
         }
         transactions.assignAll(items);
@@ -159,8 +167,9 @@ class EarningScreenController extends GetxController {
   }
 
   String _formatStatus(String earningStatus, String bookingStatus) {
-    if (bookingStatus.toUpperCase() == 'COMPLETED' || earningStatus.toUpperCase() == 'PAID') {
-       return 'Completed';
+    if (bookingStatus.toUpperCase() == 'COMPLETED' ||
+        earningStatus.toUpperCase() == 'PAID') {
+      return 'Completed';
     }
     String text = earningStatus.toLowerCase();
     if (text.isEmpty) return "";

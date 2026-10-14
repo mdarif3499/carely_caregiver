@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -51,6 +50,11 @@ class ProfileScreen extends StatelessWidget {
         onTap: () {
           Get.toNamed(AppRoutes.instance.editProfessionalProfileScreen);
         },
+      ),
+      ProfileMenuItem(
+        icon: Icons.rate_review_outlined,
+        title: 'My Reviews',
+        onTap: controller.onMyReviews,
       ),
       ProfileMenuItem(
         icon: Icons.calendar_today_outlined,
@@ -102,36 +106,45 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ── Header (User Data) ──
-                      ProfileAvatarHeader(
-                        name: controller.userModel.value?.name ?? "...",
-                        memberSince: controller.userModel.value?.memberSince ?? "...",
-                        avatarUrl: controller.userModel.value?.profileImage ?? "",
-                      ),
-                      SizedBox(height: 32.h),
+                child: RefreshIndicator(
+                  onRefresh: controller.fetchProfile,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ── Header (User Data) ──
+                        ProfileAvatarHeader(
+                          name: controller.userModel.value?.name ?? "...",
+                          memberSince:
+                              controller.userModel.value?.memberSince ?? "...",
+                          avatarUrl:
+                              controller.userModel.value?.profileImage ?? "",
+                        ),
+                        SizedBox(height: 32.h),
 
-                      // ── Account Section ──
-                      ProfileSection(
-                        title: 'Account',
-                        items: isClient ? clientAccountItems : caregiverAccountItems,
-                      ),
-                      SizedBox(height: 24.h),
+                        // ── Account Section ──
+                        ProfileSection(
+                          title: 'Account',
+                          items: isClient
+                              ? clientAccountItems
+                              : caregiverAccountItems,
+                        ),
+                        SizedBox(height: 24.h),
 
-                      // ── Settings Section ──
-                      ProfileSection(
-                        title: 'Settings',
-                        items: settingsItems,
-                      ),
-                      SizedBox(height: 32.h),
+                        // ── Settings Section ──
+                        ProfileSection(
+                          title: 'Settings',
+                          items: settingsItems,
+                        ),
+                        SizedBox(height: 32.h),
 
-                      // ── Logout ──
-                      LogoutButton(onTap: controller.logout),
-                    ],
+                        // ── Logout ──
+                        LogoutButton(onTap: controller.logout),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -142,4 +155,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
- ///
+
+///

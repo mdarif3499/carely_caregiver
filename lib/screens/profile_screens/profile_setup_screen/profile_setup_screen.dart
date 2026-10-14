@@ -5,6 +5,7 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/skill_chip.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
 import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
+import 'package:carely_caregiver/widgets/app_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,7 +60,7 @@ class ProfileSetupScreen extends StatelessWidget {
                               children: [
                                 _buildSectionTitle('Hourly Rate (\$)'),
                                 SizedBox(height: 14.h),
-                                CommonTextField(
+                                AppTextField(
                                   controller: controller.hourlyRateController,
                                   validationType: ValidationType.validateNumber,
                                   hintText: 'e.g. 25',
@@ -85,7 +86,7 @@ class ProfileSetupScreen extends StatelessWidget {
                       SizedBox(height: 28.h),
                       _buildSectionTitle('Location'),
                       SizedBox(height: 14.h),
-                      CommonTextField(
+                      AppTextField(
                         controller: controller.cityController,
                         validationType: ValidationType.notRequired,
                         hintText: 'City',
@@ -96,7 +97,7 @@ class ProfileSetupScreen extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: CommonTextField(
+                            child: AppTextField(
                               controller: controller.stateController,
                               validationType: ValidationType.notRequired,
                               hintText: 'State',
@@ -106,7 +107,7 @@ class ProfileSetupScreen extends StatelessWidget {
                           ),
                           SizedBox(width: 12.w),
                           Expanded(
-                            child: CommonTextField(
+                            child: AppTextField(
                               controller: controller.countryController,
                               validationType: ValidationType.notRequired,
                               hintText: 'Country',

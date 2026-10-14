@@ -33,6 +33,8 @@ class AppRoutes {
   final String bookingDetailsScreen = "/bookingDetailsScreen";
   final String stripePaymentWebView = "/stripePaymentWebView";
   final String clientBookingDetails = "/clientBookingDetails";
+  final String clientBookingReview = "/clientBookingReview";
+  final String caregiverReviews = "/caregiverReviews";
   final String allScheduleScreen = "/allScheduleScreen";
   final String fullScreenImage = "/fullScreenImage";
   final String notificationScreen = "/notificationScreen";

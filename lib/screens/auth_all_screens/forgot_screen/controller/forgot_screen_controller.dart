@@ -19,27 +19,35 @@ class ForgotScreenController extends GetxController {
   final ApiClient _apiClient = DioApiClient();
   RxBool isLoading = false.obs;
   RxBool isResending = false.obs;
-  late final PageController pageController;
-  late final TextEditingController emailController;
-  late final TextEditingController passwordTextEditingController;
-  late final TextEditingController confirmPasswordTextEditingController;
-  late final TextEditingController otpController;
-  late final PinInputController pinController;
+  PageController pageController = PageController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordTextEditingController = TextEditingController();
+  TextEditingController confirmPasswordTextEditingController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  late PinInputController pinController;
   GlobalKey<FormState> formKey1 = GlobalKey<FormState>();
   GlobalKey<FormState> formKey2 = GlobalKey<FormState>();
   GlobalKey<FormState> formKey3 = GlobalKey<FormState>();
 
   String resetToken = "";
 
+  void ensureControllersValid() {
+    try {
+      if (!pageController.hasClients) pageController = PageController();
+    } catch (_) {
+      pageController = PageController();
+    }
+    try { emailController.text; } catch (_) { emailController = TextEditingController(); }
+    try { passwordTextEditingController.text; } catch (_) { passwordTextEditingController = TextEditingController(); }
+    try { confirmPasswordTextEditingController.text; } catch (_) { confirmPasswordTextEditingController = TextEditingController(); }
+    try { otpController.text; } catch (_) { otpController = TextEditingController(); }
+    pinController = PinInputController(textController: otpController);
+  }
+
   @override
   void onInit() {
     super.onInit();
-    pageController = PageController();
-    emailController = TextEditingController();
-    passwordTextEditingController = TextEditingController();
-    confirmPasswordTextEditingController = TextEditingController();
-    otpController = TextEditingController();
-    pinController = PinInputController(textController: otpController);
+    ensureControllersValid();
   }
 
   Future<void> checkEmailFunction() async {

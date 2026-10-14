@@ -10,20 +10,24 @@ import '../../../../utils/error_log.dart';
 import '../../../../utils/log/app_log.dart';
 
 class SignUpController extends GetxController {
-  late final TextEditingController fullNameTextEditingController;
-  late final TextEditingController emailTextEditingController;
-  late final TextEditingController phoneTextEditingController;
-  late final TextEditingController passwordTextEditingController;
-  late final TextEditingController confirmPasswordTextEditingController;
+  TextEditingController fullNameTextEditingController = TextEditingController();
+  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController phoneTextEditingController = TextEditingController();
+  TextEditingController passwordTextEditingController = TextEditingController();
+  TextEditingController confirmPasswordTextEditingController = TextEditingController();
+
+  void ensureControllersValid() {
+    try { fullNameTextEditingController.text; } catch (_) { fullNameTextEditingController = TextEditingController(); }
+    try { emailTextEditingController.text; } catch (_) { emailTextEditingController = TextEditingController(); }
+    try { phoneTextEditingController.text; } catch (_) { phoneTextEditingController = TextEditingController(); }
+    try { passwordTextEditingController.text; } catch (_) { passwordTextEditingController = TextEditingController(); }
+    try { confirmPasswordTextEditingController.text; } catch (_) { confirmPasswordTextEditingController = TextEditingController(); }
+  }
 
   @override
   void onInit() {
     super.onInit();
-    fullNameTextEditingController = TextEditingController();
-    emailTextEditingController = TextEditingController();
-    phoneTextEditingController = TextEditingController();
-    passwordTextEditingController = TextEditingController();
-    confirmPasswordTextEditingController = TextEditingController();
+    ensureControllersValid();
   }
 
   final formKey = GlobalKey<FormState>();

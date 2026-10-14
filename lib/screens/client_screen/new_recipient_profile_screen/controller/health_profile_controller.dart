@@ -67,8 +67,8 @@ class HealthProfileController extends GetxController {
 
   @override
   void onClose() {
-    nameController.dispose();
-    healthNeedsController.dispose();
+    try { nameController.dispose(); } catch (_) {}
+    try { healthNeedsController.dispose(); } catch (_) {}
     super.onClose();
   }
 }

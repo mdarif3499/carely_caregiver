@@ -16,13 +16,15 @@ import '../../../../constant/app_colors.dart';
 class ClientBookingDetailsController extends GetxController {
   final RxBool isLoading = false.obs;
   final Rxn<CareGiverScheduleModel> booking = Rxn<CareGiverScheduleModel>();
+  String bookingId = '';
 
   @override
   void onInit() {
     super.onInit();
     _setPlaceholder();
-    final String? bookingId = Get.arguments;
-    if (bookingId != null) {
+    final argument = Get.arguments;
+    bookingId = argument is String ? argument : '';
+    if (bookingId.isNotEmpty) {
       fetchBookingDetails(bookingId);
     } else {
       showCustomSnackbar(message: "Invalid booking ID", isError: true);
@@ -60,7 +62,8 @@ class ClientBookingDetailsController extends GetxController {
       final response = await ClientRepository.instance.getBookingDetails(id);
 
       if (response.isSuccess) {
-        booking.value = CareGiverScheduleModel.fromJson(response.data['data'] ?? {});
+        booking.value =
+            CareGiverScheduleModel.fromJson(response.data['data'] ?? {});
       } else {
         showCustomSnackbar(message: response.message, isError: true);
       }
@@ -72,6 +75,23 @@ class ClientBookingDetailsController extends GetxController {
     }
   }
 
+  Future<void> onRefresh() async {
+    if (bookingId.isNotEmpty) {
+      await fetchBookingDetails(bookingId);
+    }
+  }
+
+  void onCaregiverTap() {
+    final caregiverId = booking.value?.caregiverId ?? '';
+    if (caregiverId.isEmpty || caregiverId == 'placeholder') {
+      showCustomSnackbar(
+          message: "Caregiver profile is unavailable", isError: true);
+      return;
+    }
+    Get.toNamed(AppRoutes.instance.careGiverDetailsScreen,
+        arguments: caregiverId);
+  }
+
   void showCancelDialog() {
     final TextEditingController reasonC = TextEditingController();
     final colors = AppColors.instance;
@@ -80,7 +100,8 @@ class ClientBookingDetailsController extends GetxController {
       Dialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
         child: Padding(
           padding: EdgeInsets.all(24.r),
           child: Column(
@@ -95,7 +116,8 @@ class ClientBookingDetailsController extends GetxController {
               ),
               12.height,
               CommonText(
-                text: 'Please provide a reason for cancelling this booking request.',
+                text:
+                    'Please provide a reason for cancelling this booking request.',
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 textColor: colors.secondaryText,
@@ -151,7 +173,8 @@ class ClientBookingDetailsController extends GetxController {
                       onTap: () {
                         final reason = reasonC.text.trim();
                         if (reason.isEmpty) {
-                          showCustomSnackbar(message: "Please enter a reason", isError: true);
+                          showCustomSnackbar(
+                              message: "Please enter a reason", isError: true);
                           return;
                         }
                         Get.back();
@@ -167,6 +190,7 @@ class ClientBookingDetailsController extends GetxController {
       ),
     );
   }
+
   Future<void> cancelRequest(String reason) async {
     final id = booking.value?.id;
     if (id == null || id == 'placeholder') return;
@@ -175,12 +199,14 @@ class ClientBookingDetailsController extends GetxController {
       isLoading.value = true;
       update();
 
-      final response = await ClientRepository.instance.cancelBooking(id, reason);
+      final response =
+          await ClientRepository.instance.cancelBooking(id, reason);
 
-     ///   ✅ Socket: Connected
+      ///   ✅ Socket: Connected
 
       if (response.isSuccess) {
-        showCustomSnackbar(message: "Booking cancelled successfully.", isError: false);
+        showCustomSnackbar(
+            message: "Booking cancelled successfully.", isError: false);
         await fetchBookingDetails(id);
       } else {
         showCustomSnackbar(message: response.message, isError: true);
@@ -202,21 +228,23 @@ class ClientBookingDetailsController extends GetxController {
       update();
 
       // The receiverId should be the caregiver's user ID
-      final response = await ChatRepository.instance.getOrCreateConversation(b.caregiverId);
+      final response =
+          await ChatRepository.instance.getOrCreateConversation(b.caregiverId);
 
       if (response.isSuccess) {
         final data = response.data['data'] ?? {};
-        final currentUserId = await SharePrefsHelper.getString(SharedPreferenceValue.userId);
-        final currentUserRole = await SharePrefsHelper.getString(SharedPreferenceValue.role);
+        final currentUserId =
+            await SharePrefsHelper.getString(SharedPreferenceValue.userId);
+        final currentUserRole =
+            await SharePrefsHelper.getString(SharedPreferenceValue.role);
 
-
-        final conversation = ChatConversation.fromJson(data, currentUserId, currentUserRole);
-        await Get.toNamed(AppRoutes.instance.messageScreen, arguments: conversation);
-
-
+        final conversation =
+            ChatConversation.fromJson(data, currentUserId, currentUserRole);
+        await Get.toNamed(AppRoutes.instance.messageScreen,
+            arguments: conversation);
 
         try {
-           Get.find<ChatListController>().fetchConversations();
+          Get.find<ChatListController>().fetchConversations();
         } catch (_) {}
       } else {
         showCustomSnackbar(message: response.message, isError: true);
@@ -227,5 +255,24 @@ class ClientBookingDetailsController extends GetxController {
       isLoading.value = false;
       update();
     }
+  }
+
+  void onReview() {
+    final b = booking.value;
+    if (b == null || b.id.isEmpty || b.caregiverId.isEmpty) {
+      showCustomSnackbar(
+          message: "Booking review details are unavailable", isError: true);
+      return;
+    }
+
+    Get.toNamed(
+      AppRoutes.instance.clientBookingReview,
+      arguments: {
+        "bookingId": b.id,
+        "caregiverId": b.caregiverId,
+        "caregiverName": b.caregiverName,
+        "caregiverAvatar": b.caregiverAvatar,
+      },
+    );
   }
 }

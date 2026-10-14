@@ -35,49 +35,62 @@ class BookingRequestScreen extends StatelessWidget {
 
         // ── Empty state ─────────────────────────────────
         if (requests.isEmpty) {
-          return Column(
-            children: [
-              header,
-              const SizedBox(height: 80),
-              Icon(Icons.inbox_outlined, size: 60, color: Colors.grey.shade300),
-              const SizedBox(height: 12),
-              const CommonText(
-                text: 'No requests found',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                textColor:  Color(0xff7F8C8D),
-                isDescription: true,
-                preventScaling: true,
-              ),
-            ],
+          return RefreshIndicator(
+            onRefresh: c.fetchCaregiverBookings,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                header,
+                const SizedBox(height: 80),
+                Column(
+                  children: [
+                    Icon(Icons.inbox_outlined,
+                        size: 60, color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    const CommonText(
+                      text: 'No requests found',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      textColor: Color(0xff7F8C8D),
+                      isDescription: true,
+                      preventScaling: true,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           );
         }
 
         // ── Request list via SmartListLoader ────────────
-        return SmartListLoader(
-          itemCount: requests.length,
-          appbar: header,
-          padding: const EdgeInsets.only(bottom: 20),
-          onColapsAppbar: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: BookingTabSelector(
-              selected: c.selectedTab.value,
-              newCount: c.newRequests.length,
-              onTap: c.selectTab,
+        return RefreshIndicator(
+          onRefresh: c.fetchCaregiverBookings,
+          child: SmartListLoader(
+            itemCount: requests.length,
+            appbar: header,
+            padding: const EdgeInsets.only(bottom: 20),
+            onColapsAppbar: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: BookingTabSelector(
+                selected: c.selectedTab.value,
+                newCount: c.newRequests.length,
+                onTap: c.selectTab,
+              ),
             ),
+            itemBuilder: (_, index) {
+              final req = requests[index];
+              return BookingRequestCard(
+                onTap: () {
+                  Get.toNamed(AppRoutes.instance.bookingDetailsScreen,
+                      arguments: req.id);
+                },
+                request: req,
+                isNew: c.selectedTab.value == 0,
+                onAccept: () => c.acceptRequest(req.id),
+                onDecline: () => c.showDeclineDialog(req.id),
+              );
+            },
           ),
-          itemBuilder: (_, index) {
-            final req = requests[index];
-            return BookingRequestCard(
-              onTap: () {
-                Get.toNamed(AppRoutes.instance.bookingDetailsScreen, arguments: req.id);
-              },
-              request: req,
-              isNew: c.selectedTab.value == 0,
-              onAccept: () => c.acceptRequest(req.id),
-              onDecline: () => c.showDeclineDialog(req.id),
-            );
-          },
         );
       }),
     );

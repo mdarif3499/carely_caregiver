@@ -21,7 +21,7 @@ class EarningScreen extends StatelessWidget {
       appBarTitle: 'Wallet & Earnings',
       hideBackButton: true,
       actions: [
-     const   AppIconButton(
+        const AppIconButton(
           icon: Icons.notifications_none_outlined,
           hasBadge: true,
         ),
@@ -30,59 +30,65 @@ class EarningScreen extends StatelessWidget {
       child: Obx(
         () => Skeletonizer(
           enabled: c.isLoading.value,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Weekly Earnings Large Card ───────────────
-                WeeklyEarningsChartCard(
-                  totalEarnings: c.totalWeeklyEarnings.value,
-                  bars: c.weeklyBars,
-                ),
-                const SizedBox(height: 20),
+          child: RefreshIndicator(
+            onRefresh: c.onRefresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Weekly Earnings Large Card ───────────────
+                  WeeklyEarningsChartCard(
+                    totalEarnings: c.totalWeeklyEarnings.value,
+                    bars: c.weeklyBars,
+                  ),
+                  const SizedBox(height: 20),
 
-                // ── Info Cards Row (Pending + Payout) ────────
-                Row(
-                  children: [
-                    EarningInfoCard(
-                      label: 'Pending Earnings',
-                      value: '\$${c.pendingEarnings.value.toStringAsFixed(2)}',
-                    ),
-                    const SizedBox(width: 16),
-                    EarningInfoCard(
-                      label: 'Payout Methods',
-                      value: c.payoutMethod.value,
-                      isLink: true,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // ── Recent Transactions Header ───────────────
-                CommonText(
-                  text: 'Recent Transactions',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  textColor: colors.textPrimary,
-                ),
-                const SizedBox(height: 16),
-
-                // ── Transaction List ─────────────────────────
-                if (c.transactions.isEmpty && !c.isLoading.value)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: CommonText(
-                        text: 'No transactions found.',
-                        fontSize: 16,
-                        textColor: Colors.grey,
+                  // ── Info Cards Row (Pending + Payout) ────────
+                  Row(
+                    children: [
+                      EarningInfoCard(
+                        label: 'Pending Earnings',
+                        value:
+                            '\$${c.pendingEarnings.value.toStringAsFixed(2)}',
                       ),
-                    ),
-                  )
-                else
-                  ...c.transactions.map((t) => EarningTransactionCard(transaction: t)),
-              ],
+                      const SizedBox(width: 16),
+                      EarningInfoCard(
+                        label: 'Payout Methods',
+                        value: c.payoutMethod.value,
+                        isLink: true,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // ── Recent Transactions Header ───────────────
+                  CommonText(
+                    text: 'Recent Transactions',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    textColor: colors.textPrimary,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Transaction List ─────────────────────────
+                  if (c.transactions.isEmpty && !c.isLoading.value)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40),
+                        child: CommonText(
+                          text: 'No transactions found.',
+                          fontSize: 16,
+                          textColor: Colors.grey,
+                        ),
+                      ),
+                    )
+                  else
+                    ...c.transactions
+                        .map((t) => EarningTransactionCard(transaction: t)),
+                ],
+              ),
             ),
           ),
         ),

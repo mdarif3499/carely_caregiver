@@ -36,16 +36,22 @@ class MyBookingScreen extends StatelessWidget {
                         onTap: () => c.onStatusSelected(status),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
                           decoration: BoxDecoration(
-                            color: isSelected ? colors.primary : colors.boxBg.withAlpha(50),
+                            color: isSelected
+                                ? colors.primary
+                                : colors.boxBg.withAlpha(50),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: CommonText(
                             text: c.formatStatus(status),
                             fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                            textColor: isSelected ? Colors.white : colors.secondaryText,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                            textColor: isSelected
+                                ? Colors.white
+                                : colors.secondaryText,
                           ),
                         ),
                       ),
@@ -64,17 +70,27 @@ class MyBookingScreen extends StatelessWidget {
               }
 
               if (c.bookings.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                return RefreshIndicator(
+                  onRefresh: c.fetchMyBookings,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 60, color: Colors.grey.shade300),
-                      const SizedBox(height: 16),
-                      CommonText(
-                        text: 'No ${c.formatStatus(c.selectedStatus.value).toLowerCase()} bookings found',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        textColor: Colors.grey,
+                      SizedBox(height: 120.h),
+                      Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.calendar_today_outlined,
+                                size: 60, color: Colors.grey.shade300),
+                            const SizedBox(height: 16),
+                            CommonText(
+                              text:
+                                  'No ${c.formatStatus(c.selectedStatus.value).toLowerCase()} bookings found',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              textColor: Colors.grey,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -84,6 +100,7 @@ class MyBookingScreen extends StatelessWidget {
               return RefreshIndicator(
                 onRefresh: () async => c.fetchMyBookings(),
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: c.bookings.length,
                   itemBuilder: (context, index) {
@@ -91,7 +108,8 @@ class MyBookingScreen extends StatelessWidget {
                     return ClientBookingCard(
                       booking: booking,
                       onTap: () {
-                        Get.toNamed(AppRoutes.instance.clientBookingDetails, arguments: booking.id);
+                        Get.toNamed(AppRoutes.instance.clientBookingDetails,
+                            arguments: booking.id);
                       },
                     );
                   },

@@ -48,25 +48,33 @@ class ChatListScreen extends StatelessWidget {
         return Skeletonizer(
           enabled: controller.isLoading.value,
           child: chats.isEmpty && !controller.isLoading.value
-              ? Column(
-                  children: [
-                    header,
-                    SizedBox(height: 60.h),
-                    Icon(
-                      Icons.chat_bubble_outline_rounded,
-                      size: 56.sp,
-                      color: colors.border,
-                    ),
-                    SizedBox(height: 12.h),
-                    CommonText(
-                      text: 'No conversations found',
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      textColor: colors.secondaryText,
-                      isDescription: true,
-                      preventScaling: true,
-                    ),
-                  ],
+              ? RefreshIndicator(
+                  onRefresh: controller.fetchConversations,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      header,
+                      SizedBox(height: 60.h),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 56.sp,
+                            color: colors.border,
+                          ),
+                          SizedBox(height: 12.h),
+                          CommonText(
+                            text: 'No conversations found',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            textColor: colors.secondaryText,
+                            isDescription: true,
+                            preventScaling: true,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 )
               : RefreshIndicator(
                   onRefresh: () => controller.fetchConversations(),
@@ -148,17 +156,27 @@ class _ChatTile extends StatelessWidget {
                       SizedBox(height: 3.h),
                       Row(
                         children: [
-                          if (conversation.lastMessageSenderId == controller.currentUserId && !conversation.isTyping && conversation.lastMessage != "No messages yet")
+                          if (conversation.lastMessageSenderId ==
+                                  controller.currentUserId &&
+                              !conversation.isTyping &&
+                              conversation.lastMessage != "No messages yet")
                             Padding(
                               padding: EdgeInsets.only(right: 4.w),
-                              child: _StatusTicks(status: conversation.lastMessageStatus),
+                              child: _StatusTicks(
+                                  status: conversation.lastMessageStatus),
                             ),
                           Expanded(
                             child: CommonText(
-                              text: conversation.isTyping ? 'typing...' : conversation.lastMessage,
+                              text: conversation.isTyping
+                                  ? 'typing...'
+                                  : conversation.lastMessage,
                               fontSize: 13.sp,
-                              fontWeight: conversation.isTyping ? FontWeight.w600 : FontWeight.w400,
-                              textColor: conversation.isTyping ? colors.primary : colors.secondaryText,
+                              fontWeight: conversation.isTyping
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                              textColor: conversation.isTyping
+                                  ? colors.primary
+                                  : colors.secondaryText,
                               textAlign: TextAlign.start,
                               isDescription: true,
                               preventScaling: true,
@@ -233,12 +251,12 @@ class _ChatTile extends StatelessWidget {
     );
   }
 }
-       ///   6a93ff23e368e434039b8859
-      ///   user/profileImage-1788084054933.jpg
-     ///   I/flutter ( 8688): ╔╣ Request ║ GET
-    ///   I/flutter ( 8688): ║  https://rahad5000.naimulhassan.me/api/v1/earnings/me/summary
-   ///  I/flutter ( 8688): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
 
+///   6a93ff23e368e434039b8859
+///   user/profileImage-1788084054933.jpg
+///   I/flutter ( 8688): ╔╣ Request ║ GET
+///   I/flutter ( 8688): ║  https://rahad5000.naimulhassan.me/api/v1/earnings/me/summary
+///  I/flutter ( 8688): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
 
 class _StatusTicks extends StatelessWidget {
   final String status;
@@ -248,14 +266,17 @@ class _StatusTicks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isFailed) {
-      return Icon(Icons.error_outline_rounded, size: 14.sp, color: Colors.redAccent);
+      return Icon(Icons.error_outline_rounded,
+          size: 14.sp, color: Colors.redAccent);
     }
     if (status == 'SENT') {
       return Icon(Icons.done_rounded, size: 14.sp, color: Colors.grey);
     } else if (status == 'DELIVERED') {
       return Icon(Icons.done_all_rounded, size: 14.sp, color: Colors.grey);
     } else if (status == 'SEEN') {
-      return Icon(Icons.done_all_rounded, size: 14.sp, color: const Color(0xFF34B7F1)); // WhatsApp blue for seen
+      return Icon(Icons.done_all_rounded,
+          size: 14.sp,
+          color: const Color(0xFF34B7F1)); // WhatsApp blue for seen
     }
     return const SizedBox.shrink();
   }

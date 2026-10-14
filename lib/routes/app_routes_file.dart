@@ -4,6 +4,7 @@ import 'package:carely_caregiver/screens/profile_screens/caregiver_documents_scr
 import 'package:carely_caregiver/screens/care_giver_screens/booking_details_screen/booking_details_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/book_caregiver_screen/book_caregiver_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/care_giver_details_screen.dart';
+import 'package:carely_caregiver/screens/client_screen/care_giver_details_screen/caregiver_reviews_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/client_home_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/review_booking_screen/review_booking_screen.dart';
 import 'package:carely_caregiver/screens/message_screen/message_screen.dart';
@@ -14,6 +15,8 @@ import 'package:carely_caregiver/screens/care_giver_screens/all_schedule_screen/
 import 'package:carely_caregiver/screens/message_screen/full_screen_image_screen.dart';
 import 'package:carely_caregiver/screens/cms_screen/cms_content_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/my_booking_screen/client_booking_details_screen.dart';
+import 'package:carely_caregiver/screens/client_screen/review_booking_screen/submit_booking_review_screen.dart';
+import 'package:carely_caregiver/screens/client_screen/review_booking_screen/controller/submit_booking_review_controller.dart';
 import 'package:carely_caregiver/screens/client_screen/new_recipient_profile_screen/new_recipient_profile_screen.dart';
 import 'package:carely_caregiver/screens/client_screen/payment/stripe_webview_screen.dart';
 import 'package:carely_caregiver/screens/profile_screens/notification_settings_screen/notification_settings_screen.dart';
@@ -153,13 +156,15 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.termsAndConditions,
     binding: ProfileBinding(),
-    page: () => const CMSContentScreen(title: 'Terms of Service', slug: 'terms-of-service'),
+    page: () => const CMSContentScreen(
+        title: 'Terms of Service', slug: 'terms-of-service'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
     name: AppRoutes.instance.privacyPolicy,
     binding: ProfileBinding(),
-    page: () => const CMSContentScreen(title: 'Privacy Policy', slug: 'privacy-policy'),
+    page: () =>
+        const CMSContentScreen(title: 'Privacy Policy', slug: 'privacy-policy'),
     middlewares: [InternetCheckMiddleWare()],
   ),
   GetPage(
@@ -178,6 +183,12 @@ List<GetPage> appRootRoutesFile = <GetPage>[
     name: AppRoutes.instance.careGiverDetailsScreen,
     binding: ClientHomeBinding(),
     page: () => const CareGiverDetailsScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+  GetPage(
+    name: AppRoutes.instance.caregiverReviews,
+    binding: ClientHomeBinding(),
+    page: () => const CaregiverReviewsScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 
@@ -209,6 +220,15 @@ List<GetPage> appRootRoutesFile = <GetPage>[
   GetPage(
     name: AppRoutes.instance.clientBookingDetails,
     page: () => const ClientBookingDetailsScreen(),
+    middlewares: [InternetCheckMiddleWare()],
+  ),
+
+  GetPage(
+    name: AppRoutes.instance.clientBookingReview,
+    binding: BindingsBuilder(() {
+      Get.lazyPut(() => SubmitBookingReviewController());
+    }),
+    page: () => const SubmitBookingReviewScreen(),
     middlewares: [InternetCheckMiddleWare()],
   ),
 

@@ -5,18 +5,22 @@ import '../../../../routes/app_routes.dart';
 import '../../../../utils/error_log.dart';
 
 class ChangePasswordScreenController extends GetxController {
-  late final TextEditingController oldPasswordTextEditingController;
-  late final TextEditingController newPasswordTextEditingController;
-  late final TextEditingController confirmPasswordTextEditingController;
+  TextEditingController oldPasswordTextEditingController = TextEditingController();
+  TextEditingController newPasswordTextEditingController = TextEditingController();
+  TextEditingController confirmPasswordTextEditingController = TextEditingController();
 
   final RxBool isLoading = false.obs;
+
+  void ensureControllersValid() {
+    try { oldPasswordTextEditingController.text; } catch (_) { oldPasswordTextEditingController = TextEditingController(); }
+    try { newPasswordTextEditingController.text; } catch (_) { newPasswordTextEditingController = TextEditingController(); }
+    try { confirmPasswordTextEditingController.text; } catch (_) { confirmPasswordTextEditingController = TextEditingController(); }
+  }
 
   @override
   void onInit() {
     super.onInit();
-    oldPasswordTextEditingController = TextEditingController();
-    newPasswordTextEditingController = TextEditingController();
-    confirmPasswordTextEditingController = TextEditingController();
+    ensureControllersValid();
   }
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 

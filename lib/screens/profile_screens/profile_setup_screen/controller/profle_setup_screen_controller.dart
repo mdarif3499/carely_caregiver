@@ -29,6 +29,16 @@ class ProfileSetupScreenController extends GetxController {
     fetchCategories();
   }
 
+  @override
+  void onClose() {
+    bioController.dispose();
+    hourlyRateController.dispose();
+    cityController.dispose();
+    stateController.dispose();
+    countryController.dispose();
+    super.onClose();
+  }
+
   void _setPlaceholder() {
     // Shimmer template data
     if (categories.isEmpty) {

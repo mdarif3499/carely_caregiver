@@ -21,25 +21,28 @@ class CareRecipientsScreen extends StatelessWidget {
         child: Column(
           children: [
             AddRecipientDashedCard(
-              onTap: () => Get.toNamed(AppRoutes.instance.newRecipientProfileScreen),
+              onTap: () =>
+                  Get.toNamed(AppRoutes.instance.newRecipientProfileScreen),
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: Obx(
-                () => ListView.builder(
-                  itemCount: controller.recipients.length,
-                  itemBuilder: (context, index) {
-                    final item = controller.recipients[index];
-                    return RecipientListCard(
-                      name: item.name,
-                      relationship: item.relationship,
-                      tags: item.tags,
-                      imageUrl: item.imageUrl,
-                      onTap: () => controller.selectRecipient(item),
-                    );
-                  },
-                ),
-              ),
+              child: Obx(() => RefreshIndicator(
+                    onRefresh: controller.fetchRecipients,
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: controller.recipients.length,
+                      itemBuilder: (context, index) {
+                        final item = controller.recipients[index];
+                        return RecipientListCard(
+                          name: item.name,
+                          relationship: item.relationship,
+                          tags: item.tags,
+                          imageUrl: item.imageUrl,
+                          onTap: () => controller.selectRecipient(item),
+                        );
+                      },
+                    ),
+                  )),
             ),
           ],
         ),

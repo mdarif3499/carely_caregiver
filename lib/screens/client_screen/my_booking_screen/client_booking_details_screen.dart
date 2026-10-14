@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-
 class ClientBookingDetailsScreen extends StatelessWidget {
   const ClientBookingDetailsScreen({super.key});
 
@@ -20,7 +19,7 @@ class ClientBookingDetailsScreen extends StatelessWidget {
       appBarTitle: 'Booking Details',
       child: Obx(() {
         final b = c.booking.value;
-        
+
         return Skeletonizer(
           enabled: c.isLoading.value,
           child: b == null && !c.isLoading.value
@@ -28,185 +27,220 @@ class ClientBookingDetailsScreen extends StatelessWidget {
               : Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.all(20.r),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // ── Caregiver Header ──
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 40.r,
-                                  backgroundColor: colors.boxBg,
-                                  backgroundImage: (b?.caregiverAvatar ?? "").isNotEmpty ? NetworkImage(b!.caregiverAvatar) : null,
-                                  child: (b?.caregiverAvatar ?? "").isEmpty ? Icon(Icons.person, color: colors.primary, size: 40.sp) : null,
-                                ),
-                                SizedBox(width: 16.w),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      CommonText(
-                                        text: b?.caregiverName ?? '...',
-                                        fontSize: 22.sp,
-                                        fontWeight: FontWeight.w700,
-                                        textColor: colors.textPrimary,
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.star_rounded, color: Colors.amber, size: 20.sp),
-                                          SizedBox(width: 4.w),
-                                          CommonText(
-                                            text: "4.9 (120 reviews)", // Fallback if rating not in model
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
-                                            textColor: colors.secondaryText,
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.location_on_outlined, size: 16.sp, color: colors.secondaryText),
-                                          SizedBox(width: 4.w),
-                                          CommonText(
-                                            text: "New York, NY", // Fallback
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
-                                            textColor: colors.secondaryText,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 32.h),
-
-                            // ── Schedule & Price Card ──
-                            Container(
-                              padding: EdgeInsets.all(20.r),
-                              decoration: BoxDecoration(
-                                color: colors.white,
-                                borderRadius: BorderRadius.circular(20.r),
-                                border: Border.all(color: colors.boxBg),
-                                boxShadow: [BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10.r, offset: Offset(0, 4.h))],
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CommonText(
-                                        text: 'SCHEDULE',
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        textColor: const Color(0xff7F8C8D),
-                                      ),
-                                      CommonText(
-                                        text: 'TOTAL PAID',
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        textColor: const Color(0xff7F8C8D),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CommonText(
-                                        text: _formatDate(b?.date ?? ""),
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.w700,
-                                        textColor: colors.textPrimary,
-                                      ),
-                                      CommonText(
-                                        text: '\$${(b?.amount ?? 0.0).toStringAsFixed(2)}',
-                                        fontSize: 20.sp,
-                                        fontWeight: FontWeight.w700,
-                                        textColor: colors.secondaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: CommonText(
-                                      text: b?.formattedTimeRange ?? '...',
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w400,
-                                      textColor: colors.secondaryText,
+                      child: RefreshIndicator(
+                        onRefresh: c.onRefresh,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.all(20.r),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ── Caregiver Header ──
+                              InkWell(
+                                onTap: c.onCaregiverTap,
+                                borderRadius: BorderRadius.circular(18.r),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 40.r,
+                                      backgroundColor: colors.boxBg,
+                                      backgroundImage:
+                                          (b?.caregiverAvatar ?? "").isNotEmpty
+                                              ? NetworkImage(b!.caregiverAvatar)
+                                              : null,
+                                      child: (b?.caregiverAvatar ?? "").isEmpty
+                                          ? Icon(Icons.person,
+                                              color: colors.primary,
+                                              size: 40.sp)
+                                          : null,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 16.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          CommonText(
+                                            text: b?.caregiverName ?? '...',
+                                            fontSize: 22.sp,
+                                            fontWeight: FontWeight.w700,
+                                            textColor: colors.textPrimary,
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.star_rounded,
+                                                  color: Colors.amber,
+                                                  size: 20.sp),
+                                              SizedBox(width: 4.w),
+                                              CommonText(
+                                                text: "4.9 (120 reviews)",
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400,
+                                                textColor: colors.secondaryText,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.location_on_outlined,
+                                                  size: 16.sp,
+                                                  color: colors.secondaryText),
+                                              SizedBox(width: 4.w),
+                                              CommonText(
+                                                text: "New York, NY",
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400,
+                                                textColor: colors.secondaryText,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: colors.secondaryText,
+                                      size: 24.sp,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 24.h),
+                              SizedBox(height: 32.h),
 
-                            // ── Care Details ──
-                            CommonText(
-                              text: 'Care Details',
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            SizedBox(height: 16.h),
-                            _DetailRow(
-                              icon: Icons.medical_services_outlined,
-                              label: 'Service:',
-                              value: b?.serviceName ?? '...',
-                            ),
-                            SizedBox(height: 12.h),
-                            _DetailRow(
-                              icon: Icons.person_outline_rounded,
-                              label: 'For:',
-                              value: b != null ? '${b.recipientName} (${b.relationship})' : '...',
-                            ),
-                            SizedBox(height: 12.h),
-                            _DetailRow(
-                              icon: Icons.info_outline_rounded,
-                              label: 'Status:',
-                              value: b?.formattedStatus ?? '...',
-                              isStatus: true,
-                            ),
-                            SizedBox(height: 12.h),
-                            _DetailRow(
-                              icon: Icons.payments_outlined,
-                              label: 'Payment:',
-                              value: b?.formattedPaymentStatus ?? '...',
-                              isStatus: true,
-                            ),
-                            SizedBox(height: 32.h),
+                              // ── Schedule & Price Card ──
+                              Container(
+                                padding: EdgeInsets.all(20.r),
+                                decoration: BoxDecoration(
+                                  color: colors.white,
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  border: Border.all(color: colors.boxBg),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.black.withAlpha(5),
+                                        blurRadius: 10.r,
+                                        offset: Offset(0, 4.h))
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CommonText(
+                                          text: 'SCHEDULE',
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w600,
+                                          textColor: const Color(0xff7F8C8D),
+                                        ),
+                                        CommonText(
+                                          text: 'TOTAL PAID',
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w600,
+                                          textColor: const Color(0xff7F8C8D),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CommonText(
+                                          text: _formatDate(b?.date ?? ""),
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w700,
+                                          textColor: colors.textPrimary,
+                                        ),
+                                        CommonText(
+                                          text:
+                                              '\$${(b?.amount ?? 0.0).toStringAsFixed(2)}',
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.w700,
+                                          textColor: colors.secondaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: CommonText(
+                                        text: b?.formattedTimeRange ?? '...',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        textColor: colors.secondaryText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 24.h),
 
-                            // ── Instructions ──
-                            if ((b?.instructions ?? "").isNotEmpty) ...[
+                              // ── Care Details ──
                               CommonText(
-                                text: 'Additional Instructions',
+                                text: 'Care Details',
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
                               ),
-                              SizedBox(height: 12.h),
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(16.r),
-                                decoration: BoxDecoration(
-                                  color: colors.boxBg.withAlpha(30),
-                                  borderRadius: BorderRadius.circular(16.r),
-                                ),
-                                child: CommonText(
-                                  text: b?.instructions ?? "",
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w400,
-                                  textColor: colors.textPrimary,
-                                  textAlign: TextAlign.start,
-                                  height: 1.4,
-                                ),
+                              SizedBox(height: 16.h),
+                              _DetailRow(
+                                icon: Icons.medical_services_outlined,
+                                label: 'Service:',
+                                value: b?.serviceName ?? '...',
                               ),
+                              SizedBox(height: 12.h),
+                              _DetailRow(
+                                icon: Icons.person_outline_rounded,
+                                label: 'For:',
+                                value: b != null
+                                    ? '${b.recipientName} (${b.relationship})'
+                                    : '...',
+                              ),
+                              SizedBox(height: 12.h),
+                              _DetailRow(
+                                icon: Icons.info_outline_rounded,
+                                label: 'Status:',
+                                value: b?.formattedStatus ?? '...',
+                                isStatus: true,
+                              ),
+                              SizedBox(height: 12.h),
+                              _DetailRow(
+                                icon: Icons.payments_outlined,
+                                label: 'Payment:',
+                                value: b?.formattedPaymentStatus ?? '...',
+                                isStatus: true,
+                              ),
+                              SizedBox(height: 32.h),
+
+                              // ── Instructions ──
+                              if ((b?.instructions ?? "").isNotEmpty) ...[
+                                CommonText(
+                                  text: 'Additional Instructions',
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                SizedBox(height: 12.h),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(16.r),
+                                  decoration: BoxDecoration(
+                                    color: colors.boxBg.withAlpha(30),
+                                    borderRadius: BorderRadius.circular(16.r),
+                                  ),
+                                  child: CommonText(
+                                    text: b?.instructions ?? "",
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w400,
+                                    textColor: colors.textPrimary,
+                                    textAlign: TextAlign.start,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -217,6 +251,19 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          if ((b?.status ?? "").toUpperCase() ==
+                              'COMPLETED') ...[
+                            CommonButton(
+                              titleText: 'Write a Review',
+                              onTap: c.onReview,
+                              prefix: Icon(Icons.rate_review_outlined,
+                                  color: Colors.white, size: 20.sp),
+                              buttonWidth: double.infinity,
+                              buttonHeight: 56.h,
+                              buttonRadius: 16.r,
+                            ),
+                            SizedBox(height: 12.h),
+                          ],
                           if ((b?.status ?? "").toUpperCase() == 'PENDING') ...[
                             CommonButton(
                               titleText: 'Cancel Booking',
@@ -229,11 +276,13 @@ class ClientBookingDetailsScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 12.h),
                           ],
-                          if ((b?.paymentStatus ?? "").toUpperCase() != 'UNPAID')
+                          if ((b?.paymentStatus ?? "").toUpperCase() !=
+                              'UNPAID')
                             CommonButton(
                               titleText: 'Chat with Caregiver',
                               onTap: c.onChat,
-                              prefix: Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 20.sp),
+                              prefix: Icon(Icons.chat_bubble_outline_rounded,
+                                  color: Colors.white, size: 20.sp),
                               buttonWidth: double.infinity,
                               buttonHeight: 56.h,
                               buttonRadius: 16.r,
@@ -264,7 +313,11 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final bool isStatus;
 
-  const _DetailRow({required this.icon, required this.label, required this.value, this.isStatus = false});
+  const _DetailRow(
+      {required this.icon,
+      required this.label,
+      required this.value,
+      this.isStatus = false});
 
   @override
   Widget build(BuildContext context) {

@@ -17,7 +17,7 @@ class BookingDetailsScreen extends StatelessWidget {
       appBarTitle: 'Booking Details',
       child: Obx(() {
         final b = ctrl.booking.value;
-        
+
         return Skeletonizer(
           enabled: ctrl.isLoading.value,
           child: b == null && !ctrl.isLoading.value
@@ -25,19 +25,28 @@ class BookingDetailsScreen extends StatelessWidget {
               : Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.all(16.r),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClientProfileHeader(booking: b!),
-                            20.height,
-                            ScheduleEarningsCard(booking: b),
-                            20.height,
-                            AdditionalInstructionsCard(
-                              instructions: b.instructions,
-                            ),
-                          ],
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          final bookingId = ctrl.booking.value?.id;
+                          if (bookingId != null && bookingId.isNotEmpty) {
+                            await ctrl.fetchBookingDetails(bookingId);
+                          }
+                        },
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.all(16.r),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClientProfileHeader(booking: b!),
+                              20.height,
+                              ScheduleEarningsCard(booking: b),
+                              20.height,
+                              AdditionalInstructionsCard(
+                                instructions: b.instructions,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

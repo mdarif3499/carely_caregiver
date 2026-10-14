@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 class AppApiEndPoint {
   AppApiEndPoint._privateConstructor();
   static final AppApiEndPoint _instance = AppApiEndPoint._privateConstructor();
@@ -18,6 +19,7 @@ class AppApiEndPoint {
   static const String createCareRecipient = "/care-recipient";
   static const String uploadDocument = "/document/upload";
   static const String getMyDocuments = "/document/me";
+  static const String getMyCaregiverProfile = "/caregiver-profiles/me";
   static const String updateCaregiverProfile = "/caregiver-profiles/me";
   static const String availability = "/availability";
   static const String getMyAvailability = "/availability/me";
@@ -26,15 +28,13 @@ class AppApiEndPoint {
   static const String booking = "/booking";
   static const String myBookings = "/booking/my";
   static const String caregiverBooking = "/booking/caregiver";
+  static const String review = "/review";
   static const String earningsSummary = "/earnings/me/summary";
   static const String earnings = "/earnings/me";
   static const String notifications = "/notification/my";
   static const String conversation = "/conversation";
   static const String message = "/message";
   static const String cms = "/cms";
-
-
-
 
   static String imageUrl(String? path) {
     if (path == null || path.isEmpty) return "";
@@ -45,8 +45,8 @@ class AppApiEndPoint {
 }
 
 String _getDomain() {
-  const String liveServer = "https://rahad5000.naimulhassan.me";
-  const String localServer = "https://rahad5000.naimulhassan.me";
+  const String liveServer = "http://10.10.26.188:5050";
+  const String localServer = "http://10.10.26.188:5050";
   // const String liveServer =  "http://10.10.26.188:5000";
   // const String localServer = "http://10.10.26.188:5000";
   return kDebugMode ? localServer : liveServer;

@@ -22,89 +22,92 @@ class AvailabilityScreen extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Obx(() {
-                    errorLog('availabily ui update${c.rebuild.value}', 'AvailabilityScreen');
-                    return AppCalendar(controller: c);
-                  }),
-                  24.height,
-                  Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CommonText(
-                          text: '${c.selectedDateLabel} Schedule',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          textColor: colors.textPrimary,
-                          isDescription: true,
-                          preventScaling: true,
-                        ),
-                        GestureDetector(
-                          onTap: () => _showAddShiftSheet(context, c),
-                          child: CommonText(
-                            text: '+ Add Shift',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            textColor: colors.primary,
+            child: RefreshIndicator(
+              onRefresh: c.fetchAvailabilityForMonth,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() {
+                      errorLog('availabily ui update${c.rebuild.value}',
+                          'AvailabilityScreen');
+                      return AppCalendar(controller: c);
+                    }),
+                    24.height,
+                    Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CommonText(
+                            text: '${c.selectedDateLabel} Schedule',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            textColor: colors.textPrimary,
                             isDescription: true,
                             preventScaling: true,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  16.height,
-
-                  Obx(() {
-                    if (c.isFetching.value && c.shiftsForSelected.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.only(top: 60),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-
-                    final shifts = c.shiftsForSelected;
-                    if (shifts.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 24),
-                        child: Center(
-                          child: CommonText(
-                            text:
-                                'No shifts for this day.\nTap + Add Shift to schedule.',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            textColor: colors.secondaryText,
-                            isDescription: true,
-                            preventScaling: true,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
-                    }
-                    return Column(
-                      children: shifts
-                          .map(
-                            (s) => ShiftCard(
-                              shift: s,
-                              onDelete: () => _showDeleteConfirmation(context, c, s),
-                              onEdit: () =>
-                                  _showAddShiftSheet(context, c, existing: s),
+                          GestureDetector(
+                            onTap: () => _showAddShiftSheet(context, c),
+                            child: CommonText(
+                              text: '+ Add Shift',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              textColor: colors.primary,
+                              isDescription: true,
+                              preventScaling: true,
                             ),
-                          )
-                          .toList(),
-                    );
-                  }),
-                ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    16.height,
+                    Obx(() {
+                      if (c.isFetching.value && c.shiftsForSelected.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 60),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      final shifts = c.shiftsForSelected;
+                      if (shifts.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: Center(
+                            child: CommonText(
+                              text:
+                                  'No shifts for this day.\nTap + Add Shift to schedule.',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              textColor: colors.secondaryText,
+                              isDescription: true,
+                              preventScaling: true,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      return Column(
+                        children: shifts
+                            .map(
+                              (s) => ShiftCard(
+                                shift: s,
+                                onDelete: () =>
+                                    _showDeleteConfirmation(context, c, s),
+                                onEdit: () =>
+                                    _showAddShiftSheet(context, c, existing: s),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
-
-
           Obx(
             () => Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -134,7 +137,8 @@ class AvailabilityScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, AvailabilityScreenController c, Shift shift) {
+  void _showDeleteConfirmation(
+      BuildContext context, AvailabilityScreenController c, Shift shift) {
     Get.dialog(
       Dialog(
         backgroundColor: Colors.white,
@@ -153,7 +157,8 @@ class AvailabilityScreen extends StatelessWidget {
               ),
               16.height,
               CommonText(
-                text: 'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
+                text:
+                    'Are you sure you want to remove this ${shift.label}? This action cannot be undone.',
                 fontSize: 14,
                 textColor: AppColors.instance.secondaryText,
               ),
@@ -203,8 +208,10 @@ class AvailabilityScreen extends StatelessWidget {
     if (existing != null) {
       final startParts = existing.apiStartTime.split(':');
       final endParts = existing.apiEndTime.split(':');
-      startTime.value = TimeOfDay(hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
-      endTime.value = TimeOfDay(hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
+      startTime.value = TimeOfDay(
+          hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
+      endTime.value = TimeOfDay(
+          hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
     }
 
     showModalBottomSheet(
@@ -293,15 +300,20 @@ class AvailabilityScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CommonText(text: 'Start Time', fontSize: 14, fontWeight: FontWeight.w600),
+                      const CommonText(
+                          text: 'Start Time',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600),
                       8.height,
                       Obx(() => _TimePickerBox(
-                        time: startTime.value,
-                        onTap: () async {
-                          final picked = await showTimePicker(context: context, initialTime: startTime.value);
-                          if (picked != null) startTime.value = picked;
-                        },
-                      )),
+                            time: startTime.value,
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                  context: context,
+                                  initialTime: startTime.value);
+                              if (picked != null) startTime.value = picked;
+                            },
+                          )),
                     ],
                   ),
                 ),
@@ -310,15 +322,19 @@ class AvailabilityScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CommonText(text: 'End Time', fontSize: 14, fontWeight: FontWeight.w600),
+                      const CommonText(
+                          text: 'End Time',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600),
                       8.height,
                       Obx(() => _TimePickerBox(
-                        time: endTime.value,
-                        onTap: () async {
-                          final picked = await showTimePicker(context: context, initialTime: endTime.value);
-                          if (picked != null) endTime.value = picked;
-                        },
-                      )),
+                            time: endTime.value,
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                  context: context, initialTime: endTime.value);
+                              if (picked != null) endTime.value = picked;
+                            },
+                          )),
                     ],
                   ),
                 ),
@@ -336,15 +352,17 @@ class AvailabilityScreen extends StatelessWidget {
                   final end = endTime.value;
 
                   // Robust 24-hour formatting for Backend
-                  final apiStart = '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
-                  final apiEnd = '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
+                  final apiStart =
+                      '${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}';
+                  final apiEnd =
+                      '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
 
                   // Robust AM/PM formatting for UI (ignoring system locale to keep it professional)
                   final dtStart = DateTime(0, 1, 1, start.hour, start.minute);
                   final dtEnd = DateTime(0, 1, 1, end.hour, end.minute);
                   final uiStart = DateFormat('hh:mm a').format(dtStart);
                   final uiEnd = DateFormat('hh:mm a').format(dtEnd);
-                  
+
                   if (existing != null) {
                     c.updateShiftInApi(
                       Shift(
@@ -414,17 +432,20 @@ class _ShiftTypeBtn extends StatelessWidget {
               color: isSelected ? colors.primary : colors.boxBg,
               width: 2,
             ),
-            boxShadow: isSelected ? [
-              BoxShadow(
-                color: colors.primary.withAlpha(40),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ] : null,
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: colors.primary.withAlpha(40),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : null,
           ),
           child: Column(
             children: [
-              Icon(icon, color: isSelected ? Colors.white : colors.textGrey, size: 24),
+              Icon(icon,
+                  color: isSelected ? Colors.white : colors.textGrey, size: 24),
               8.height,
               CommonText(
                 text: label,
@@ -474,7 +495,6 @@ class _TimePickerBox extends StatelessWidget {
     );
   }
 }
-
 
 ///   12:53:35[GETX] GOING TO ROUTE /app-navigation-screen
 ///   [GETX] REMOVING ROUTE /

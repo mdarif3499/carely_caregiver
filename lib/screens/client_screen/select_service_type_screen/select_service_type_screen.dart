@@ -21,44 +21,52 @@ class SelectServiceTypeScreen extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CommonText(
-                    text: 'What type of care is needed?',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  const SizedBox(height: 8),
-                  CommonText(
-                    text: "Choose the service that best matches your loved one's requirements.",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    textColor: colors.secondaryText,
-                    textAlign: TextAlign.start,
-                  ),
-                  const SizedBox(height: 24),
-                  Obx(
-                    () => Column(
-                      children: List.generate(controller.serviceTypes.length, (index) {
-                        final item = controller.serviceTypes[index];
-                        final isSelected = controller.selectedIndex.value == index;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: ServiceTypeCard(
-                            title: item.title,
-                            description: item.description,
-                            icon: item.icon,
-                            isSelected: isSelected,
-                            onTap: () => controller.selectType(index),
-                          ),
-                        );
-                      }),
+            child: RefreshIndicator(
+              onRefresh: controller.fetchCategories,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CommonText(
+                      text: 'What type of care is needed?',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    CommonText(
+                      text:
+                          "Choose the service that best matches your loved one's requirements.",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      textColor: colors.secondaryText,
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 24),
+                    Obx(
+                      () => Column(
+                        children: List.generate(controller.serviceTypes.length,
+                            (index) {
+                          final item = controller.serviceTypes[index];
+                          final isSelected =
+                              controller.selectedIndex.value == index;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: ServiceTypeCard(
+                              title: item.title,
+                              description: item.description,
+                              icon: item.icon,
+                              isSelected: isSelected,
+                              onTap: () => controller.selectType(index),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

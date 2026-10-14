@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' as get_x;
+import '../../screens/auth_all_screens/login_screen/controller/login_screen_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/show_custom_snackbar.dart';
 import '../share_pref_helper/share_pref_helper.dart';
@@ -65,10 +66,13 @@ class AuthInterceptor extends Interceptor {
       // Securely clear all session data
       await SharePrefsHelper.clearData();
       
+      get_x.Get.delete<LoginScreenController>(force: true);
+
       // Wipe navigation stack and go to login
       get_x.Get.offAllNamed(AppRoutes.instance.loginScreen);
     } catch (e) {
       // Fallback navigation if something fails
+      get_x.Get.delete<LoginScreenController>(force: true);
       get_x.Get.offAllNamed(AppRoutes.instance.loginScreen);
     } finally {
       // Reset flag after a sufficient delay

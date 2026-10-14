@@ -33,13 +33,21 @@ class CaregiverModel {
   factory CaregiverModel.fromJson(Map<String, dynamic> json) {
     final userData = json['user'] as Map<String, dynamic>? ?? {};
     final specialties = json['specialties'] as List? ?? [];
-    
+
     return CaregiverModel(
       id: userData['_id'] ?? json['_id'] ?? '',
       name: userData['name'] ?? 'Unknown',
       role: 'Caregiver',
-      specialty: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['name'] ?? 'General Care') : specialties.join(', ')) : 'General Care',
-      serviceCategoryId: specialties.isNotEmpty ? (specialties.first is Map ? (specialties.first['_id'] ?? specialties.first['id'] ?? '') : '') : '',
+      specialty: specialties.isNotEmpty
+          ? (specialties.first is Map
+              ? (specialties.first['name'] ?? 'General Care')
+              : specialties.join(', '))
+          : 'General Care',
+      serviceCategoryId: specialties.isNotEmpty
+          ? (specialties.first is Map
+              ? (specialties.first['_id'] ?? specialties.first['id'] ?? '')
+              : '')
+          : '',
       description: json['bio'] ?? '',
       rating: (json['averageRating'] ?? 0.0).toDouble(),
       hourlyRate: (json['hourlyRate'] ?? 0.0).toDouble(),
@@ -95,7 +103,7 @@ class FindCaregiverController extends GetxController {
   void onInit() {
     super.onInit();
     searchController = TextEditingController();
-    
+
     // Handle incoming arguments for pre-filtering
     final args = Get.arguments;
     if (args is Map) {
@@ -120,6 +128,10 @@ class FindCaregiverController extends GetxController {
     await fetchCaregivers();
   }
 
+  Future<void> onRefresh() async {
+    await Future.wait([fetchCategories(), fetchCaregivers()]);
+  }
+
   Future<void> fetchCategories() async {
     try {
       final response = await CaregiverRepository.instance.getCategories();
@@ -134,7 +146,9 @@ class FindCaregiverController extends GetxController {
 
   @override
   void onClose() {
-    searchController.dispose();
+    try {
+      searchController.dispose();
+    } catch (_) {}
     super.onClose();
   }
 
@@ -144,25 +158,25 @@ class FindCaregiverController extends GetxController {
     fetchCaregivers();
   }
 
+  ///  BookCaregiverController
 
-///  BookCaregiverController
-
-
-
-  List<String> get filterCategoryNames => ['All', ...categories.map((e) => e.name)];
+  List<String> get filterCategoryNames =>
+      ['All', ...categories.map((e) => e.name)];
 
   Future<void> fetchCaregivers() async {
     try {
       isLoading.value = true;
       update();
 
-      final specialty = selectedFilterId.value == 'All' ? null : selectedFilterId.value;
-      final skills = filterState.value.selectedSkills.isNotEmpty 
-          ? filterState.value.selectedSkills.join(', ') 
+      final specialty =
+          selectedFilterId.value == 'All' ? null : selectedFilterId.value;
+      final skills = filterState.value.selectedSkills.isNotEmpty
+          ? filterState.value.selectedSkills.join(', ')
           : null;
       final language = filterState.value.selectedLanguage;
 
-      debugPrint("Fetching Caregivers: search=${searchQuery.value}, specialty=$specialty, skills=$skills, lang=$language");
+      debugPrint(
+          "Fetching Caregivers: search=${searchQuery.value}, specialty=$specialty, skills=$skills, lang=$language");
 
       final response = await ClientRepository.instance.getCaregiverProfiles(
         searchTerm: searchQuery.value,
@@ -177,7 +191,8 @@ class FindCaregiverController extends GetxController {
 
       if (response.isSuccess) {
         final List data = response.data['data'] ?? [];
-        caregivers.value = data.map((json) => CaregiverModel.fromJson(json)).toList();
+        caregivers.value =
+            data.map((json) => CaregiverModel.fromJson(json)).toList();
       } else {
         caregivers.clear();
       }
@@ -190,12 +205,8 @@ class FindCaregiverController extends GetxController {
     }
   }
 
-   ///   🌐 N 📡
+  ///   🌐 N 📡
   ///
-
-
-
-
 
   List<CaregiverModel> get filteredCaregivers => caregivers;
 }

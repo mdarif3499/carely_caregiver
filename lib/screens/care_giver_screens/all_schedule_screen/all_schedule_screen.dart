@@ -19,27 +19,34 @@ class AllScheduleScreen extends StatelessWidget {
       appBarTitle: "Today's Schedule",
       child: Obx(() {
         final schedules = c.schedules;
-        
+
         return Skeletonizer(
           enabled: c.isLoading.value,
           child: schedules.isEmpty && !c.isLoading.value
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              ? RefreshIndicator(
+                  onRefresh: c.fetchSchedules,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 64.sp, color: Colors.grey.shade300),
-                      SizedBox(height: 16.h),
-                      CommonText(
-                        text: 'No bookings for today',
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        textColor: Colors.grey,
-                      ),
-                      SizedBox(height: 8.h),
-                      CommonText(
-                        text: todayLabel,
-                        fontSize: 14.sp,
-                        textColor: Colors.grey.shade400,
+                      SizedBox(height: 120.h),
+                      Column(
+                        children: [
+                          Icon(Icons.calendar_today_outlined,
+                              size: 64.sp, color: Colors.grey.shade300),
+                          SizedBox(height: 16.h),
+                          CommonText(
+                            text: 'No bookings for today',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            textColor: Colors.grey,
+                          ),
+                          SizedBox(height: 8.h),
+                          CommonText(
+                            text: todayLabel,
+                            fontSize: 14.sp,
+                            textColor: Colors.grey.shade400,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -60,7 +67,9 @@ class AllScheduleScreen extends StatelessWidget {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.w, vertical: 8.h),
                           itemCount: schedules.length,
                           itemBuilder: (context, index) {
                             final item = schedules[index];

@@ -2,6 +2,7 @@ import 'package:carely_caregiver/constant/app_colors.dart';
 import 'package:carely_caregiver/screens/profile_screens/personal_information_screen/controller/personal_info_controller.dart';
 import 'package:carely_caregiver/screens/profile_screens/personal_information_screen/widgets/personal_info_widgets.dart';
 import 'package:carely_caregiver/widgets/default_background_template.dart';
+import 'package:carely_caregiver/widgets/app_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
                       // ── Name Field ──
                       CommonText(text: 'Full Name', fontSize: 16.sp, fontWeight: FontWeight.w500, textColor: colors.textPrimary),
                       SizedBox(height: 12.h),
-                      CommonTextField(
+                      AppTextField(
                         controller: controller.nameController,
                         hintText: 'Enter your name',
                         backgroundColor: colors.textFiledBg,
@@ -51,7 +52,7 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
                       // ── Email Field ──
                       CommonText(text: 'Email Address', fontSize: 16.sp, fontWeight: FontWeight.w500, textColor: colors.textPrimary),
                       SizedBox(height: 12.h),
-                      CommonTextField(
+                      AppTextField(
                         controller: controller.emailController,
                         isReadOnly: true,
                         hintText: 'Enter your email',
@@ -77,7 +78,7 @@ class PersonalInfoScreen extends GetView<PersonalInfoController> {
                           ),
                           SizedBox(width: 12.w),
                           Expanded(
-                            child: CommonTextField(
+                            child: AppTextField(
                               controller: controller.phoneController,
                               hintText: 'Enter phone number',
                               backgroundColor: colors.textFiledBg,

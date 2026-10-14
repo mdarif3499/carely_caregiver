@@ -4,18 +4,32 @@ import 'package:carely_caregiver/widgets/default_background_template.dart';
 import 'package:carely_caregiver/widgets/skill_chip.dart';
 import 'package:carely_caregiver/widgets/text/primary_text.dart';
 import 'package:carely_caregiver/widgets/app_multiline_text_field.dart';
+import 'package:carely_caregiver/widgets/app_text_field.dart';
 import 'package:core_kit/core_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class EditProfessionalProfileScreen extends StatelessWidget {
+class EditProfessionalProfileScreen extends StatefulWidget {
   const EditProfessionalProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<EditProfessionalProfileController>();
+  State<EditProfessionalProfileScreen> createState() =>
+      _EditProfessionalProfileScreenState();
+}
 
+class _EditProfessionalProfileScreenState
+    extends State<EditProfessionalProfileScreen> {
+  late final EditProfessionalProfileController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<EditProfessionalProfileController>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return DefaultBackgroundTemplate(
       appBarTitle: 'Professional Profile',
       child: Obx(() {
@@ -25,7 +39,8 @@ class EditProfessionalProfileScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -45,7 +60,7 @@ class EditProfessionalProfileScreen extends StatelessWidget {
                       SizedBox(height: 28.h),
                       _buildSectionTitle('Skills'),
                       SizedBox(height: 14.h),
-                      _buildSkillsGrid(controller),
+                      _buildSkillsGrid(context, controller),
                       SizedBox(height: 28.h),
                       Row(
                         children: [
@@ -55,12 +70,13 @@ class EditProfessionalProfileScreen extends StatelessWidget {
                               children: [
                                 _buildSectionTitle('Hourly Rate (\$)'),
                                 SizedBox(height: 14.h),
-                                CommonTextField(
+                                AppTextField(
                                   controller: controller.hourlyRateController,
                                   validationType: ValidationType.validateNumber,
                                   hintText: 'e.g. 25',
                                   borderRadius: 16.r,
-                                  backgroundColor: AppColors.instance.textFiledBg,
+                                  backgroundColor:
+                                      AppColors.instance.textFiledBg,
                                 ),
                               ],
                             ),
@@ -81,7 +97,7 @@ class EditProfessionalProfileScreen extends StatelessWidget {
                       SizedBox(height: 28.h),
                       _buildSectionTitle('Location'),
                       SizedBox(height: 14.h),
-                      CommonTextField(
+                      AppTextField(
                         controller: controller.cityController,
                         validationType: ValidationType.notRequired,
                         hintText: 'City',
@@ -92,7 +108,7 @@ class EditProfessionalProfileScreen extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: CommonTextField(
+                            child: AppTextField(
                               controller: controller.stateController,
                               validationType: ValidationType.notRequired,
                               hintText: 'State',
@@ -102,7 +118,7 @@ class EditProfessionalProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(width: 12.w),
                           Expanded(
-                            child: CommonTextField(
+                            child: AppTextField(
                               controller: controller.countryController,
                               validationType: ValidationType.notRequired,
                               hintText: 'Country',
@@ -150,34 +166,108 @@ class EditProfessionalProfileScreen extends StatelessWidget {
       () => Wrap(
         spacing: 10,
         runSpacing: 10,
-        children: controller.categories.map(
-          (category) => SkillChip(
-            label: category.name,
-            isSelected: controller.selectedSpecialties.contains(category.id),
-            onTap: () => controller.toggleSpecialty(category.id),
-          ),
-        ).toList(),
+        children: controller.categories
+            .map(
+              (category) => SkillChip(
+                label: category.name,
+                isSelected: controller.isSpecialtySelected(category),
+                onTap: () => controller.toggleSpecialty(category),
+              ),
+            )
+            .toList(),
       ),
     );
   }
 
-  Widget _buildSkillsGrid(EditProfessionalProfileController controller) {
+  Widget _buildSkillsGrid(
+      BuildContext context, EditProfessionalProfileController controller) {
     return Obx(
       () => Wrap(
         spacing: 10,
         runSpacing: 10,
-        children: controller.allSkills.map(
-          (skill) => SkillChip(
-            label: skill,
-            isSelected: controller.selectedSkills.contains(skill),
-            onTap: () => controller.toggleSkill(skill),
+        children: [
+          ...controller.allSkills.map(
+            (skill) => SkillChip(
+              label: skill,
+              isSelected: controller.isSkillSelected(skill),
+              onTap: () => controller.toggleSkill(skill),
+            ),
           ),
-        ).toList(),
+          GestureDetector(
+            onTap: () => _showAddSkillDialog(context, controller),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppColors.instance.primary.withAlpha(30),
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(
+                  color: AppColors.instance.primary,
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_rounded,
+                      size: 18.sp, color: AppColors.instance.primary),
+                  SizedBox(width: 4.w),
+                  CommonText(
+                    text: 'Add Skill',
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    textColor: AppColors.instance.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildExperienceDropdown(EditProfessionalProfileController controller) {
+  void _showAddSkillDialog(
+      BuildContext context, EditProfessionalProfileController controller) {
+    final textController = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: const AppPrimaryText(
+            text: 'Add Skill', fontSize: 18, fontWeight: FontWeight.w600),
+        content: AppTextField(
+          controller: textController,
+          hintText: 'e.g. CPR Certified',
+          validationType: ValidationType.notRequired,
+          borderRadius: 12.r,
+          backgroundColor: AppColors.instance.textFiledBg,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (textController.text.trim().isNotEmpty) {
+                controller.addCustomSkill(textController.text.trim());
+                Get.back();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.instance.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r)),
+            ),
+            child: const Text('Add', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExperienceDropdown(
+      EditProfessionalProfileController controller) {
     return CommonDropDown<String>(
       hint: 'Experience',
       enableInitalSelection: controller.selectedExperience.value != null,
