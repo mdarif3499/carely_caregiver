@@ -80,13 +80,16 @@ class CareGiverDetailsController extends GetxController {
     _setPlaceholder();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final argument = Get.arguments;
+      final reviewsOnly = argument is Map && argument['reviewsOnly'] == true;
       caregiverId = argument is Map
           ? argument['caregiverId']?.toString() ?? ''
           : argument is String
               ? argument
               : '';
       if (caregiverId.isNotEmpty) {
-        fetchCaregiverProfile(caregiverId);
+        if (!reviewsOnly) {
+          fetchCaregiverProfile(caregiverId);
+        }
       } else {
         showCustomSnackbar(message: "Invalid caregiver ID", isError: true);
       }

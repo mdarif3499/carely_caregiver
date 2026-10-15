@@ -135,15 +135,52 @@ class _EditProfessionalProfileScreenState
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
-                child: CommonButton(
-                  isLoading: controller.isSubmitting.value,
-                  titleText: 'Save Changes',
-                  onTap: () {
-                    controller.updateProfile();
-                  },
-                  buttonWidth: double.infinity,
-                  buttonHeight: 54.h,
-                  buttonRadius: 16.r,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54.h,
+                  child: ElevatedButton(
+                    onPressed: controller.isSubmitting.value
+                        ? null
+                        : controller.updateProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.instance.primary,
+                      foregroundColor: AppColors.instance.white,
+                      disabledBackgroundColor: AppColors.instance.primary,
+                      disabledForegroundColor: AppColors.instance.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                    ),
+                    child: controller.isSubmitting.value
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 18.w,
+                                height: 18.w,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.instance.white,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10.w),
+                              CommonText(
+                                text: 'Saving...',
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                textColor: AppColors.instance.white,
+                              ),
+                            ],
+                          )
+                        : CommonText(
+                            text: 'Save Changes',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            textColor: AppColors.instance.white,
+                          ),
+                  ),
                 ),
               ),
             ],

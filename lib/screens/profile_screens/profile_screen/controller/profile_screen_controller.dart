@@ -80,6 +80,7 @@ class ProfileScreenController extends GetxController {
       arguments: {
         'caregiverId': id,
         'caregiverName': userModel.value?.name ?? 'Caregiver',
+        'reviewsOnly': true,
       },
     );
   }
